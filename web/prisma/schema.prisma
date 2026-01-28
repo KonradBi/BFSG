@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ScanStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum FindingSeverity {
+  P0
+  P1
+  P2
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  sessions    Session[]
+  accounts    Account[]
+}
+
+model Org {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  sites       Site[]
+
+  stripeCustomerId String?
+  stripeSubId      String?
+  stripePriceId    String?
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  role      OrgRole  @default(MEMBER)
+  createdAt DateTime @default(now())
+
+  userId String
+  orgId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Org  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+}
+
+model Site {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org   Org   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  scans Scan[]
+
+  @@index([orgId])
+}
+
+model Scan {
+  id        String     @id @default(cuid())
+  siteId    String
+  status    ScanStatus @default(QUEUED)
+  startedAt DateTime?
+  finishedAt DateTime?
+  error     String?
+
+  toolVersions Json?
+  summary      Json?
+
+  createdAt DateTime @default(now())
+
+  site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  findings Finding[]
+
+  @@index([siteId])
+}
+
+model Finding {
+  id        String          @id @default(cuid())
+  scanId    String
+  severity  FindingSeverity
+  ruleId    String
+  title     String
+  description String
+  helpUrl   String?
+  selector  String?
+  snippet   String?
+  screenshotUrl String?
+
+  createdAt DateTime @default(now())
+
+  scan Scan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId])
+  @@index([severity])
+}
+
+// Auth.js (NextAuth) Prisma models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
