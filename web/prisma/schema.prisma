@@ -89,6 +89,11 @@ model Scan {
   finishedAt DateTime?
   error     String?
 
+  // Paywall / access
+  isPaid   Boolean  @default(false)
+  paidAt   DateTime?
+  tier     String?  // mini|standard|plus
+
   toolVersions Json?
   summary      Json?
 
@@ -98,6 +103,7 @@ model Scan {
   findings Finding[]
 
   @@index([siteId])
+  @@index([isPaid])
 }
 
 model Finding {
