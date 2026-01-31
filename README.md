@@ -21,3 +21,5 @@ npm run dev
 
 ## Notes
 - No legal advice. We map automated checks to technical standards and provide remediation guidance.
+
+# Deploy trigger 2026-01-31T18:30:19Z
