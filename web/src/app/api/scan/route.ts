@@ -245,11 +245,16 @@ export async function POST(req: Request) {
     });
   }
 
-  const browser = await chromium.launch();
-  const context = await browser.newContext({ bypassCSP: true });
-  const page = await context.newPage();
+  let browser: any = null;
+  let context: any = null;
+  let page: any = null;
 
   try {
+    browser = await chromium.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    context = await browser.newContext({ bypassCSP: true });
+    page = await context.newPage();
     await page.goto(safeUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
 
     // Inject axe-core (browser build).
@@ -355,10 +360,12 @@ export async function POST(req: Request) {
       },
     });
   } catch (e: any) {
+    // Surface meaningful errors to the client (and Vercel logs) instead of an empty 500.
+    console.error("/api/scan failed", e);
     return NextResponse.json({ error: "scan_failed", details: String(e?.message || e) }, { status: 500 });
   } finally {
-    await page.close().catch(() => {});
-    await context.close().catch(() => {});
-    await browser.close().catch(() => {});
+    await page?.close?.().catch(() => {});
+    await context?.close?.().catch(() => {});
+    await browser?.close?.().catch(() => {});
   }
 }
