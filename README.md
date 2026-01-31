@@ -5,15 +5,19 @@ AI-gestützter WCAG-Scanner für SMBs & Agenturen in Deutschland: Issues finden 
 ## Workspace
 - `web/` Next.js App Router (UI + API routes)
 
-## Start (local)
+## Setup / Start (local)
+See the detailed setup guide in `web/README.md`.
+
+Quickstart:
 ```bash
 cd web
-npm i
+npm install
+docker compose up -d
+cp .env.example .env.local
+npx prisma generate
+npx prisma migrate dev
 npm run dev
 ```
-
-## Setup (Env)
-Copy `web/.env.example` → `web/.env.local`.
 
 ## Notes
 - No legal advice. We map automated checks to technical standards and provide remediation guidance.

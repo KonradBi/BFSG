@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../../../convex/_generated/api";
 
 export const runtime = "nodejs";
 
@@ -9,7 +13,36 @@ function getStripe() {
   return new Stripe(key, { apiVersion: "2025-12-15.clover" });
 }
 
+function getConvexClient() {
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+  if (!url) return null;
+  return new ConvexHttpClient(url);
+}
+
 export async function POST(req: Request) {
+  // TEST BYPASS: allow marking scan as paid without Stripe signature.
+  // Enabled only when explicitly requested.
+  if (process.env.PLAYWRIGHT_TEST === "1" && req.headers.get("x-test-bypass-signature") === "1") {
+    const convex = getConvexClient();
+    if (!convex) return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
+
+    const body = (await req.json()) as { scanId?: string; tier?: string };
+    if (!body.scanId) return NextResponse.json({ error: "missing_scanId" }, { status: 400 });
+
+    await convex.mutation(api.scans.markPaid, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: body.scanId as any,
+      tier: body.tier ?? undefined,
+    });
+
+    await convex.mutation((api as any).scanJobs.enqueue, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: body.scanId as any,
+    });
+
+    return NextResponse.json({ received: true, bypass: true });
+  }
+
   const stripe = getStripe();
   if (!stripe) return NextResponse.json({ error: "stripe_not_configured" }, { status: 500 });
 
@@ -28,11 +61,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_signature", details: String(err?.message || err) }, { status: 400 });
   }
 
-  // TODO (B/C): persist scan results in DB, then mark Scan.isPaid=true on checkout.session.completed
+  // Mark scan as paid (idempotent)
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    // session.metadata?.scanId
-    // session.metadata?.tier
+    const scanId = session.metadata?.scanId;
+    const tier = session.metadata?.tier;
+
+    const convex = getConvexClient();
+    if (!convex) {
+      return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
+    }
+
+    if (scanId) {
+      await convex.mutation(api.scans.markPaid, {
+        // Convex document IDs are strings at runtime.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scanId: scanId as any,
+        tier: tier ?? undefined,
+      });
+
+      // enqueue worker job (idempotent)
+      await convex.mutation((api as any).scanJobs.enqueue, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scanId: scanId as any,
+      });
+    }
   }
 
   return NextResponse.json({ received: true });
