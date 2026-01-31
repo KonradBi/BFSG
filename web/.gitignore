@@ -45,3 +45,4 @@ DEPLOYMENT_VERCEL_VALUES.local.md
 next-env.d.ts
 
 /src/generated/prisma
+.env*.local
