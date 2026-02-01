@@ -33,18 +33,18 @@ export default function Home() {
   // Default = "neutral".
   const copy: CopyVariant = {
     // NEUTRAL
-    heroBadge: "BFSG 2025: In 2 Minuten wissen, wo du angreifbar bist (technischer Check – keine Rechtsberatung)",
-    heroH1: "BFSG‑WebCheck: In Minuten Klarheit, ob deine Website Abmahn‑Risiken hat",
+    heroBadge: "BFSG 2025: In 2 Minuten wissen, wo Sie angreifbar sind (technischer Check – keine Rechtsberatung)",
+    heroH1: "BFSG‑WebCheck: In Minuten Klarheit, ob Ihre Website Abmahn‑Risiken hat",
     heroSubhead:
-      "Kostenloser Kurz‑Check + optionaler Vollreport: Wir finden die wichtigsten Barrierefreiheits‑Probleme (WCAG/BITV/EN 301 549) und zeigen dir konkret, was du als Nächstes fixen solltest.",
+      "Kostenloser Kurz‑Check + optionaler Vollreport: Wir finden die wichtigsten Barrierefreiheits‑Probleme (WCAG/BITV/EN 301 549) und zeigen Ihnen konkret, was Sie als Nächstes beheben sollten.",
 
     painHeadline: "Warum jetzt? Weil " + "\"wird schon passen\"" + " teuer werden kann.",
     painSubhead:
       "Viele Websites sind nicht absichtlich " + "\"nicht barrierefrei\"" + ", aber kleine Fehler reichen schon: fehlende Labels, schlechte Kontraste, kaputte Tastaturbedienung. Genau das wird bei Beschwerden sichtbar.",
     painBullets: [
-      "Schnell wissen, ob du ein Risiko hast – bevor jemand anderes es meldet.",
+      "Schnell wissen, ob Sie ein Risiko haben – bevor jemand anderes es meldet.",
       "Konkrete, priorisierte To‑Dos (P0/P1/P2) statt vager Empfehlungen.",
-      "Spart Zeit mit Agentur/Dev: du bekommst direkt umsetzbare Hinweise.",
+      "Spart Zeit mit Agentur/Dev: Sie erhalten direkt umsetzbare Hinweise.",
     ],
 
     primaryCta: "Jetzt Kurz‑Check starten",
@@ -93,7 +93,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/scans" className="text-sm font-medium hover:text-blue-400 transition-colors">
-              Dashboard
+Übersicht
             </Link>
 
             <AuthNav />

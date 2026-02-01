@@ -342,7 +342,7 @@ function ScanContent() {
   }, [estimatedPages, record?.url, teaser?.url, url]);
 
   const selectedTier = tiers.find((t) => t.id === tier) ?? tiers[0];
-  const priceText = (selectedTier.label.split(" ")[0] || "€29").trim();
+  const priceText = `€${selectedTier.price}`;
   const compareAtText = `€${selectedTier.compareAt}`;
   const savings = Math.max(0, selectedTier.compareAt - selectedTier.price);
 
@@ -355,7 +355,7 @@ function ScanContent() {
     }
 
     if (!authorizedToScan) {
-      alert("Bitte bestätige, dass du berechtigt bist, diese Website zu scannen.");
+      alert("Bitte bestätigen Sie, dass Sie berechtigt sind, diese Website zu scannen.");
       return;
     }
 
@@ -507,7 +507,7 @@ function ScanContent() {
       <div className="mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">Teaser-Scan</h1>
         <p className="text-muted-foreground text-lg">
-          Sofortige Analyse deiner Website auf Barrierefreiheit.
+          Sofortige Analyse Ihrer Website auf Barrierefreiheit.
         </p>
       </div>
 
@@ -518,7 +518,7 @@ function ScanContent() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="flex-1 bg-white border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 placeholder-slate-400"
-            placeholder="https://deine-website.de"
+            placeholder="https://ihre-website.de"
           />
           <button
             onClick={() => runScan()}
@@ -794,7 +794,7 @@ function ScanContent() {
                     {/* CTA */}
                     <div className="mt-6">
                       <div className="mb-3 text-center text-sm font-semibold text-slate-700">
-                        Kleine Barrierefreiheits-Fehler reichen oft schon, um auffällig zu werden – hol dir jetzt Klarheit.
+                        Kleine Barrierefreiheits-Fehler reichen oft schon, um auffällig zu werden – holen Sie sich jetzt Klarheit.
                       </div>
 
                       <button
