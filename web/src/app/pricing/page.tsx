@@ -26,14 +26,24 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-32 pb-20 px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">A</div>
             <span className="font-bold tracking-tight text-lg text-slate-900">Shield</span>
           </Link>
-          <Link href="/" className="text-sm font-medium text-slate-600 hover:text-blue-600 Transition flex items-center gap-2">
+          {/* Mobile: icon only */}
+          <Link
+            href="/"
+            aria-label="Zur Startseite"
+            className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </Link>
+
+          {/* Desktop */}
+          <Link href="/" className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             Zurück
           </Link>
@@ -41,18 +51,18 @@ export default function PricingPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20 animate-fade-in">
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-slate-900">Einfaches Pricing.</h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Kostenloser Teaser-Scan → Sie sehen sofort, ob sich ein Audit lohnt. Den vollständigen Bericht schalten Sie einmalig frei.
+        <div className="text-center mb-12 md:mb-20 animate-fade-in">
+          <h1 className="text-4xl md:text-7xl font-black mb-4 md:mb-6 text-slate-900 tracking-tight">Einfaches Pricing.</h1>
+          <p className="text-base md:text-xl text-slate-600 max-w-2xl mx-auto">
+            Kostenloser Teaser‑Scan → Sie sehen sofort, ob sich ein Audit lohnt. Den vollständigen Bericht schalten Sie einmalig frei.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
           {tiers.map((t, idx) => (
             <div 
               key={t.id} 
-              className={`p-8 rounded-[2.5rem] border ${t.popular ? 'border-blue-200 bg-blue-50/50 shadow-xl shadow-blue-500/10' : 'border-slate-100 bg-white shadow-lg'} flex flex-col relative animate-fade-in transition-all hover:-translate-y-2`}
+              className={`p-6 md:p-8 rounded-[2.5rem] border ${t.popular ? 'border-blue-200 bg-blue-50/50 shadow-xl shadow-blue-500/10' : 'border-slate-100 bg-white shadow-lg'} flex flex-col relative animate-fade-in transition-all md:hover:-translate-y-2`}
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               {t.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-500/30">Empfohlen</div>}
