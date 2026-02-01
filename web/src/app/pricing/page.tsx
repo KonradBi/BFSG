@@ -26,7 +26,7 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6 overflow-x-hidden">
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export default function PricingPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12 md:mb-20 animate-fade-in">
           <h1 className="text-4xl md:text-7xl font-black mb-4 md:mb-6 text-slate-900 tracking-tight">Einfaches Pricing.</h1>
           <p className="text-base md:text-xl text-slate-600 max-w-2xl mx-auto">
