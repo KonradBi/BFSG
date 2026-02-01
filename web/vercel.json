@@ -5,8 +5,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "env": {
-    "PLAYWRIGHT_BROWSERS_PATH": "0"
-  }
+  ]
 }

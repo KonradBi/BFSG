@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { NextResponse } from "next/server";
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
+import chromiumLambda from "@sparticuz/chromium";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -250,8 +251,12 @@ export async function POST(req: Request) {
   let page: any = null;
 
   try {
+    // Serverless-compatible Chromium (Vercel/AWS Lambda style)
+    const executablePath = await chromiumLambda.executablePath();
     browser = await chromium.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath,
+      args: chromiumLambda.args,
+      headless: chromiumLambda.headless,
     });
     context = await browser.newContext({ bypassCSP: true });
     page = await context.newPage();
