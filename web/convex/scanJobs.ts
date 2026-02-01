@@ -72,12 +72,25 @@ export const claimNext = mutation({
       });
     }
 
-    // Find the next queued job.
-    const job = await ctx.db
+    // Find the next queued job. If there are very old queued jobs (e.g. from dev/testing),
+    // mark them FAILED so they don't block the queue forever.
+    const STALE_JOB_MS = 24 * 60 * 60_000;
+
+    let job = await ctx.db
       .query("scanJobs")
       .withIndex("by_status_nextRunAt", (q) => q.eq("status", "QUEUED").lte("nextRunAt", t))
       .order("asc")
       .first();
+
+    // Clean up a few stale jobs per call.
+    for (let i = 0; job && i < 5 && t - job.createdAt > STALE_JOB_MS; i++) {
+      await ctx.db.patch(job._id, { status: "FAILED", updatedAt: t });
+      job = await ctx.db
+        .query("scanJobs")
+        .withIndex("by_status_nextRunAt", (q) => q.eq("status", "QUEUED").lte("nextRunAt", t))
+        .order("asc")
+        .first();
+    }
 
     if (!job) return null;
 
