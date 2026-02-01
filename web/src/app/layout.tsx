@@ -14,9 +14,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bfsg.vercel.app"),
   title: "BFSG-WebCheck | Barrierefreiheits-Checks & Audit-Reports",
   description:
     "Technische Barrierefreiheits-Checks (WCAG/BITV/EN 301 549) mit klaren Befunden und Fix-Schritten. Kein Rechtsrat.",
+  openGraph: {
+    type: "website",
+    title: "BFSG-WebCheck",
+    description:
+      "Technische Barrierefreiheits-Checks (WCAG/BITV/EN 301 549) mit klaren Befunden und Fix-Schritten.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "BFSG-WebCheck",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BFSG-WebCheck",
+    description:
+      "Technische Barrierefreiheits-Checks (WCAG/BITV/EN 301 549) mit klaren Befunden und Fix-Schritten.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({

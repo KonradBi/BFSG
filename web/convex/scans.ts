@@ -25,6 +25,7 @@ export const create = mutation({
       url: args.url,
       accessToken: args.accessToken,
       authorizedToScan: args.authorizedToScan,
+      userId: undefined,
       previousScanId: args.previousScanId,
       status: "SUCCEEDED",
       isPaid: false,
@@ -35,6 +36,29 @@ export const create = mutation({
       updatedAt: now,
     });
     return { scanId: id };
+  },
+});
+
+export const createQueued = mutation({
+  args: {
+    url: v.string(),
+    accessToken: v.string(),
+    authorizedToScan: v.boolean(),
+    userId: v.optional(v.string()),
+  },
+  handler: async (ctx, { url, accessToken, authorizedToScan, userId }) => {
+    const now = Date.now();
+    const scanId = await ctx.db.insert("scans", {
+      url,
+      accessToken,
+      authorizedToScan,
+      userId,
+      status: "QUEUED",
+      isPaid: false,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return { scanId };
   },
 });
 

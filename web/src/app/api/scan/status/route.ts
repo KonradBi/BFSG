@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { ConvexHttpClient } from "convex/browser";
 import { chromium } from "playwright-core";
 import chromiumLambda from "@sparticuz/chromium";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import crypto from "node:crypto";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 
 export const runtime = "nodejs";
 
@@ -20,42 +17,6 @@ function getConvexClient() {
 }
 
 type Severity = "P0" | "P1" | "P2";
-
-type RateKey = string;
-const RATE_BUCKET: Map<RateKey, { resetAt: number; count: number }> =
-  // eslint-disable-next-line no-var
-  (globalThis as any).__als_rate_bucket || new Map();
-// eslint-disable-next-line no-var
-(globalThis as any).__als_rate_bucket = RATE_BUCKET;
-
-function getClientIp(req: Request) {
-  // Basic best-effort IP extraction (works behind common proxies).
-  const fwd = req.headers.get("x-forwarded-for") || "";
-  const first = fwd.split(",")[0]?.trim();
-  return first || req.headers.get("x-real-ip") || "unknown";
-}
-
-function rateLimitOrNull(req: Request) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-
-  const windowMs = Number(process.env.SCAN_RATE_LIMIT_WINDOW_MS || 60_000);
-  const max = Number(process.env.SCAN_RATE_LIMIT_MAX || 10);
-
-  const key = `scan:${ip}`;
-  const cur = RATE_BUCKET.get(key);
-  if (!cur || cur.resetAt <= now) {
-    RATE_BUCKET.set(key, { resetAt: now + windowMs, count: 1 });
-    return null;
-  }
-  if (cur.count >= max) {
-    const retryAfterSec = Math.max(1, Math.ceil((cur.resetAt - now) / 1000));
-    return { retryAfterSec, ip };
-  }
-  cur.count += 1;
-  RATE_BUCKET.set(key, cur);
-  return null;
-}
 
 function severityFromImpact(impact?: string | null): Severity {
   if (!impact) return "P2";
@@ -110,7 +71,6 @@ function deFailureSummary(s?: string | null) {
 }
 
 function fixStepsForRule(ruleId: string): string[] {
-  // Short, implementation-first guidance. (No legal advice.)
   switch (ruleId) {
     case "color-contrast":
       return [
@@ -131,20 +91,6 @@ function fixStepsForRule(ruleId: string): string[] {
         "Dekorative Bilder: alt=\"\" und role=\"presentation\" (oder via CSS Background).",
         "Keine redundanten Texte (z.B. 'Bild von …').",
       ];
-    case "landmark-one-main":
-      return [
-        "Genau ein <main> Landmark pro Seite (oder role=\"main\").",
-        "Layout prüfen: Header/Nav/Aside/Footer korrekt semantisch strukturieren.",
-        "Re-test: Screenreader-Landmark-Navigation.",
-      ];
-    case "aria-required-attr":
-    case "aria-valid-attr":
-    case "aria-roles":
-      return [
-        "ARIA nur verwenden, wenn nötig; Rollen/Attribute müssen zur Rolle passen.",
-        "Ungültige Attribute entfernen oder auf passende Rolle umstellen.",
-        "Mit Browser DevTools + axe re-testen.",
-      ];
     default:
       return [
         "Element anhand Selector/Snippet lokalisieren.",
@@ -152,10 +98,6 @@ function fixStepsForRule(ruleId: string): string[] {
         "Re-test (automatisch + kurz manuell im Flow).",
       ];
   }
-}
-
-function newAccessToken() {
-  return crypto.randomBytes(24).toString("hex");
 }
 
 async function runAxeScan(safeUrl: string) {
@@ -179,11 +121,8 @@ async function runAxeScan(safeUrl: string) {
     await page.addScriptTag({ content: axeSource });
     await page.waitForTimeout(50);
 
-    const axeType = await page.evaluate(() => typeof (window as any).axe);
-    if (axeType === "undefined") throw new Error("axe_injection_failed");
-
     const results = await page.evaluate(async () => {
-      // @ts-expect-error - axe is injected at runtime
+      // @ts-expect-error - axe injected
       return await window.axe.run(document, { resultTypes: ["violations"] });
     });
 
@@ -193,8 +132,7 @@ async function runAxeScan(safeUrl: string) {
       const impact = v.impact ?? null;
       const severity = severityFromImpact(impact);
       const nodes = Array.isArray(v.nodes) ? v.nodes : [];
-      const nodesLimited = nodes.slice(0, 5);
-      return nodesLimited.map((node: any) => ({
+      return nodes.slice(0, 5).map((node: any) => ({
         severity,
         impact,
         ruleId: v.id,
@@ -216,9 +154,7 @@ async function runAxeScan(safeUrl: string) {
       .sort((a: any, b: any) => {
         const d = sortKey(a.severity) - sortKey(b.severity);
         if (d) return d;
-        const r = String(a.ruleId || "").localeCompare(String(b.ruleId || ""));
-        if (r) return r;
-        return String(a.selector || "").localeCompare(String(b.selector || ""));
+        return String(a.ruleId || "").localeCompare(String(b.ruleId || ""));
       })
       .slice(0, 60);
 
@@ -229,20 +165,11 @@ async function runAxeScan(safeUrl: string) {
       total: findings.length,
     };
 
-    const sample = findings[0] ?? {
-      severity: "P2" as const,
-      title: "Keine automatischen Issues gefunden",
-      description: "",
-      helpUrl: null,
-      selector: null,
-      snippet: null,
-      fixSteps: [],
-    };
-
+    const first = findings[0];
     const sampleFinding = {
-      title: sample.title,
-      severity: sample.severity,
-      hint: sample.helpUrl ? `Fix-Hinweis: ${sample.helpUrl}` : "Fix-Hinweis: Details im Vollreport",
+      title: first?.title ?? "Keine automatischen Issues gefunden",
+      severity: first?.severity ?? ("P2" as const),
+      hint: first?.helpUrl ? `Fix-Hinweis: ${first.helpUrl}` : "Fix-Hinweis: Details im Vollreport",
     };
 
     return { totals, sampleFinding, findings };
@@ -255,7 +182,7 @@ async function runAxeScan(safeUrl: string) {
 
 async function processQueueOnce(convex: ConvexHttpClient) {
   const claimed = await convex.mutation(api.scanJobs.claimNext, { now: Date.now() });
-  if (!claimed) return { ran: false as const };
+  if (!claimed) return;
 
   const { jobId, scanId, scan } = claimed as any;
   const url = String(scan?.url || "");
@@ -266,58 +193,40 @@ async function processQueueOnce(convex: ConvexHttpClient) {
     await convex.mutation((api as any).scansWorker.storeResults, { scanId, totals, sampleFinding, findings });
     await convex.mutation(api.scans.setStatus, { scanId, status: "SUCCEEDED" });
     await convex.mutation(api.scanJobs.complete, { jobId });
-    return { ran: true as const, ok: true as const, scanId };
   } catch (e: any) {
     const msg = String(e?.message || e);
-    console.error("scan job failed", { jobId, scanId, msg });
     await convex.mutation(api.scans.setStatus, { scanId, status: "FAILED", error: msg });
     await convex.mutation(api.scanJobs.fail, { jobId, error: msg });
-    return { ran: true as const, ok: false as const, scanId, error: msg };
   }
 }
 
-export async function POST(req: Request) {
-  const limited = rateLimitOrNull(req);
-  if (limited) {
-    return NextResponse.json(
-      { error: "rate_limited", retryAfterSec: limited.retryAfterSec },
-      { status: 429, headers: { "retry-after": String(limited.retryAfterSec) } }
-    );
-  }
+export async function GET(req: Request) {
+  const u = new URL(req.url);
+  const jobId = u.searchParams.get("jobId") || "";
 
-  const body = (await req.json()) as { url?: string; authorizedToScan?: boolean };
-  const safeUrl = String(body?.url || "").trim();
-  const authorizedToScan = Boolean(body?.authorizedToScan);
-
-  if (!authorizedToScan) {
-    return NextResponse.json({ error: "authorization_required" }, { status: 400 });
-  }
-  if (!safeUrl.startsWith("http")) {
-    return NextResponse.json({ error: "invalid_url" }, { status: 400 });
-  }
+  if (!jobId) return NextResponse.json({ error: "missing_jobId" }, { status: 400 });
 
   const convex = getConvexClient();
   if (!convex) return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
 
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id as string | undefined;
-
-  const accessToken = newAccessToken();
-  const { scanId } = await convex.mutation(api.scans.createQueued, {
-    url: safeUrl,
-    accessToken,
-    authorizedToScan,
-    userId,
-  });
-
-  const { jobId } = await convex.mutation(api.scanJobs.enqueue, { scanId });
-
-  // Best-effort: try to process immediately (or on subsequent status polls).
+  // Each poll attempts to advance the queue.
   await processQueueOnce(convex).catch(() => {});
 
-  return NextResponse.json({
-    jobId,
-    scanId,
-    scanToken: accessToken,
-  });
+  const res = await convex.query((api as any).scanJobs.getStatus, { jobId });
+  if (!res) return NextResponse.json({ error: "job_not_found" }, { status: 404 });
+
+  const { job, scan } = res as any;
+
+  if (job.status === "DONE" && scan) {
+    return NextResponse.json({
+      status: job.status,
+      scanId: scan._id,
+      url: scan.url,
+      totals: scan.totals,
+      sampleFinding: scan.sampleFinding,
+      pdfUrl: `/api/report/pdf?scanId=${encodeURIComponent(String(scan._id))}&token=${encodeURIComponent(String(scan.accessToken || ""))}`,
+    });
+  }
+
+  return NextResponse.json({ status: job.status, scanId: scan?._id, error: scan?.error });
 }
