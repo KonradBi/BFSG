@@ -3,23 +3,23 @@ import Link from "next/link";
 const tiers = [
   {
     id: "mini",
-    name: "Audit TO-GO Mini",
+    name: "Audit Mini",
     price: "€29",
-    bullets: ["1 URL Scan", "Voller Report", "Fix-Hinweise", "PDF Export"],
+    bullets: ["1 URL-Scan", "Vollständiger Bericht", "Konkrete Umsetzungshinweise", "PDF-Export"],
     popular: false,
   },
   {
     id: "standard",
-    name: "Audit TO-GO Standard",
+    name: "Audit Standard",
     price: "€59",
-    bullets: ["1 URL + 5 Templates", "Kritische Pfade", "Snippets & Code", "PDF Export"],
+    bullets: ["1 URL + 5 Templates", "Kritische Nutzerpfade", "Code-Beispiele", "PDF-Export"],
     popular: true,
   },
   {
     id: "plus",
-    name: "Audit TO-GO Plus",
+    name: "Audit Plus",
     price: "€99",
-    bullets: ["Standard + Re-Scan", "Diff Analysis", "Expert Support", "PDF Export"],
+    bullets: ["Standard + erneuter Scan", "Vorher-/Nachher-Vergleich", "Unterstützung bei Fragen", "PDF-Export"],
     popular: false,
   },
 ];
@@ -44,7 +44,7 @@ export default function PricingPage() {
         <div className="text-center mb-20 animate-fade-in">
           <h1 className="text-4xl md:text-7xl font-bold mb-6 text-slate-900">Einfaches Pricing.</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Kostenloser Teaser-Scan → du siehst sofort, ob sich ein Audit lohnt. Den vollständigen Report schaltest du einmalig frei.
+            Kostenloser Teaser-Scan → Sie sehen sofort, ob sich ein Audit lohnt. Den vollständigen Bericht schalten Sie einmalig frei.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function PricingPage() {
               className={`p-8 rounded-[2.5rem] border ${t.popular ? 'border-blue-200 bg-blue-50/50 shadow-xl shadow-blue-500/10' : 'border-slate-100 bg-white shadow-lg'} flex flex-col relative animate-fade-in transition-all hover:-translate-y-2`}
               style={{ animationDelay: `${idx * 100}ms` }}
             >
-              {t.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-500/30">Most Popular</div>}
+              {t.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-500/30">Empfohlen</div>}
               <div className="text-xl font-bold mb-2 text-slate-900">{t.name}</div>
               <div className="flex items-baseline gap-1 mb-8">
                 <span className="text-5xl font-bold text-slate-900">{t.price}</span>
@@ -87,8 +87,8 @@ export default function PricingPage() {
            <div className="space-y-6">
               {[
                 { q: "Gibt es versteckte Gebühren?", a: "Nein. Wir arbeiten mit Einmalzahlungen pro Scan. Kein Abo, keine automatische Verlängerung." },
-                { q: "Erhalte ich eine Rechnung mit MwSt?", a: "Ja, nach der Zahlung über Stripe erhältst du sofort eine ordentliche Rechnung für deine Buchhaltung." },
-                { q: "Was passiert, wenn der Scan fehlschlägt?", a: "Unser Support hilft dir sofort weiter oder wir erstatten den Betrag, falls die Analyse technisch nicht möglich ist." }
+                { q: "Erhalte ich eine Rechnung mit MwSt.?", a: "Ja. Nach der Zahlung über Stripe erhalten Sie sofort eine ordentliche Rechnung für Ihre Buchhaltung." },
+                { q: "Was passiert, wenn der Scan fehlschlägt?", a: "Unser Support hilft Ihnen schnell weiter – oder wir erstatten den Betrag, falls die Analyse technisch nicht möglich ist." }
               ].map(faq => (
                 <div key={faq.q}>
                   <div className="font-bold text-sm mb-1">{faq.q}</div>

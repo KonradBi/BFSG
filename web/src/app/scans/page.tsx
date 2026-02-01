@@ -60,9 +60,9 @@ export default function ScansPage() {
     <main className="min-h-screen bg-background text-foreground hero-gradient pt-24 pb-20 px-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-black text-slate-900">Deine Scans</h1>
+          <h1 className="text-3xl font-black text-slate-900">Ihre Scans</h1>
           <Link href="/scan" className="text-sm font-bold text-blue-700 hover:text-blue-800">
-            + Neuer Scan
++ Neuer Scan
           </Link>
         </div>
 
@@ -88,13 +88,13 @@ export default function ScansPage() {
                   <div className="mt-2 text-xs font-bold text-slate-600">
                     Status: {r.status}
                     {r.progress ? ` · ${r.progress.pagesDone}/${r.progress.pagesTotal}` : ""}
-                    {r.isPaid ? " · paid" : ""}
+                    {r.isPaid ? " · bezahlt" : ""}
                   </div>
                   {r.error && <div className="mt-2 text-xs font-bold text-red-700">Fehler: {r.error}</div>}
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-black text-slate-900">{r.totals?.total ?? "–"}</div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase">Findings</div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
                 </div>
               </div>
             </Link>
@@ -102,7 +102,7 @@ export default function ScansPage() {
         </div>
 
         <div className="mt-10 text-xs text-slate-500">
-          Hinweis: Dieses Dashboard zeigt Scans, die lokal (localStorage) gespeichert sind.
+          Hinweis: Diese Übersicht zeigt Scans, die lokal (localStorage) gespeichert sind.
         </div>
       </div>
     </main>

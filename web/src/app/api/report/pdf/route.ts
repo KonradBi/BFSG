@@ -46,6 +46,48 @@ const DE_RULE_TITLES: Record<string, { title: string; description?: string }> = 
   },
 };
 
+const DE_RULE_PLAIN: Record<string, { what: string; why: string; forWhom: string }> = {
+  "link-name": {
+    what: "Ein Link hat keinen eindeutigen Linktext (oder keinen zugänglichen Namen).",
+    why: "Nutzerinnen und Nutzer wissen nicht, wohin der Link führt – besonders bei Screenreadern oder wenn Links nur als Icon dargestellt sind.",
+    forWhom: "Screenreader, Menschen mit kognitiven Einschränkungen, mobile Nutzung (kleine Icons)",
+  },
+  "color-contrast": {
+    what: "Text oder Bedienelemente heben sich zu wenig vom Hintergrund ab.",
+    why: "Inhalte sind schwer lesbar, besonders bei Sehschwäche oder bei Sonne/Reflexionen auf dem Display.",
+    forWhom: "Menschen mit Sehbehinderung, ältere Nutzerinnen und Nutzer, mobile Nutzung",
+  },
+  "image-alt": {
+    what: "Ein Bild hat keinen passenden Alternativtext.",
+    why: "Screenreader können den Bildinhalt nicht vermitteln. Informationen gehen verloren.",
+    forWhom: "Screenreader, Nutzerinnen und Nutzer mit deaktivierten Bildern",
+  },
+  label: {
+    what: "Ein Formularfeld hat keine klare Beschriftung.",
+    why: "Es ist unklar, was in das Feld gehört. Screenreader lesen oft nur „Eingabefeld“ vor.",
+    forWhom: "Screenreader, Tastatur-Nutzung, kognitive Einschränkungen",
+  },
+  "landmark-one-main": {
+    what: "Die Seite hat keinen (oder mehrere) Hauptbereiche (<main>).",
+    why: "Screenreader-Navigation wird unübersichtlich, weil die Hauptinhalte nicht eindeutig auffindbar sind.",
+    forWhom: "Screenreader und Tastatur-Nutzerinnen und -Nutzer",
+  },
+  region: {
+    what: "Ein Teil der Inhalte liegt außerhalb der typischen Struktur-Bereiche (header/nav/main/footer).",
+    why: "Hilfstechnologien können Inhalte schlechter als „Bereiche“ anspringen – das kostet Zeit.",
+    forWhom: "Screenreader und Tastatur-Nutzerinnen und -Nutzer",
+  },
+  "heading-order": {
+    what: "Überschriften springen in der Hierarchie (z.B. H2 direkt zu H4).",
+    why: "Die Seite wirkt für Screenreader wie ein schlecht gegliederter Text – Navigation und Orientierung werden schwerer.",
+    forWhom: "Screenreader, kognitive Einschränkungen",
+  },
+};
+
+function plainExplain(ruleId: string) {
+  return DE_RULE_PLAIN[ruleId] || null;
+}
+
 function translateFailureSummary(s?: string | null) {
   if (!s) return s;
   return String(s)
@@ -69,7 +111,7 @@ function translateFinding(f: Finding) {
     title: map?.title ?? f.title,
     description: map?.description ?? f.description,
     failureSummary: translateFailureSummary(f.failureSummary),
-    originalFailureSummary: f.failureSummary,
+    originalFailureSummary: null,
   };
 }
 
@@ -101,7 +143,7 @@ function fixStepsForRule(ruleId: string): string[] {
       return [
         "Kontrast messen (Normaltext ≥ 4.5:1, großer Text ≥ 3:1).",
         "Farben/Weight/Size anpassen, Zustände (Hover/Focus/Disabled) prüfen.",
-        "Re-test (automatisch + kurz manuell).",
+        "Nachprüfung (automatisch + kurz manuell)."
       ];
     case "label":
     case "label-title-only":
@@ -120,13 +162,13 @@ function fixStepsForRule(ruleId: string): string[] {
       return [
         "Genau ein <main> pro Seite.",
         "Semantik prüfen: header/nav/aside/footer korrekt setzen.",
-        "Re-test: Landmark-Navigation im Screenreader.",
+        "Nachprüfung: Landmark-Navigation im Screenreader."
       ];
     default:
       return [
         "Element über Selector/Snippet lokalisieren.",
-        "Fix anhand der verlinkten Regelbeschreibung umsetzen.",
-        "Re-test im relevanten Flow.",
+        "Behebung anhand der verlinkten Regelbeschreibung umsetzen."
+        "Nachprüfung im relevanten Ablauf."
       ];
   }
 }
@@ -156,10 +198,10 @@ function reportHtml(params: {
   // Executive summary / quick recommendation
   const recos = [
     totals.p0
-      ? `Sofortmaßnahmen: ${totals.p0} kritische Findings (P0) priorisieren und innerhalb von 24–72h beheben.`
-      : "Keine P0-Findings gefunden (gut).",
-    totals.p1 ? `Als nächstes: ${totals.p1} wichtige Findings (P1) in den Sprint aufnehmen.` : "Keine P1-Findings gefunden.",
-    totals.total ? "Nach Fixes: Re-Scan durchführen und Änderungen verifizieren." : "",
+      ? `Sofortmaßnahmen: ${totals.p0} kritische Befunde (P0) priorisieren und innerhalb von 24–72h beheben.`
+      : "Keine P0-Befunde gefunden (gut).",
+    totals.p1 ? `Als nächstes: ${totals.p1} wichtige Befunde (P1) in den Sprint aufnehmen.` : "Keine P1-Befunde gefunden.",
+    totals.total ? "Nach Behebungen: erneuten Scan durchführen und Änderungen verifizieren." : "",
   ].filter(Boolean);
 
   const by = {
@@ -175,12 +217,14 @@ function reportHtml(params: {
       ${arr
         .map((f) => {
           const sevClass = f.severity.toLowerCase();
+          const t = translateFinding(f);
+          const plain = plainExplain(String((f as any).ruleId || ""));
           const steps = (f.fixSteps || []).slice(0, 3);
           return `
             <section class="finding">
               <div class="finding__header">
                 <div class="badge badge--${sevClass}">${f.severity}</div>
-                <div class="finding__title">${escapeHtml(translateFinding(f).title)}</div>
+                <div class="finding__title">${escapeHtml(t.title)}</div>
               </div>
 
               <div class="finding__meta">
@@ -189,14 +233,24 @@ function reportHtml(params: {
                 ${f.capturedAt ? `<div><span class="label">Zeit</span> <span>${escapeHtml(f.capturedAt)}</span></div>` : ""}
               </div>
 
-              <div class="finding__desc">${escapeHtml(translateFinding(f).description)}</div>
-              ${translateFinding(f).failureSummary ? `<div class="kv"><span class="label">Warum</span><span>${escapeHtml(translateFinding(f).failureSummary!)}</span></div>` : ""}
-              ${translateFinding(f).originalFailureSummary && translateFinding(f).originalFailureSummary !== translateFinding(f).failureSummary ? `<div class="kv" style="font-size:10.5px;"><span class="label">Original (EN)</span><span>${escapeHtml(String(translateFinding(f).originalFailureSummary).slice(0, 900))}${String(translateFinding(f).originalFailureSummary).length > 900 ? "…" : ""}</span></div>` : ""}
+              <div class="finding__desc">${escapeHtml(t.description)}</div>
+
+              ${plain ? `
+                <div class="plain">
+                  <div class="plain__title">Kurz erklärt</div>
+                  <div class="plain__row"><span class="label">Was bedeutet das?</span><span>${escapeHtml(plain.what)}</span></div>
+                  <div class="plain__row"><span class="label">Warum wichtig?</span><span>${escapeHtml(plain.why)}</span></div>
+                  <div class="plain__row"><span class="label">Für wen relevant?</span><span>${escapeHtml(plain.forWhom)}</span></div>
+                </div>
+              ` : ""}
+
+              ${t.failureSummary ? `<div class="kv"><span class="label">Warum</span><span>${escapeHtml(t.failureSummary!)}</span></div>` : ""}
+              ${translateFinding(f).originalFailureSummary && translateFinding(f).originalFailureSummary !== translateFinding(f).failureSummary ? `<div class="kv" style="font-size:10.5px;"><span class="label">Original</span><span>${escapeHtml(String(translateFinding(f).originalFailureSummary).slice(0, 900))}${String(translateFinding(f).originalFailureSummary).length > 900 ? "…" : ""}</span></div>` : ""}
               ${f.selector ? `<div class="kv"><span class="label">Selektor</span><code>${escapeHtml(f.selector)}</code></div>` : ""}
 
               ${steps.length ? `
                 <div class="steps">
-                  <div class="steps__title">Fix in 3 Schritten</div>
+                  <div class="steps__title">Behebung in 3 Schritten</div>
                   <ol>
                     ${steps.map((s) => `<li>${escapeHtml(s)}</li>`).join("\n")}
                   </ol>
@@ -223,7 +277,7 @@ function reportHtml(params: {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BFSG-WebCheck – Audit Report</title>
+  <title>BFSG-WebCheck – Prüfbericht</title>
   <style>
     :root {
       --text: #0f172a;
@@ -348,6 +402,18 @@ function reportHtml(params: {
     .kv { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
     .kv .label { display: inline-block; min-width: 90px; font-weight: 700; }
 
+    .plain {
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 10px 0;
+      color: var(--text);
+    }
+    .plain__title { font-size: 12px; font-weight: 900; margin-bottom: 6px; }
+    .plain__row { font-size: 12px; line-height: 1.45; margin: 4px 0; }
+    .plain__row .label { display: inline-block; min-width: 120px; font-weight: 800; color: #1e3a8a; }
+
     .steps {
       border: 1px dashed var(--line);
       border-radius: 12px;
@@ -398,7 +464,7 @@ function reportHtml(params: {
         <div class="brand">
           ${brandLogoDataUrl ? `<img alt="BFSG WebCheck" src="${brandLogoDataUrl}" />` : ""}
           <div>
-            <h1 style="margin:0">BFSG-WebCheck – Barrierefreiheits-Audit</h1>
+            <h1 style="margin:0">BFSG-WebCheck – Barrierefreiheits‑Prüfbericht</h1>
             <div class="sub">
               Website: <b>${escapeHtml(url)}</b><br />
               Hinweis: Technischer Report (WCAG/EN 301 549/BITV) – <b>keine Rechtsberatung</b> und <b>keine Garantie auf BFSG-/WCAG-Konformität</b>.
@@ -408,7 +474,7 @@ function reportHtml(params: {
       </div>
       <div class="meta">
         Generiert: ${escapeHtml(generatedAt)}<br />
-        Audit-ID: ${escapeHtml(auditId)}<br />
+        Prüf-ID: ${escapeHtml(auditId)}<br />
         Ergebnis-Hash: ${escapeHtml(findingsHash)}<br />
         Version: MVP
       </div>
@@ -453,7 +519,7 @@ function reportHtml(params: {
     ${section("P2", by.P2)}
 
     <div class="footerNote" style="margin-top:16px; border-top:1px solid var(--line); padding-top:10px;">
-      Tipp: Nutze diesen Report als Grundlage für Tickets. Priorisiere zuerst P0, dann P1. Re-test nach Fix.
+      Tipp: Nutzen Sie diesen Bericht als Grundlage für Tickets. Priorisieren Sie zuerst P0, dann P1. Nachprüfung nach der Behebung.
     </div>
   </div>
 </body>
