@@ -74,7 +74,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="sticky top-0 w-full z-50 border-b border-slate-200/60 glass">
+      <nav className="sticky top-0 w-full z-50 border-b border-slate-200/60 glass pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <BrandMark />
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
