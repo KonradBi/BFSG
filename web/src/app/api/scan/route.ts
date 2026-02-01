@@ -256,7 +256,7 @@ export async function POST(req: Request) {
     browser = await chromium.launch({
       executablePath,
       args: chromiumLambda.args,
-      headless: chromiumLambda.headless,
+      headless: true,
     });
     context = await browser.newContext({ bypassCSP: true });
     page = await context.newPage();
