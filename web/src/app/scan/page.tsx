@@ -470,31 +470,7 @@ function ScanContent() {
   }
 
   async function rerunPaidScan() {
-    if (!record?.isPaid) return;
-    if ((record.tier ?? "mini") !== "plus") {
-      alert("Re-Scan ist im MVP nur im Plus-Plan verfügbar.");
-      return;
-    }
-
-    const token = getToken(record.scanId);
-    setBusy(true);
-    try {
-      const res = await fetch("/api/scan/rerun", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-scan-token": token },
-        body: JSON.stringify({ scanId: record.scanId }),
-      });
-      const data = (await res.json()) as { scanId?: string; scanToken?: string; error?: string };
-      if (!res.ok || !data.scanId || !data.scanToken) throw new Error(data.error || "rerun_failed");
-
-      setToken(data.scanId, data.scanToken);
-      window.location.href = `/scan?scanId=${encodeURIComponent(data.scanId)}&token=${encodeURIComponent(data.scanToken)}`;
-    } catch (e) {
-      console.error(e);
-      alert("Re-Scan konnte nicht gestartet werden.");
-    } finally {
-      setBusy(false);
-    }
+    alert("Re-Scan ist aktuell deaktiviert. Für einen neuen Scan bitte einen neuen Check starten.");
   }
 
   return (
@@ -672,14 +648,7 @@ function ScanContent() {
                       >
                         PDF öffnen
                       </button>
-                      {(record.tier ?? "mini") === "plus" && (
-                        <button
-                          onClick={rerunPaidScan}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold"
-                        >
-                          Re-Scan
-                        </button>
-                      )}
+                      {/* Re-Scan disabled */}
                     </div>
                   </div>
 

@@ -170,38 +170,13 @@ export const updateProgress = mutation({
   },
 });
 
+// Re-scans are disabled (product decision).
 export const createRescan = mutation({
   args: {
     previousScanId: v.id("scans"),
     accessToken: v.string(),
   },
-  handler: async (ctx, { previousScanId, accessToken }) => {
-    const now = Date.now();
-    const prev = await ctx.db.get(previousScanId);
-    if (!prev) throw new Error("scan_not_found");
-    if (!prev.isPaid) throw new Error("previous_scan_not_paid");
-
-    // MVP policy: only Plus includes Re-Scan.
-    if ((prev.tier ?? "mini") !== "plus") throw new Error("tier_not_allowed");
-
-    const plan = planForTier(prev.tier ?? "mini");
-
-    const scanId = await ctx.db.insert("scans", {
-      url: prev.url,
-      accessToken,
-      authorizedToScan: prev.authorizedToScan,
-      previousScanId: previousScanId,
-      status: "QUEUED",
-      isPaid: true,
-      paidAt: now,
-      tier: prev.tier,
-      plan,
-      progress: { pagesDone: 0, pagesTotal: plan.maxPages },
-      pages: [],
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    return { scanId };
+  handler: async () => {
+    throw new Error("rescan_disabled");
   },
 });
