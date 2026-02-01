@@ -504,26 +504,26 @@ function ScanContent() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">Teaser-Scan</h1>
-        <p className="text-muted-foreground text-lg">
+      <div className="mb-8 md:mb-12 text-center">
+        <h1 className="text-3xl md:text-5xl font-black mb-3 text-gradient tracking-tight">Teaser‑Scan</h1>
+        <p className="text-muted-foreground text-base md:text-lg">
           Sofortige Analyse Ihrer Website auf Barrierefreiheit.
         </p>
       </div>
 
-      <div className="glass rounded-[2rem] p-8 border border-slate-200 shadow-2xl">
-        <label className="block text-sm font-semibold mb-3 text-slate-600">Website URL zum Scannen</label>
+      <div className="glass rounded-3xl p-5 md:p-8 border border-slate-200 shadow-2xl">
+        <label className="block text-sm font-semibold mb-3 text-slate-600">Website‑URL zum Scannen</label>
         <div className="flex flex-col md:flex-row gap-3">
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="flex-1 bg-white border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 placeholder-slate-400"
+            className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 placeholder-slate-400"
             placeholder="https://ihre-website.de"
           />
           <button
             onClick={() => runScan()}
             disabled={busy || !url.startsWith("http")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
             {busy ? (
               <span className="flex items-center gap-2">
@@ -948,13 +948,27 @@ function ScanContent() {
 
 export default function ScanPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-32 pb-20 px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <BrandMark />
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <BrandMark />
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-4">
             <AuthNav />
-            <Link href="/" className="text-sm font-medium text-slate-600 hover:text-blue-600 Transition flex items-center gap-2">
+
+            {/* Mobile: icon only */}
+            <Link
+              href="/"
+              aria-label="Zur Startseite"
+              className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </Link>
+
+            {/* Desktop */}
+            <Link href="/" className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               Zurück
             </Link>
