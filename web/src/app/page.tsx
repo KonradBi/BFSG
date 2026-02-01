@@ -149,8 +149,8 @@ export default function Home() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-slate-900 leading-[1.08]">
+            <div className="min-w-0">
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-slate-900 leading-[1.08] break-words">
                 {copy.heroH1}
               </h1>
               <p className="text-xl text-slate-600 mb-8 leading-relaxed">{copy.heroSubhead}</p>
