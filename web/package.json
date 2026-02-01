@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "playwright install chromium",
     "test:e2e": "playwright test"
   },
   "dependencies": {
