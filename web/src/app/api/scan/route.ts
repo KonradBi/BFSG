@@ -231,7 +231,7 @@ async function runAxeScan(safeUrl: string) {
 
     const sample = findings[0] ?? {
       severity: "P2" as const,
-      title: "Keine automatischen Issues gefunden",
+      title: "Keine automatischen Probleme gefunden",
       description: "",
       helpUrl: null,
       selector: null,
@@ -239,10 +239,17 @@ async function runAxeScan(safeUrl: string) {
       fixSteps: [],
     };
 
+    // Teaser-Hinweis: bewusst ohne englische Begriffe und ohne bloßen Deque-Link.
+    // Ziel: in 1–2 Sätzen sagen, was zu tun ist.
+    const steps = Array.isArray((sample as any).fixSteps) ? (sample as any).fixSteps.filter(Boolean) : [];
+    const hint = steps.length
+      ? `Behebung: ${steps.slice(0, 2).join(" ")}`
+      : "Behebung: Details im Vollreport.";
+
     const sampleFinding = {
       title: sample.title,
       severity: sample.severity,
-      hint: sample.helpUrl ? `Fix-Hinweis: ${sample.helpUrl}` : "Fix-Hinweis: Details im Vollreport",
+      hint,
     };
 
     return { totals, sampleFinding, findings };

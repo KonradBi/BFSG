@@ -596,9 +596,9 @@ function ScanContent() {
 
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { l: "P0 Critical", v: (record?.totals?.p0 ?? teaser?.totals.p0) ?? 0, c: "bg-red-50 text-red-600 border-red-100" },
-                  { l: "P1 High", v: (record?.totals?.p1 ?? teaser?.totals.p1) ?? 0, c: "bg-orange-50 text-orange-600 border-orange-100" },
-                  { l: "P2 Medium", v: (record?.totals?.p2 ?? teaser?.totals.p2) ?? 0, c: "bg-yellow-50 text-yellow-600 border-yellow-100" },
+                  { l: "P0 (kritisch)", v: (record?.totals?.p0 ?? teaser?.totals.p0) ?? 0, c: "bg-red-50 text-red-600 border-red-100" },
+                  { l: "P1 (hoch)", v: (record?.totals?.p1 ?? teaser?.totals.p1) ?? 0, c: "bg-orange-50 text-orange-600 border-orange-100" },
+                  { l: "P2 (mittel)", v: (record?.totals?.p2 ?? teaser?.totals.p2) ?? 0, c: "bg-yellow-50 text-yellow-600 border-yellow-100" },
                 ].map((stat) => (
                   <div key={stat.l} className={`p-4 rounded-2xl border ${stat.c}`}>
                     <div className="text-2xl font-bold">{stat.v}</div>
@@ -749,18 +749,7 @@ function ScanContent() {
                           </div>
                         )}
 
-                        {f.helpUrl && (
-                          <div className="mt-4">
-                            <a
-                              href={f.helpUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm font-bold text-blue-700 hover:text-blue-800"
-                            >
-                              Regel/Referenz öffnen
-                            </a>
-                          </div>
-                        )}
+                        {/* Optionaler Link entfernt: statt nur Link lieber konkrete Fix-Schritte (siehe oben). */}
                       </div>
                     ))}
                   </div>
@@ -773,7 +762,7 @@ function ScanContent() {
                   <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="text-center">
                       <h4 className="text-2xl font-black tracking-tight">
-                        Dein Kurzcheck: <span className="text-blue-700">{teaser.totals.total}</span> Issues gefunden
+                        Dein Kurzcheck: <span className="text-blue-700">{teaser.totals.total}</span> Probleme gefunden
                       </h4>
                       <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
                         <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700">P0 {teaser.totals.p0}</span>
@@ -788,7 +777,7 @@ function ScanContent() {
                       <div className="font-extrabold text-slate-900">
                         Kritisch ({teaser.sampleFinding.severity}): {teaser.sampleFinding.title}
                       </div>
-                      <div className="text-sm text-slate-700 mt-1">Impact: {teaser.sampleFinding.hint}</div>
+                      <div className="text-sm text-slate-700 mt-1">Hinweis: {teaser.sampleFinding.hint}</div>
                     </div>
 
                     {/* CTA */}
