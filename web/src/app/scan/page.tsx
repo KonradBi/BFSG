@@ -125,7 +125,8 @@ function ScanContent() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [teaser, setTeaser] = useState<Teaser | null>(null);
-  const [tier, setTier] = useState("standard");
+  // Default to the cheapest plan; we can show a recommendation separately.
+  const [tier, setTier] = useState("mini");
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
 
@@ -276,7 +277,7 @@ function ScanContent() {
 
   function recommendTierFromUrl(u?: string | null) {
     const s = String(u || "").toLowerCase();
-    if (!s) return "standard";
+    if (!s) return "mini";
 
     // Heuristic: if it looks like commerce or conversion-heavy flows → Plus.
     const shopHints = [
