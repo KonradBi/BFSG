@@ -280,7 +280,7 @@ function ScanContent() {
 
   function recommendTierFromUrl(u?: string | null) {
     const s = String(u || "").toLowerCase();
-    if (!s) return "mini";
+    if (!s) return "standard";
 
     // Heuristic: if it looks like commerce or conversion-heavy flows → Plus.
     const shopHints = [
@@ -303,16 +303,35 @@ function ScanContent() {
     ];
     if (shopHints.some((h) => s.includes(h))) return "plus";
 
-    // If user is just checking a single public homepage/news site, Standard is a safe default.
-    // Mini remains for people who explicitly want a 1-page snapshot.
     return "standard";
   }
 
+  function recommendTierFromPages(pages: number | null | undefined) {
+    const n = typeof pages === "number" && Number.isFinite(pages) ? pages : null;
+    if (!n) return null;
+    if (n <= 5) return "mini";
+    if (n <= 15) return "standard";
+    return "plus";
+  }
+
+  const estimatedPages = useMemo(() => {
+    // Prefer the scanner's own discovery/progress numbers.
+    return (
+      discoveredPages ??
+      liveProgress?.pagesTotal ??
+      record?.progress?.pagesTotal ??
+      null
+    );
+  }, [discoveredPages, liveProgress?.pagesTotal, record?.progress?.pagesTotal]);
+
   const recommendedTier = useMemo(() => {
-    // Prefer the URL we actually scanned (teaser/record) otherwise use the current input.
+    const byPages = recommendTierFromPages(estimatedPages);
+    if (byPages) return byPages;
+
+    // Fallback: URL heuristic.
     const u = record?.url || teaser?.url || url;
     return recommendTierFromUrl(u);
-  }, [record?.url, teaser?.url, url]);
+  }, [estimatedPages, record?.url, teaser?.url, url]);
 
   const selectedTier = tiers.find((t) => t.id === tier) ?? tiers[0];
   const priceText = (selectedTier.label.split(" ")[0] || "€29").trim();
@@ -764,6 +783,10 @@ function ScanContent() {
 
                     {/* CTA */}
                     <div className="mt-6">
+                      <div className="mb-3 text-center text-sm font-semibold text-slate-700">
+                        Kleine Barrierefreiheits-Fehler reichen oft schon, um auffällig zu werden – hol dir jetzt Klarheit.
+                      </div>
+
                       <button
                         onClick={unlock}
                         disabled={busy}
@@ -772,17 +795,18 @@ function ScanContent() {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5 5 5-5m-5 5V3" />
                         </svg>
-                        {record?.isPaid
-                          ? "PDF öffnen"
-                          : authStatus === "authenticated"
-                            ? "Jetzt Report freischalten"
-                            : "Weiter mit Google (Report freischalten)"}
+                        {record?.isPaid ? "PDF öffnen" : "Jetzt Report freischalten"}
                       </button>
 
                       {!record?.isPaid && (
-                        <p className="mt-3 text-xs text-center text-slate-600">
-                          Danach einmalig <span className="font-extrabold text-slate-900">{priceText}</span> · PDF sofort · kein Abo
-                        </p>
+                        <>
+                          <p className="mt-3 text-xs text-center text-slate-600">
+                            Danach einmalig <span className="font-extrabold text-slate-900">{priceText}</span> · PDF sofort · kein Abo
+                          </p>
+                          <p className="mt-2 text-[11px] text-center text-slate-500 font-semibold">
+                            Bereits 100+ technische Checks erstellt · WCAG / BITV / EN 301 549
+                          </p>
+                        </>
                       )}
 
                       {!record?.isPaid && (
@@ -794,12 +818,7 @@ function ScanContent() {
                             <li>PDF als technischer Prüfbericht (kein Rechtsgutachten)</li>
                           </ul>
 
-                          <details className="mt-4 max-w-md mx-auto">
-                            <summary className="cursor-pointer text-xs font-bold text-slate-600">Warum Google Login?</summary>
-                            <div className="mt-2 text-xs text-slate-600">
-                              Nur zur Zuordnung von Kauf &amp; Download. Kein Newsletter, kein Abo.
-                            </div>
-                          </details>
+                          {/* Google Login Hinweis entfernt (UI cleaner) */}
                         </div>
                       )}
                     </div>
@@ -830,8 +849,8 @@ function ScanContent() {
                               <span
                                 className={`absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[10px] font-black border ${
                                   tier === t.id
-                                    ? "bg-white/15 text-white border-white/30"
-                                    : "bg-blue-50 text-blue-700 border-blue-200"
+                                    ? "bg-white/10 text-white border-white/25"
+                                    : "bg-slate-50 text-slate-700 border-slate-200"
                                 }`}
                               >
                                 Empfohlen
@@ -847,13 +866,19 @@ function ScanContent() {
                     <div className="max-w-md mx-auto text-xs text-slate-600 bg-white border border-slate-200 rounded-2xl p-4">
                       <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-center">Welches Paket passt?</div>
                       <ul className="space-y-1 list-disc pl-5">
-                        <li><b>Mini</b>: 1 Seite (Landingpage/Startseite) – schnelle Einschätzung.</li>
-                        <li><b>Standard</b>: bis 10 wichtige Seiten (z.B. Start, Kontakt, Checkout, Formular, Produkt/Leistung).</li>
-                        <li><b>Plus</b>: bis 50 Seiten (repräsentativ) – besser für Shops, größere Sites und mehrere Templates.</li>
+                        <li><b>Mini</b>: bis 5 Seiten – schnelle Einschätzung.</li>
+                        <li><b>Standard</b>: bis 15 Seiten – die wichtigsten Seiten/Flows.</li>
+                        <li><b>Plus</b>: bis 50 Seiten – repräsentativer Audit für größere Websites/Shops.</li>
                       </ul>
                       <div className="mt-3 text-[11px] text-slate-500">
-                        Vorschlag basiert auf URL/Seiten-Typ (Heuristik). Du kannst jederzeit umstellen.
+                        Empfehlung basiert primär auf der geschätzten Seitenanzahl{estimatedPages ? ` (~${estimatedPages})` : ""}. Du kannst jederzeit umstellen.
                       </div>
+                      {typeof estimatedPages === "number" && estimatedPages > 50 && (
+                        <div className="mt-3 text-[11px] font-semibold text-slate-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                          Hinweis: Es wurden mehr als 50 Seiten entdeckt. „Plus“ ist dann am sinnvollsten (repräsentativ) –
+                          für 100% Abdeckung bitte Scope/Unterseiten eingrenzen.
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
