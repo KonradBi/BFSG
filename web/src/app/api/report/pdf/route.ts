@@ -162,13 +162,13 @@ function fixStepsForRule(ruleId: string): string[] {
       return [
         "Genau ein <main> pro Seite.",
         "Semantik prüfen: header/nav/aside/footer korrekt setzen.",
-        "Nachprüfung: Landmark-Navigation im Screenreader."
+        "Nachprüfung: Landmark-Navigation im Screenreader.",
       ];
     default:
       return [
         "Element über Selector/Snippet lokalisieren.",
-        "Behebung anhand der verlinkten Regelbeschreibung umsetzen."
-        "Nachprüfung im relevanten Ablauf."
+        "Behebung anhand der verlinkten Regelbeschreibung umsetzen.",
+        "Nachprüfung im relevanten Ablauf.",
       ];
   }
 }
