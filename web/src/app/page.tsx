@@ -33,22 +33,22 @@ export default function Home() {
   // Default = "neutral".
   const copy: CopyVariant = {
     // NEUTRAL
-    heroBadge: "BFSG 2025: technische Prüfung nach WCAG / BITV / EN 301 549 (keine Rechtsberatung)",
-    heroH1: "Abmahn- und Haftungsrisiken durch Barrierefreiheit minimieren",
+    heroBadge: "BFSG 2025: In 2 Minuten wissen, wo du angreifbar bist (technischer Check – keine Rechtsberatung)",
+    heroH1: "BFSG‑WebCheck: In Minuten Klarheit, ob deine Website Abmahn‑Risiken hat",
     heroSubhead:
-      "Technisches Audit nach WCAG/BITV/EN 301 549 mit klaren Findings, Prioritäten und umsetzbaren Empfehlungen. Hinweis: keine Rechtsberatung.",
+      "Kostenloser Kurz‑Check + optionaler Vollreport: Wir finden die wichtigsten Barrierefreiheits‑Probleme (WCAG/BITV/EN 301 549) und zeigen dir konkret, was du als Nächstes fixen solltest.",
 
-    painHeadline: "Warum jetzt? Frist, Bußgelder, Reputationsrisiko.",
+    painHeadline: "Warum jetzt? Weil " + "\"wird schon passen\"" + " teuer werden kann.",
     painSubhead:
-      "Wenn Barrierefreiheit erst unter Druck nachgerüstet wird, wird es teuer: hektische Hotfixes, Projekt‑Stopps und unnötige Schleifen mit Agentur/Dev.",
+      "Viele Websites sind nicht absichtlich " + "\"nicht barrierefrei\"" + ", aber kleine Fehler reichen schon: fehlende Labels, schlechte Kontraste, kaputte Tastaturbedienung. Genau das wird bei Beschwerden sichtbar.",
     painBullets: [
-      "BFSG: Marktüberwachung kann Maßnahmen anordnen; bei Verstößen drohen Bußgelder.",
-      "§ 37 BFSG: Ordnungswidrigkeiten können mit Geldbußen bis zu 100.000 € geahndet werden (je nach Tatbestand; in anderen Fällen bis 10.000 €).",
-      "Früh prüfen = planbar priorisieren (P0/P1) statt später Feuer löschen.",
+      "Schnell wissen, ob du ein Risiko hast – bevor jemand anderes es meldet.",
+      "Konkrete, priorisierte To‑Dos (P0/P1/P2) statt vager Empfehlungen.",
+      "Spart Zeit mit Agentur/Dev: du bekommst direkt umsetzbare Hinweise.",
     ],
 
-    primaryCta: "Audit anfragen",
-    secondaryCta: "Beispielbericht ansehen",
+    primaryCta: "Jetzt Kurz‑Check starten",
+    secondaryCta: "Muster‑Report ansehen",
 
     pricingHeadline: "Transparente Pakete nach Umfang",
     pricingSubhead:
