@@ -53,9 +53,25 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
+  // Pull findings from the reports table (preferred), fallback to scan.findings.
+  const report = await convex
+    .query((api as any).reports.getByScan, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+    })
+    .catch(() => null);
+
+  const pdf = await convex
+    .query((api as any).pdfs.getLatestByScan, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+    })
+    .catch(() => null);
+
   return NextResponse.json({
     ...base,
-    findings: scan.findings ?? [],
+    findings: (report as any)?.findings ?? (scan as any).findings ?? [],
+    pdfUrl: (pdf as any)?.url ?? null,
   });
 }
 

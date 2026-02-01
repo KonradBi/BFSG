@@ -38,6 +38,8 @@ function deTitleForRule(ruleId: string): string | null {
       return "Dokument braucht genau einen Hauptbereich (main)";
     case "region":
       return "Inhalte sollen in Landmarken liegen";
+    case "render-failed":
+      return "Seite konnte nicht stabil geladen werden";
     default:
       return null;
   }
@@ -55,6 +57,8 @@ function deDescriptionForRule(ruleId: string): string | null {
       return "Es sollte genau ein <main>-Landmark pro Seite vorhanden sein.";
     case "region":
       return "Seiteninhalt sollte innerhalb von Landmarken (header/nav/main/footer/aside) liegen.";
+    case "render-failed":
+      return "Beim Laden/Rendern der Seite ist ein Fehler aufgetreten (Timeout, Navigation, Script).";
     default:
       return null;
   }
@@ -64,10 +68,7 @@ function deFailureSummary(s?: string | null) {
   if (!s) return s;
   return String(s)
     .replace(/^Fix all of the following:/gm, "Beheben Sie Folgendes:")
-    .replace(
-      /^Fix any of the following:/gm,
-      "Beheben Sie mindestens eines der folgenden Probleme:"
-    )
+    .replace(/^Fix any of the following:/gm, "Beheben Sie mindestens eines der folgenden Probleme:")
     .replace(/^Ensure /gm, "Stellen Sie sicher, dass ");
 }
 
@@ -99,14 +100,6 @@ function fixStepsForRule(ruleId: string): string[] {
         "Layout prüfen: Header/Nav/Aside/Footer korrekt semantisch strukturieren.",
         "Re-test: Screenreader-Landmark-Navigation.",
       ];
-    case "aria-required-attr":
-    case "aria-valid-attr":
-    case "aria-roles":
-      return [
-        "ARIA nur verwenden, wenn nötig; Rollen/Attribute müssen zur Rolle passen.",
-        "Ungültige Attribute entfernen oder auf passende Rolle umstellen.",
-        "Mit Browser DevTools + axe re-testen.",
-      ];
     default:
       return [
         "Element anhand Selector/Snippet lokalisieren.",
@@ -116,64 +109,239 @@ function fixStepsForRule(ruleId: string): string[] {
   }
 }
 
-export async function runAxeScan(safeUrl: string) {
+function isProbablyHtmlUrl(u: URL) {
+  const p = u.pathname.toLowerCase();
+  // Skip common non-HTML assets
+  const badExt = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".gif",
+    ".svg",
+    ".pdf",
+    ".zip",
+    ".mp4",
+    ".mp3",
+    ".webm",
+    ".css",
+    ".js",
+    ".json",
+    ".xml",
+    ".txt",
+  ];
+  return !badExt.some((ext) => p.endsWith(ext));
+}
+
+function normalizeDiscoveredUrl(u: URL) {
+  // Remove hash + query to avoid duplicates from tracking params.
+  u.hash = "";
+  u.search = "";
+  return u.toString();
+}
+
+async function fetchHtml(url: string, timeoutMs = 10_000) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      signal: controller.signal,
+      headers: { accept: "text/html,application/xhtml+xml" },
+    });
+    const ct = res.headers.get("content-type") || "";
+    if (!res.ok) return null;
+    if (!ct.includes("text/html") && !ct.includes("application/xhtml") && !ct.includes("charset")) {
+      // Best-effort: if content-type is missing or weird, still try.
+      // But skip obvious binary.
+    }
+    return await res.text();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function extractLinks(html: string): string[] {
+  const out: string[] = [];
+  const re = /href\s*=\s*["']([^"']+)["']/gi;
+  let m: RegExpExecArray | null = null;
+  while ((m = re.exec(html))) {
+    const href = String(m[1] || "").trim();
+    if (!href) continue;
+    out.push(href);
+  }
+  return out;
+}
+
+async function discoverInternalPages(startUrl: string, maxPages: number) {
+  const start = new URL(startUrl);
+  const origin = start.origin;
+
+  const seen = new Set<string>();
+  const queue: Array<{ url: string; depth: number }> = [{ url: start.toString(), depth: 0 }];
+
+  const MAX_DEPTH = 3;
+  const MAX_FETCHES = Math.max(5, Math.min(60, maxPages * 2));
+  let fetches = 0;
+
+  while (queue.length && seen.size < maxPages && fetches < MAX_FETCHES) {
+    const cur = queue.shift()!;
+    const curUrl = cur.url;
+
+    if (seen.has(curUrl)) continue;
+    seen.add(curUrl);
+
+    if (cur.depth >= MAX_DEPTH) continue;
+
+    const html = await fetchHtml(curUrl);
+    fetches += 1;
+    if (!html) continue;
+
+    const links = extractLinks(html);
+    for (const href of links) {
+      if (seen.size >= maxPages) break;
+      if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
+
+      let u: URL;
+      try {
+        u = new URL(href, curUrl);
+      } catch {
+        continue;
+      }
+
+      if (u.origin !== origin) continue;
+      if (!isProbablyHtmlUrl(u)) continue;
+
+      const normalized = normalizeDiscoveredUrl(u);
+      // Skip obvious admin / checkout paths
+      const p = new URL(normalized).pathname.toLowerCase();
+      if (
+        p.startsWith("/wp-admin") ||
+        p.startsWith("/wp-login") ||
+        p.startsWith("/cart") ||
+        p.startsWith("/checkout") ||
+        p.startsWith("/account")
+      ) {
+        continue;
+      }
+
+      if (!seen.has(normalized)) {
+        queue.push({ url: normalized, depth: cur.depth + 1 });
+      }
+    }
+  }
+
+  // Preserve a stable order: start first, then others as discovered.
+  return Array.from(seen);
+}
+
+function capString(s: unknown, max = 800) {
+  const str = String(s ?? "");
+  if (str.length <= max) return str;
+  return str.slice(0, max) + "…";
+}
+
+function sanitizeFinding(f: any) {
+  const out: any = { ...f };
+  if (out.snippet) out.snippet = capString(out.snippet, 1200);
+  if (out.failureSummary) out.failureSummary = capString(out.failureSummary, 800);
+  if (out.title) out.title = capString(out.title, 180);
+  if (out.description) out.description = capString(out.description, 600);
+  if (Array.isArray(out.fixSteps)) out.fixSteps = out.fixSteps.slice(0, 5).map((s: any) => capString(s, 220));
+  return out;
+}
+
+async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number; maxWallTimeMs: number }) {
+  const startedAt = Date.now();
+
   let browser: any = null;
   let context: any = null;
   let page: any = null;
 
+  const allFindings: any[] = [];
+
+  const executablePath = await chromiumLambda.executablePath();
+  const axeSource = await readFile(path.join(process.cwd(), "node_modules/axe-core/axe.min.js"), "utf8");
+
   try {
-    const executablePath = await chromiumLambda.executablePath();
-    browser = await chromium.launch({
-      executablePath,
-      args: chromiumLambda.args,
-      headless: true,
-    });
+    browser = await chromium.launch({ executablePath, args: chromiumLambda.args, headless: true });
     context = await browser.newContext({ bypassCSP: true });
     page = await context.newPage();
 
-    await page.goto(safeUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
+    for (const u of urls) {
+      const now = Date.now();
+      if (now - startedAt > opts.maxWallTimeMs) break;
 
-    const axeSource = await readFile(
-      path.join(process.cwd(), "node_modules/axe-core/axe.min.js"),
-      "utf8"
-    );
-    await page.addScriptTag({ content: axeSource });
-    await page.waitForTimeout(50);
+      const pageStart = Date.now();
+      try {
+        await page.goto(u, { waitUntil: "domcontentloaded", timeout: Math.min(45_000, opts.maxPerPageTimeMs) });
 
-    const axeType = await page.evaluate(() => typeof (window as any).axe);
-    if (axeType === "undefined") throw new Error("axe_injection_failed");
+        // Inject axe after navigation
+        await page.addScriptTag({ content: axeSource });
+        await page.waitForTimeout(40);
 
-    const results = await page.evaluate(async () => {
-      // @ts-expect-error - axe is injected at runtime
-      return await window.axe.run(document, { resultTypes: ["violations"] });
-    });
+        const axeType = await page.evaluate(() => typeof (window as any).axe);
+        if (axeType === "undefined") throw new Error("axe_injection_failed");
 
-    const nowIso = new Date().toISOString();
+        const results = await page.evaluate(async () => {
+          // @ts-expect-error injected
+          return await window.axe.run(document, { resultTypes: ["violations"] });
+        });
 
-    const raw = (results.violations || []).flatMap((v: any) => {
-      const impact = v.impact ?? null;
-      const severity = severityFromImpact(impact);
-      const nodes = Array.isArray(v.nodes) ? v.nodes : [];
-      const nodesLimited = nodes.slice(0, 5);
-      return nodesLimited.map((node: any) => ({
-        severity,
-        impact,
-        ruleId: v.id,
-        title: deTitleForRule(String(v.id || "")) || v.help,
-        description: deDescriptionForRule(String(v.id || "")) || v.description,
-        helpUrl: v.helpUrl,
-        tags: v.tags ?? [],
-        selector: node?.target?.[0] ?? null,
-        snippet: node?.html ?? null,
-        failureSummary: deFailureSummary(node?.failureSummary ?? null),
-        fixSteps: fixStepsForRule(String(v.id || "")),
-        pageUrl: safeUrl,
-        capturedAt: nowIso,
-      }));
-    });
+        const nowIso = new Date().toISOString();
+
+        const raw = (results.violations || []).flatMap((v: any) => {
+          const impact = v.impact ?? null;
+          const severity = severityFromImpact(impact);
+          const nodes = Array.isArray(v.nodes) ? v.nodes : [];
+          const nodesLimited = nodes.slice(0, 5);
+          return nodesLimited.map((node: any) => ({
+            severity,
+            impact,
+            ruleId: v.id,
+            title: deTitleForRule(String(v.id || "")) || v.help,
+            description: deDescriptionForRule(String(v.id || "")) || v.description,
+            helpUrl: v.helpUrl,
+            tags: v.tags ?? [],
+            selector: node?.target?.[0] ?? null,
+            snippet: node?.html ?? null,
+            failureSummary: deFailureSummary(node?.failureSummary ?? null),
+            fixSteps: fixStepsForRule(String(v.id || "")),
+            pageUrl: u,
+            capturedAt: nowIso,
+          }));
+        });
+
+        for (const f of raw) allFindings.push(f);
+      } catch (e: any) {
+        const nowIso = new Date().toISOString();
+        allFindings.push({
+          severity: "P0",
+          impact: "critical",
+          ruleId: "render-failed",
+          title: deTitleForRule("render-failed"),
+          description: deDescriptionForRule("render-failed"),
+          helpUrl: null,
+          tags: [],
+          selector: null,
+          snippet: null,
+          failureSummary: `Fehler beim Scannen: ${String(e?.message || e).slice(0, 300)}`,
+          fixSteps: ["Seite manuell öffnen und auf Redirects/Fehler prüfen.", "Scan erneut starten.", "Wenn es ein Login/Paywall ist: URL anpassen."],
+          pageUrl: u,
+          capturedAt: nowIso,
+        });
+      } finally {
+        const elapsed = Date.now() - pageStart;
+        if (elapsed < 80) await page.waitForTimeout(80 - elapsed);
+      }
+    }
 
     const sortKey = (s: Severity) => (s === "P0" ? 0 : s === "P1" ? 1 : 2);
-    const findings = raw
+    const findings = allFindings
+      .map(sanitizeFinding)
       .sort((a: any, b: any) => {
         const d = sortKey(a.severity) - sortKey(b.severity);
         if (d) return d;
@@ -181,8 +349,7 @@ export async function runAxeScan(safeUrl: string) {
         if (r) return r;
         return String(a.selector || "").localeCompare(String(b.selector || ""));
       })
-      // Hard cap returned findings so API response stays reasonable
-      .slice(0, 120);
+      .slice(0, 600);
 
     const totals = {
       p0: findings.filter((f: any) => f.severity === "P0").length,
@@ -200,9 +367,7 @@ export async function runAxeScan(safeUrl: string) {
     const sampleFinding = {
       title: sample.title,
       severity: sample.severity,
-      hint: sample.helpUrl
-        ? `Fix-Hinweis: ${sample.helpUrl}`
-        : "Fix-Hinweis: Details im Vollreport",
+      hint: sample.helpUrl ? `Fix-Hinweis: ${sample.helpUrl}` : "Fix-Hinweis: Details im Vollreport",
     };
 
     return { totals, sampleFinding, findings };
@@ -211,6 +376,11 @@ export async function runAxeScan(safeUrl: string) {
     await context?.close?.().catch(() => {});
     await browser?.close?.().catch(() => {});
   }
+}
+
+export async function runAxeScan(safeUrl: string) {
+  // Backwards-compatible single-page scan.
+  return runAxeScanMulti([safeUrl], { maxPerPageTimeMs: 25_000, maxWallTimeMs: 2 * 60_000 });
 }
 
 /**
@@ -228,14 +398,42 @@ export async function processQueueOnce(convex: ConvexHttpClient) {
   try {
     await convex.mutation(api.scans.setStatus, { scanId, status: "RUNNING" });
 
-    const { totals, sampleFinding, findings } = await runAxeScan(url);
+    const plan = (scan as any)?.plan ?? { maxPages: 1, maxWallTimeMs: 2 * 60_000, maxPerPageTimeMs: 25_000 };
+    const maxPages = Math.max(1, Math.min(50, Number(plan.maxPages || 1)));
 
-    await convex.mutation((api as any).scansWorker.storeResults, {
+    // Discover pages (internal crawl) up to maxPages.
+    const discovered = await discoverInternalPages(url, maxPages);
+
+    // Update progress totals and show something in UI immediately.
+    await convex.mutation(api.scans.updateProgress, {
       scanId,
-      totals,
-      sampleFinding,
-      findings,
+      pagesDone: 0,
+      pagesTotal: discovered.length,
+      pages: [],
     });
+
+    const startedAt = Date.now();
+    const urlsToScan: string[] = [];
+    for (const u of discovered) {
+      if (urlsToScan.length >= maxPages) break;
+      if (Date.now() - startedAt > Number(plan.maxWallTimeMs || 0)) break;
+      urlsToScan.push(u);
+    }
+
+    const { totals, sampleFinding, findings } = await runAxeScanMulti(urlsToScan, {
+      maxPerPageTimeMs: Number(plan.maxPerPageTimeMs || 25_000),
+      maxWallTimeMs: Number(plan.maxWallTimeMs || 5 * 60_000),
+    });
+
+    // Update progress to "done".
+    await convex.mutation(api.scans.updateProgress, {
+      scanId,
+      pagesDone: urlsToScan.length,
+      pagesTotal: urlsToScan.length,
+      pages: urlsToScan.map((u) => ({ url: u, mode: "FULL" as const, ms: 0 })),
+    });
+
+    await convex.mutation((api as any).scansWorker.storeResults, { scanId, totals, sampleFinding, findings });
 
     await convex.mutation(api.scans.setStatus, { scanId, status: "SUCCEEDED" });
     await convex.mutation(api.scanJobs.complete, { jobId });
@@ -245,7 +443,6 @@ export async function processQueueOnce(convex: ConvexHttpClient) {
     const msg = String(e?.message || e);
     console.error("scan job failed", { jobId, scanId, msg });
 
-    // Keep error visible on scan.
     await convex.mutation(api.scans.setStatus, { scanId, status: "FAILED", error: msg });
     await convex.mutation(api.scanJobs.fail, { jobId, error: msg });
 

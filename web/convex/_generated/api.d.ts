@@ -10,9 +10,14 @@
 
 import type * as crons from "../crons.js";
 import type * as maintenance from "../maintenance.js";
+import type * as payments from "../payments.js";
+import type * as pdfActions from "../pdfActions.js";
+import type * as pdfs from "../pdfs.js";
+import type * as reports from "../reports.js";
 import type * as scanJobs from "../scanJobs.js";
 import type * as scans from "../scans.js";
 import type * as scansWorker from "../scansWorker.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -23,9 +28,14 @@ import type {
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   maintenance: typeof maintenance;
+  payments: typeof payments;
+  pdfActions: typeof pdfActions;
+  pdfs: typeof pdfs;
+  reports: typeof reports;
   scanJobs: typeof scanJobs;
   scans: typeof scans;
   scansWorker: typeof scansWorker;
+  users: typeof users;
 }>;
 
 /**

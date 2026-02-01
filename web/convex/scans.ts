@@ -75,9 +75,10 @@ function planForTier(tier?: string | null) {
     return { maxPages: 50, maxWallTimeMs: 20 * 60_000, maxPerPageTimeMs: 25_000 };
   }
   if (t === "standard") {
-    return { maxPages: 10, maxWallTimeMs: 7 * 60_000, maxPerPageTimeMs: 25_000 };
+    return { maxPages: 15, maxWallTimeMs: 10 * 60_000, maxPerPageTimeMs: 25_000 };
   }
-  return { maxPages: 1, maxWallTimeMs: 2 * 60_000, maxPerPageTimeMs: 25_000 };
+  // Mini now includes a small multi-page crawl.
+  return { maxPages: 5, maxWallTimeMs: 4 * 60_000, maxPerPageTimeMs: 25_000 };
 }
 
 export const markPaid = mutation({

@@ -60,6 +60,29 @@ export async function POST(req: Request) {
     tier,
   });
 
+  // Best-effort: store payment record
+  try {
+    const scan = await convex.query(api.scans.get, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+    });
+    const userId = (scan as any)?.userId as string | undefined;
+
+    await convex.mutation((api as any).payments.createOrUpdateFromStripe, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+      userId,
+      tier: tier ?? (scan as any)?.tier ?? "mini",
+      status: "PAID",
+      currency: (session.currency as string | undefined) ?? undefined,
+      amount: (session.amount_total as number | undefined) ?? undefined,
+      stripeCheckoutSessionId: session.id,
+      stripePaymentIntentId: (session.payment_intent as string | null) ?? undefined,
+    });
+  } catch {
+    // ignore
+  }
+
   await convex.mutation((api as any).scanJobs.enqueue, {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scanId: scanId as any,

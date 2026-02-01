@@ -302,6 +302,79 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id as string | undefined;
 
+  // Keep a user row for reporting & future history.
+  if (userId) {
+    await convex
+      .mutation((api as any).users.upsert, {
+        userId,
+        email: (session?.user as any)?.email ?? undefined,
+        name: (session?.user as any)?.name ?? undefined,
+        image: (session?.user as any)?.image ?? undefined,
+      })
+      .catch(() => {});
+  }
+
+  // Autoplan (discovery): estimate internal page count so the user doesn't need to know it.
+  // This is intentionally lightweight (fetch + href parsing) to keep latency reasonable.
+  async function discoverCount(startUrl: string, max = 60) {
+    const start = new URL(startUrl);
+    const origin = start.origin;
+    const seen = new Set<string>();
+    const q: string[] = [start.toString()];
+    let fetches = 0;
+
+    const normalize = (u: URL) => {
+      u.hash = "";
+      u.search = "";
+      return u.toString();
+    };
+
+    const isHtmlish = (u: URL) => {
+      const p = u.pathname.toLowerCase();
+      const bad = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg", ".pdf", ".zip", ".mp4", ".mp3", ".webm", ".css", ".js", ".json", ".xml"];
+      return !bad.some((ext) => p.endsWith(ext));
+    };
+
+    while (q.length && seen.size < max && fetches < max) {
+      const cur = q.shift()!;
+      if (seen.has(cur)) continue;
+      seen.add(cur);
+
+      try {
+        const res = await fetch(cur, { headers: { accept: "text/html,application/xhtml+xml" } });
+        fetches += 1;
+        if (!res.ok) continue;
+        const html = await res.text();
+        const re = /href\s*=\s*["']([^"']+)["']/gi;
+        let m: RegExpExecArray | null = null;
+        while ((m = re.exec(html))) {
+          const href = String(m[1] || "").trim();
+          if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
+          let u: URL;
+          try {
+            u = new URL(href, cur);
+          } catch {
+            continue;
+          }
+          if (u.origin !== origin) continue;
+          if (!isHtmlish(u)) continue;
+          const norm = normalize(u);
+          if (!seen.has(norm)) q.push(norm);
+          if (seen.size >= max) break;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    return seen.size;
+  }
+
+  const discoveredPages = await discoverCount(safeUrl, 60).catch(() => 1);
+
+  const recommendedTier =
+    discoveredPages <= 5 ? "mini" : discoveredPages <= 15 ? "standard" : "plus";
+
   const accessToken = newAccessToken();
   const { scanId } = await convex.mutation(api.scans.createQueued, {
     url: safeUrl,
@@ -319,5 +392,7 @@ export async function POST(req: Request) {
     jobId,
     scanId,
     scanToken: accessToken,
+    discoveredPages,
+    recommendedTier,
   });
 }

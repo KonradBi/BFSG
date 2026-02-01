@@ -73,12 +73,36 @@ export async function POST(req: Request) {
     }
 
     if (scanId) {
+      // Mark scan as paid
       await convex.mutation(api.scans.markPaid, {
         // Convex document IDs are strings at runtime.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scanId: scanId as any,
         tier: tier ?? undefined,
       });
+
+      // Store payment record (proper data model)
+      try {
+        const scan = await convex.query(api.scans.get, {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          scanId: scanId as any,
+        });
+        const userId = (scan as any)?.userId as string | undefined;
+
+        await convex.mutation((api as any).payments.createOrUpdateFromStripe, {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          scanId: scanId as any,
+          userId,
+          tier: tier ?? (scan as any)?.tier ?? "mini",
+          status: "PAID",
+          currency: (session.currency as string | undefined) ?? undefined,
+          amount: (session.amount_total as number | undefined) ?? undefined,
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: (session.payment_intent as string | null) ?? undefined,
+        });
+      } catch {
+        // non-fatal
+      }
 
       // enqueue worker job (idempotent)
       await convex.mutation((api as any).scanJobs.enqueue, {
