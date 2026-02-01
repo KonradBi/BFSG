@@ -386,7 +386,10 @@ export async function POST(req: Request) {
   const { jobId } = await convex.mutation(api.scanJobs.enqueue, { scanId });
 
   // Best-effort: try to process immediately (or on subsequent status polls).
-  await processQueueOnce(convex).catch(() => {});
+  // Best-effort: try to process immediately.
+  // Use the shared worker logic so we stay consistent with /api/scan/worker.
+  const { processQueueOnce: processQueueOnceShared } = await import("@/lib/scanQueueWorker");
+  await processQueueOnceShared(convex).catch(() => {});
 
   return NextResponse.json({
     jobId,

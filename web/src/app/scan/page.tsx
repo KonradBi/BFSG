@@ -126,6 +126,8 @@ function ScanContent() {
   const [busy, setBusy] = useState(false);
   const [teaser, setTeaser] = useState<Teaser | null>(null);
   const [discoveredPages, setDiscoveredPages] = useState<number | null>(null);
+  const [liveProgress, setLiveProgress] = useState<{ pagesDone: number; pagesTotal: number } | null>(null);
+  const [liveStep, setLiveStep] = useState<string>("");
   // Default to the cheapest plan; we can show a recommendation separately.
   const [tier, setTier] = useState("mini");
   const [record, setRecord] = useState<ScanRecord | null>(null);
@@ -330,6 +332,8 @@ function ScanContent() {
 
     setBusy(true);
     setTeaser(null);
+    setLiveProgress(null);
+    setLiveStep("Vorbereitung…");
     try {
       const res = await fetch("/api/scan", {
         method: "POST",
@@ -362,12 +366,26 @@ function ScanContent() {
       }
 
       // Poll job status until it completes.
-      for (let i = 0; i < 120; i++) {
-        await new Promise((r) => setTimeout(r, 1000));
+      for (let i = 0; i < 180; i++) {
+        await new Promise((r) => setTimeout(r, 900));
         const sres = await fetch(`/api/scan/status?jobId=${encodeURIComponent(started.jobId)}`, { cache: "no-store" });
         const sdata = (await sres.json()) as any;
 
-        if (sdata?.status === "DONE") {
+        const p = sdata?.progress;
+        if (p && typeof p.pagesDone === "number" && typeof p.pagesTotal === "number") {
+          setLiveProgress({ pagesDone: p.pagesDone, pagesTotal: p.pagesTotal });
+          if (p.pagesTotal > 1) {
+            setLiveStep(`Scanne Seiten… (${p.pagesDone}/${p.pagesTotal})`);
+          } else {
+            setLiveStep(`Scanne… (${p.pagesDone}/${p.pagesTotal})`);
+          }
+        } else {
+          // Fall back to generic messaging based on job/scan status.
+          if (sdata?.status === "RUNNING" || sdata?.scanStatus === "RUNNING") setLiveStep("Scanne…");
+          else if (sdata?.status === "QUEUED") setLiveStep("In Warteschlange…");
+        }
+
+        if (sdata?.status === "DONE") { 
           const teaserData: Teaser = {
             scanId: sdata.scanId,
             scanToken: started.scanToken,
@@ -525,6 +543,35 @@ function ScanContent() {
             </span>
           </span>
         </label>
+
+        {busy && (
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white/60 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-semibold text-slate-700">{liveStep || "Scanne…"}</div>
+              {discoveredPages !== null && (
+                <div className="text-xs text-slate-600">Gefunden: ~{discoveredPages} Seiten</div>
+              )}
+            </div>
+
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-blue-600 transition-all"
+                style={{
+                  width:
+                    liveProgress && liveProgress.pagesTotal
+                      ? `${Math.min(100, Math.round((100 * liveProgress.pagesDone) / Math.max(1, liveProgress.pagesTotal)))}%`
+                      : "18%",
+                }}
+              />
+            </div>
+
+            {liveProgress && (
+              <div className="mt-2 text-xs text-slate-600">
+                {liveProgress.pagesDone}/{liveProgress.pagesTotal} Seiten
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {(teaser || record) && (
