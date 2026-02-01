@@ -9,6 +9,9 @@ export default defineSchema({
     // Optional to keep backward compatibility with older rows.
     accessToken: v.optional(v.string()),
 
+    // Optional: stable user id from NextAuth (session.user.id).
+    userId: v.optional(v.string()),
+
     // User confirmation that they are authorized to scan this website.
     // Optional for backward compatibility.
     authorizedToScan: v.optional(v.boolean()),
@@ -87,6 +90,9 @@ export default defineSchema({
   scanJobs: defineTable({
     scanId: v.id("scans"),
 
+    // Optional linkage for per-user concurrency.
+    userId: v.optional(v.string()),
+
     status: v.union(
       v.literal("QUEUED"),
       v.literal("RUNNING"),
@@ -101,5 +107,6 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_status_nextRunAt", ["status", "nextRunAt"])
+    .index("by_status_user", ["status", "userId"])
     .index("by_scan", ["scanId"]),
 });

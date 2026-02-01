@@ -1,0 +1,52 @@
+name: Scan Worker
+
+on:
+  schedule:
+    # Every 2 minutes.
+    # Note: GitHub may delay scheduled runs; this is best-effort.
+    - cron: "*/2 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Call BFSG scan worker
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          WORKER_SECRET: ${{ secrets.WORKER_SECRET }}
+        run: |
+          if [ -z "${WORKER_URL}" ]; then
+            echo "Missing secrets.WORKER_URL" >&2
+            exit 1
+          fi
+          if [ -z "${WORKER_SECRET}" ]; then
+            echo "Missing secrets.WORKER_SECRET" >&2
+            exit 1
+          fi
+
+          echo "Calling ${WORKER_URL}"
+          # Treat 204 (no work) as success.
+          code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
+            -H "X-Worker-Secret: ${WORKER_SECRET}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            "${WORKER_URL}")
+
+          echo "HTTP ${code}"
+          if [ -s /tmp/resp.json ]; then
+            cat /tmp/resp.json
+          fi
+
+          if [ "${code}" = "204" ]; then
+            exit 0
+          fi
+
+          # 2xx -> ok
+          if [ "${code}" -ge 200 ] && [ "${code}" -lt 300 ]; then
+            exit 0
+          fi
+
+          exit 1

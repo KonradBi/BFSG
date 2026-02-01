@@ -345,19 +345,48 @@ function ScanContent() {
         return;
       }
 
-      const data = (await res.json()) as Teaser;
-      setTeaser(data);
-      setToken(data.scanId, data.scanToken);
+      const started = (await res.json()) as { jobId: string; scanId: string; scanToken: string };
+      setToken(started.scanId, started.scanToken);
       setRecord(null);
 
-      try {
-        const key = "als_scanIds";
-        const existing = JSON.parse(localStorage.getItem(key) || "[]") as string[];
-        const next = Array.from(new Set([data.scanId, ...existing])).slice(0, 20);
-        localStorage.setItem(key, JSON.stringify(next));
-      } catch {
-        // ignore
+      // Poll job status until it completes.
+      for (let i = 0; i < 120; i++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        const sres = await fetch(`/api/scan/status?jobId=${encodeURIComponent(started.jobId)}`, { cache: "no-store" });
+        const sdata = (await sres.json()) as any;
+
+        if (sdata?.status === "DONE") {
+          const teaserData: Teaser = {
+            scanId: sdata.scanId,
+            scanToken: started.scanToken,
+            url: sdata.url,
+            totals: sdata.totals,
+            sampleFinding: sdata.sampleFinding,
+            pdfUrl: sdata.pdfUrl,
+            limits: { findingsReturned: sdata?.totals?.total ?? 0, note: "" },
+          } as any;
+
+          setTeaser(teaserData);
+
+          try {
+            const key = "als_scanIds";
+            const existing = JSON.parse(localStorage.getItem(key) || "[]") as string[];
+            const next = Array.from(new Set([teaserData.scanId, ...existing])).slice(0, 20);
+            localStorage.setItem(key, JSON.stringify(next));
+          } catch {
+            // ignore
+          }
+
+          return;
+        }
+
+        if (sdata?.status === "FAILED") {
+          alert(`Scan fehlgeschlagen: ${sdata?.error || "FAILED"}`);
+          return;
+        }
       }
+
+      alert("Scan dauert zu lange (Timeout). Bitte später erneut versuchen.");
     } catch (e) {
       console.error(e);
     } finally {

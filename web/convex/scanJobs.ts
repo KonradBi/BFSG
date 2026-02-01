@@ -29,8 +29,10 @@ export const enqueue = mutation({
       return { ok: true, jobId: existing._id, alreadyExisted: true };
     }
 
+    const scan = await ctx.db.get(scanId);
     const jobId = await ctx.db.insert("scanJobs", {
       scanId,
+      userId: (scan as any)?.userId,
       status: "QUEUED",
       attempts: 0,
       nextRunAt: now,
@@ -42,6 +44,8 @@ export const enqueue = mutation({
   },
 });
 
+const LEASE_MS = 5 * 60_000;
+
 export const claimNext = mutation({
   args: {
     // Optional: only claim jobs scheduled up to this time.
@@ -50,13 +54,54 @@ export const claimNext = mutation({
   handler: async (ctx, { now }) => {
     const t = now ?? Date.now();
 
-    const job = await ctx.db
+    // Global concurrency = 1: if a RUNNING job is still within lease, do not start another.
+    const running = await ctx.db
+      .query("scanJobs")
+      .withIndex("by_status_nextRunAt", (q) => q.eq("status", "RUNNING"))
+      .order("desc")
+      .first();
+
+    if (running) {
+      const stale = t - running.updatedAt > LEASE_MS;
+      if (!stale) return null;
+      // Lease expired: re-queue
+      await ctx.db.patch(running._id, {
+        status: "QUEUED",
+        nextRunAt: t,
+        updatedAt: t,
+      });
+    }
+
+    // Find the next queued job. If there are very old queued jobs (e.g. from dev/testing),
+    // mark them FAILED so they don't block the queue forever.
+    const STALE_JOB_MS = 24 * 60 * 60_000;
+
+    let job = await ctx.db
       .query("scanJobs")
       .withIndex("by_status_nextRunAt", (q) => q.eq("status", "QUEUED").lte("nextRunAt", t))
       .order("asc")
       .first();
 
+    // Clean up a few stale jobs per call.
+    for (let i = 0; job && i < 5 && t - job.createdAt > STALE_JOB_MS; i++) {
+      await ctx.db.patch(job._id, { status: "FAILED", updatedAt: t });
+      job = await ctx.db
+        .query("scanJobs")
+        .withIndex("by_status_nextRunAt", (q) => q.eq("status", "QUEUED").lte("nextRunAt", t))
+        .order("asc")
+        .first();
+    }
+
     if (!job) return null;
+
+    // Per-user concurrency = 1.
+    if (job.userId) {
+      const userRunning = await ctx.db
+        .query("scanJobs")
+        .withIndex("by_status_user", (q) => q.eq("status", "RUNNING").eq("userId", job.userId))
+        .first();
+      if (userRunning) return null;
+    }
 
     await ctx.db.patch(job._id, {
       status: "RUNNING",
@@ -140,5 +185,15 @@ export const listQueued = query({
       .withIndex("by_status_nextRunAt", (q) => q.eq("status", "QUEUED"))
       .order("asc")
       .take(lim);
+  },
+});
+
+export const getStatus = query({
+  args: { jobId: v.id("scanJobs") },
+  handler: async (ctx, { jobId }) => {
+    const job = await ctx.db.get(jobId);
+    if (!job) return null;
+    const scan = await ctx.db.get(job.scanId);
+    return { job, scan };
   },
 });

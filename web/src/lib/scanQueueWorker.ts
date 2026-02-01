@@ -1,61 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
 import { chromium } from "playwright-core";
 import chromiumLambda from "@sparticuz/chromium";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import crypto from "node:crypto";
 import { ConvexHttpClient } from "convex/browser";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../convex/_generated/api";
 
-export const runtime = "nodejs";
-
-function getConvexClient() {
-  const url = process.env.NEXT_PUBLIC_CONVEX_URL;
-  if (!url) return null;
-  return new ConvexHttpClient(url);
-}
+// Shared scan runner + single-job queue worker.
+//
+// Why this exists:
+// - /api/scan enqueues jobs and may try to run them best-effort.
+// - Production needs a deterministic driver (Vercel Cron) to claim + process jobs.
+// - Both routes should share the same scanning logic.
 
 type Severity = "P0" | "P1" | "P2";
-
-type RateKey = string;
-const RATE_BUCKET: Map<RateKey, { resetAt: number; count: number }> =
-  // eslint-disable-next-line no-var
-  (globalThis as any).__als_rate_bucket || new Map();
-// eslint-disable-next-line no-var
-(globalThis as any).__als_rate_bucket = RATE_BUCKET;
-
-function getClientIp(req: Request) {
-  // Basic best-effort IP extraction (works behind common proxies).
-  const fwd = req.headers.get("x-forwarded-for") || "";
-  const first = fwd.split(",")[0]?.trim();
-  return first || req.headers.get("x-real-ip") || "unknown";
-}
-
-function rateLimitOrNull(req: Request) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-
-  const windowMs = Number(process.env.SCAN_RATE_LIMIT_WINDOW_MS || 60_000);
-  const max = Number(process.env.SCAN_RATE_LIMIT_MAX || 10);
-
-  const key = `scan:${ip}`;
-  const cur = RATE_BUCKET.get(key);
-  if (!cur || cur.resetAt <= now) {
-    RATE_BUCKET.set(key, { resetAt: now + windowMs, count: 1 });
-    return null;
-  }
-  if (cur.count >= max) {
-    const retryAfterSec = Math.max(1, Math.ceil((cur.resetAt - now) / 1000));
-    return { retryAfterSec, ip };
-  }
-  cur.count += 1;
-  RATE_BUCKET.set(key, cur);
-  return null;
-}
 
 function severityFromImpact(impact?: string | null): Severity {
   if (!impact) return "P2";
@@ -105,7 +64,10 @@ function deFailureSummary(s?: string | null) {
   if (!s) return s;
   return String(s)
     .replace(/^Fix all of the following:/gm, "Beheben Sie Folgendes:")
-    .replace(/^Fix any of the following:/gm, "Beheben Sie mindestens eines der folgenden Probleme:")
+    .replace(
+      /^Fix any of the following:/gm,
+      "Beheben Sie mindestens eines der folgenden Probleme:"
+    )
     .replace(/^Ensure /gm, "Stellen Sie sicher, dass ");
 }
 
@@ -154,11 +116,7 @@ function fixStepsForRule(ruleId: string): string[] {
   }
 }
 
-function newAccessToken() {
-  return crypto.randomBytes(24).toString("hex");
-}
-
-async function runAxeScan(safeUrl: string) {
+export async function runAxeScan(safeUrl: string) {
   let browser: any = null;
   let context: any = null;
   let page: any = null;
@@ -175,7 +133,10 @@ async function runAxeScan(safeUrl: string) {
 
     await page.goto(safeUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
 
-    const axeSource = await readFile(path.join(process.cwd(), "node_modules/axe-core/axe.min.js"), "utf8");
+    const axeSource = await readFile(
+      path.join(process.cwd(), "node_modules/axe-core/axe.min.js"),
+      "utf8"
+    );
     await page.addScriptTag({ content: axeSource });
     await page.waitForTimeout(50);
 
@@ -220,7 +181,8 @@ async function runAxeScan(safeUrl: string) {
         if (r) return r;
         return String(a.selector || "").localeCompare(String(b.selector || ""));
       })
-      .slice(0, 60);
+      // Hard cap returned findings so API response stays reasonable
+      .slice(0, 120);
 
     const totals = {
       p0: findings.filter((f: any) => f.severity === "P0").length,
@@ -229,20 +191,18 @@ async function runAxeScan(safeUrl: string) {
       total: findings.length,
     };
 
-    const sample = findings[0] ?? {
-      severity: "P2" as const,
-      title: "Keine automatischen Issues gefunden",
-      description: "",
+    const sample = findings[0] || {
+      title: "Keine automatischen Probleme gefunden",
+      severity: "P2" as Severity,
       helpUrl: null,
-      selector: null,
-      snippet: null,
-      fixSteps: [],
     };
 
     const sampleFinding = {
       title: sample.title,
       severity: sample.severity,
-      hint: sample.helpUrl ? `Fix-Hinweis: ${sample.helpUrl}` : "Fix-Hinweis: Details im Vollreport",
+      hint: sample.helpUrl
+        ? `Fix-Hinweis: ${sample.helpUrl}`
+        : "Fix-Hinweis: Details im Vollreport",
     };
 
     return { totals, sampleFinding, findings };
@@ -253,7 +213,12 @@ async function runAxeScan(safeUrl: string) {
   }
 }
 
-async function processQueueOnce(convex: ConvexHttpClient) {
+/**
+ * Claims and processes at most one queued scan job.
+ *
+ * Returns { ran: false } when there was no job to claim.
+ */
+export async function processQueueOnce(convex: ConvexHttpClient) {
   const claimed = await convex.mutation(api.scanJobs.claimNext, { now: Date.now() });
   if (!claimed) return { ran: false as const };
 
@@ -262,62 +227,28 @@ async function processQueueOnce(convex: ConvexHttpClient) {
 
   try {
     await convex.mutation(api.scans.setStatus, { scanId, status: "RUNNING" });
+
     const { totals, sampleFinding, findings } = await runAxeScan(url);
-    await convex.mutation((api as any).scansWorker.storeResults, { scanId, totals, sampleFinding, findings });
+
+    await convex.mutation((api as any).scansWorker.storeResults, {
+      scanId,
+      totals,
+      sampleFinding,
+      findings,
+    });
+
     await convex.mutation(api.scans.setStatus, { scanId, status: "SUCCEEDED" });
     await convex.mutation(api.scanJobs.complete, { jobId });
-    return { ran: true as const, ok: true as const, scanId };
+
+    return { ran: true as const, ok: true as const, scanId, jobId };
   } catch (e: any) {
     const msg = String(e?.message || e);
     console.error("scan job failed", { jobId, scanId, msg });
+
+    // Keep error visible on scan.
     await convex.mutation(api.scans.setStatus, { scanId, status: "FAILED", error: msg });
     await convex.mutation(api.scanJobs.fail, { jobId, error: msg });
-    return { ran: true as const, ok: false as const, scanId, error: msg };
+
+    return { ran: true as const, ok: false as const, scanId, jobId, error: msg };
   }
-}
-
-export async function POST(req: Request) {
-  const limited = rateLimitOrNull(req);
-  if (limited) {
-    return NextResponse.json(
-      { error: "rate_limited", retryAfterSec: limited.retryAfterSec },
-      { status: 429, headers: { "retry-after": String(limited.retryAfterSec) } }
-    );
-  }
-
-  const body = (await req.json()) as { url?: string; authorizedToScan?: boolean };
-  const safeUrl = String(body?.url || "").trim();
-  const authorizedToScan = Boolean(body?.authorizedToScan);
-
-  if (!authorizedToScan) {
-    return NextResponse.json({ error: "authorization_required" }, { status: 400 });
-  }
-  if (!safeUrl.startsWith("http")) {
-    return NextResponse.json({ error: "invalid_url" }, { status: 400 });
-  }
-
-  const convex = getConvexClient();
-  if (!convex) return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
-
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id as string | undefined;
-
-  const accessToken = newAccessToken();
-  const { scanId } = await convex.mutation(api.scans.createQueued, {
-    url: safeUrl,
-    accessToken,
-    authorizedToScan,
-    userId,
-  });
-
-  const { jobId } = await convex.mutation(api.scanJobs.enqueue, { scanId });
-
-  // Best-effort: try to process immediately (or on subsequent status polls).
-  await processQueueOnce(convex).catch(() => {});
-
-  return NextResponse.json({
-    jobId,
-    scanId,
-    scanToken: accessToken,
-  });
 }
