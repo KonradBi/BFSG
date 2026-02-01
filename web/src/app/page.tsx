@@ -72,10 +72,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 overflow-x-hidden">
       {/* Navigation */}
       <nav className="sticky top-0 w-full z-50 border-b border-slate-200/60 glass">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <BrandMark />
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <Link href="#leistungen" className="hover:text-foreground transition-colors">
@@ -91,16 +91,40 @@ export default function Home() {
               FAQ
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/scans" className="text-sm font-medium hover:text-blue-400 transition-colors">
-Übersicht
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Mobile: icon-only */}
+            <Link
+              href="/scans"
+              aria-label="Übersicht"
+              className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 3h8v8H3z" />
+                <path d="M13 3h8v5h-8z" />
+                <path d="M13 10h8v11h-8z" />
+                <path d="M3 13h8v8H3z" />
+              </svg>
+            </Link>
+
+            {/* Desktop */}
+            <Link href="/scans" className="hidden md:inline text-sm font-medium hover:text-blue-400 transition-colors">
+              Übersicht
             </Link>
 
             <AuthNav />
 
+            {/* Mobile: compact CTA */}
             <Link
               href="#audit"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all"
+              className="inline-flex md:hidden bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-full text-sm font-semibold transition-all"
+            >
+              Kurz‑Check
+            </Link>
+
+            {/* Desktop CTA */}
+            <Link
+              href="#audit"
+              className="hidden md:inline-flex bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all"
             >
               {copy.primaryCta}
             </Link>
@@ -116,7 +140,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-100 bg-blue-50 text-xs font-bold text-blue-600 mb-6 animate-fade-in shadow-sm">
+          <div className="inline-flex max-w-full items-center gap-2 px-4 py-1.5 rounded-full border border-blue-100 bg-blue-50 text-xs font-bold text-blue-600 mb-6 animate-fade-in shadow-sm whitespace-normal">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
