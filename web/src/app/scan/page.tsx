@@ -125,6 +125,7 @@ function ScanContent() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [teaser, setTeaser] = useState<Teaser | null>(null);
+  const [discoveredPages, setDiscoveredPages] = useState<number | null>(null);
   // Default to the cheapest plan; we can show a recommendation separately.
   const [tier, setTier] = useState("mini");
   const [record, setRecord] = useState<ScanRecord | null>(null);
@@ -268,9 +269,9 @@ function ScanContent() {
 
   const tiers = useMemo(
     () => [
-      { id: "mini", label: "€29 Mini", desc: "1 Seite" },
-      { id: "standard", label: "€59 Standard", desc: "Wichtige Seiten (bis 10)" },
-      { id: "plus", label: "€99 Plus", desc: "Repräsentatives Audit (bis 50)" },
+      { id: "mini", label: "€29 Mini", desc: "Bis 5 Seiten" },
+      { id: "standard", label: "€59 Standard", desc: "Bis 15 Seiten" },
+      { id: "plus", label: "€99 Plus", desc: "Bis 50 Seiten" },
     ],
     []
   );
@@ -346,9 +347,19 @@ function ScanContent() {
         return;
       }
 
-      const started = (await res.json()) as { jobId: string; scanId: string; scanToken: string };
+      const started = (await res.json()) as {
+        jobId: string;
+        scanId: string;
+        scanToken: string;
+        discoveredPages?: number;
+        recommendedTier?: string;
+      };
       setToken(started.scanId, started.scanToken);
       setRecord(null);
+      setDiscoveredPages(typeof started.discoveredPages === "number" ? started.discoveredPages : null);
+      if (started.recommendedTier && ["mini", "standard", "plus"].includes(started.recommendedTier)) {
+        setTier(started.recommendedTier);
+      }
 
       // Poll job status until it completes.
       for (let i = 0; i < 120; i++) {

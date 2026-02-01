@@ -71,6 +71,42 @@ export const storeResults = mutation({
       updatedAt: now,
     });
 
+    // Also store a report snapshot in the proper reports table.
+    // (We keep the scan fields for backwards compatibility / caching.)
+    await ctx.db
+      .query("reports")
+      .withIndex("by_scan", (q) => q.eq("scanId", scanId))
+      .first()
+      .then(async (existing) => {
+        if (existing) {
+          await ctx.db.patch(existing._id, {
+            userId: (scan as any).userId,
+            tier: (scan as any).tier,
+            plan: (scan as any).plan,
+            totals,
+            sampleFinding,
+            findings: capped,
+            scannedPages: (scan as any).progress?.pagesDone ?? undefined,
+            discoveredPages: (scan as any).progress?.pagesTotal ?? undefined,
+            updatedAt: now,
+          });
+        } else {
+          await ctx.db.insert("reports", {
+            scanId,
+            userId: (scan as any).userId,
+            tier: (scan as any).tier,
+            plan: (scan as any).plan,
+            totals,
+            sampleFinding,
+            findings: capped,
+            scannedPages: (scan as any).progress?.pagesDone ?? undefined,
+            discoveredPages: (scan as any).progress?.pagesTotal ?? undefined,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      });
+
     return { ok: true, stored: capped.length, diffSummary };
   },
 });

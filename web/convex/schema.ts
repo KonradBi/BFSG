@@ -2,6 +2,98 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  users: defineTable({
+    // NextAuth stable id (session.user.id)
+    userId: v.string(),
+    email: v.optional(v.string()),
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"])
+    .index("by_email", ["email"]),
+
+  payments: defineTable({
+    scanId: v.id("scans"),
+    userId: v.optional(v.string()),
+
+    tier: v.string(), // mini|standard|plus
+    currency: v.optional(v.string()),
+    amount: v.optional(v.number()),
+
+    status: v.union(
+      v.literal("PENDING"),
+      v.literal("PAID"),
+      v.literal("FAILED"),
+      v.literal("REFUNDED")
+    ),
+
+    stripeCheckoutSessionId: v.optional(v.string()),
+    stripePaymentIntentId: v.optional(v.string()),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_scan", ["scanId"])
+    .index("by_user", ["userId"]) 
+    .index("by_stripe_session", ["stripeCheckoutSessionId"]),
+
+  reports: defineTable({
+    scanId: v.id("scans"),
+    userId: v.optional(v.string()),
+
+    // snapshot of tier/plan used
+    tier: v.optional(v.string()),
+    plan: v.optional(
+      v.object({
+        maxPages: v.number(),
+        maxWallTimeMs: v.number(),
+        maxPerPageTimeMs: v.number(),
+      })
+    ),
+
+    // discovery
+    discoveredPages: v.optional(v.number()),
+    scannedPages: v.optional(v.number()),
+
+    // Results
+    totals: v.optional(
+      v.object({
+        p0: v.number(),
+        p1: v.number(),
+        p2: v.number(),
+        total: v.number(),
+      })
+    ),
+    sampleFinding: v.optional(
+      v.object({
+        title: v.string(),
+        severity: v.union(v.literal("P0"), v.literal("P1"), v.literal("P2")),
+        hint: v.string(),
+      })
+    ),
+    findings: v.optional(v.array(v.any())),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_scan", ["scanId"])
+    .index("by_user", ["userId"]),
+
+  pdfs: defineTable({
+    scanId: v.id("scans"),
+    reportId: v.optional(v.id("reports")),
+    userId: v.optional(v.string()),
+
+    findingsHash: v.string(),
+    storageId: v.id("_storage"),
+
+    createdAt: v.number(),
+  })
+    .index("by_scan", ["scanId"])
+    .index("by_report", ["reportId"])
+    .index("by_hash", ["findingsHash"]),
+
   scans: defineTable({
     url: v.string(),
 

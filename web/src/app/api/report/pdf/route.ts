@@ -558,6 +558,19 @@ export async function GET(req: Request) {
     .digest("hex")
     .slice(0, 16);
 
+  // If we already have a stored PDF for this exact findings hash, redirect to it.
+  try {
+    const existing = await convex.query((api as any).pdfs.getLatestByScan, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+    });
+    if (existing?.url && String((existing as any).findingsHash || "") === findingsHash) {
+      return NextResponse.redirect(existing.url, { status: 302 });
+    }
+  } catch {
+    // ignore
+  }
+
   let brandLogoDataUrl: string | null = null;
   try {
     const abs = path.join(process.cwd(), "public", "brand", "logo.png");
@@ -605,6 +618,26 @@ export async function GET(req: Request) {
           <span><span class=\"pageNumber\"></span>/<span class=\"totalPages\"></span></span>
         </div>`,
     });
+
+    // Store PDF in Convex (deduped by findingsHash).
+    // We still return the bytes so the download works even if storage fails.
+    try {
+      const report = await convex.query((api as any).reports.getByScan, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scanId: scanId as any,
+      });
+
+      await convex.action((api as any).pdfActions.storeForScanIfMissing, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scanId: scanId as any,
+        userId: (scan as any).userId ?? undefined,
+        reportId: report?._id ?? undefined,
+        findingsHash,
+        pdfBase64: Buffer.from(pdf).toString("base64"),
+      });
+    } catch {
+      // ignore
+    }
 
     return new NextResponse(new Uint8Array(pdf), {
       status: 200,
