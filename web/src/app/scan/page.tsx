@@ -269,11 +269,19 @@ function ScanContent() {
     computeDiff();
   }, [record]);
 
-  const tiers = useMemo(
+  type TierOption = {
+    id: "mini" | "standard" | "plus";
+    label: string;
+    desc: string;
+    price: number;
+    compareAt: number;
+  };
+
+  const tiers = useMemo<TierOption[]>(
     () => [
-      { id: "mini", label: "€29 Mini", desc: "Bis 5 Seiten" },
-      { id: "standard", label: "€59 Standard", desc: "Bis 15 Seiten" },
-      { id: "plus", label: "€99 Plus", desc: "Bis 50 Seiten" },
+      { id: "mini", label: "€29 Mini", desc: "Bis 5 Seiten", price: 29, compareAt: 49 },
+      { id: "standard", label: "€59 Standard", desc: "Bis 15 Seiten", price: 59, compareAt: 99 },
+      { id: "plus", label: "€99 Plus", desc: "Bis 50 Seiten", price: 99, compareAt: 149 },
     ],
     []
   );
@@ -335,6 +343,8 @@ function ScanContent() {
 
   const selectedTier = tiers.find((t) => t.id === tier) ?? tiers[0];
   const priceText = (selectedTier.label.split(" ")[0] || "€29").trim();
+  const compareAtText = `€${selectedTier.compareAt}`;
+  const savings = Math.max(0, selectedTier.compareAt - selectedTier.price);
 
   async function runScan(targetUrl?: string) {
     const scanUrlRaw = targetUrl || url;
@@ -801,7 +811,13 @@ function ScanContent() {
                       {!record?.isPaid && (
                         <>
                           <p className="mt-3 text-xs text-center text-slate-600">
-                            Danach einmalig <span className="font-extrabold text-slate-900">{priceText}</span> · PDF sofort · kein Abo
+                            Danach einmalig{" "}
+                            <span className="font-extrabold text-slate-900">{priceText}</span>{" "}
+                            <span className="ml-1 text-slate-400 line-through">{compareAtText}</span>
+                            <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-black text-emerald-700">
+                              Februar‑Special: spare €{savings}
+                            </span>
+                            <span className="ml-2">· PDF sofort · kein Abo</span>
                           </p>
                           <p className="mt-2 text-[11px] text-center text-slate-500 font-semibold">
                             Bereits 100+ technische Checks erstellt · WCAG / BITV / EN 301 549
@@ -835,20 +851,23 @@ function ScanContent() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                       {tiers.map((t) => {
                         const isRec = t.id === recommendedTier;
+                        const isSelected = tier === t.id;
+                        const save = Math.max(0, t.compareAt - t.price);
+
                         return (
                           <button
                             key={t.id}
                             onClick={() => setTier(t.id)}
                             className={`text-left p-4 rounded-2xl border transition-all relative ${
-                              tier === t.id
+                              isSelected
                                 ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-blue-200 hover:text-slate-900"
+                                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-blue-200"
                             }`}
                           >
                             {isRec && (
                               <span
                                 className={`absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                                  tier === t.id
+                                  isSelected
                                     ? "bg-white/10 text-white border-white/25"
                                     : "bg-slate-50 text-slate-700 border-slate-200"
                                 }`}
@@ -856,8 +875,17 @@ function ScanContent() {
                                 Empfohlen
                               </span>
                             )}
+
                             <div className="font-bold">{t.label}</div>
-                            <div className="text-[10px] opacity-80 uppercase font-bold mt-1">{t.desc}</div>
+                            <div className={`mt-1 text-xs font-extrabold ${isSelected ? "text-white/90" : "text-slate-900"}`}>
+                              <span className={isSelected ? "text-white" : "text-slate-900"}>€{t.price}</span>{" "}
+                              <span className={isSelected ? "text-white/60 line-through" : "text-slate-400 line-through"}>€{t.compareAt}</span>
+                              <span className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black border ${isSelected ? "bg-white/10 border-white/25 text-white" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`}>
+                                Februar‑Special: spare €{save}
+                              </span>
+                            </div>
+
+                            <div className={`text-[10px] uppercase font-bold mt-2 ${isSelected ? "text-white/80" : "text-slate-500"}`}>{t.desc}</div>
                           </button>
                         );
                       })}
