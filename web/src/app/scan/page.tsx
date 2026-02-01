@@ -279,9 +279,9 @@ function ScanContent() {
 
   const tiers = useMemo<TierOption[]>(
     () => [
-      { id: "mini", label: "€29 Mini", desc: "Bis 5 Seiten", price: 29, compareAt: 49 },
-      { id: "standard", label: "€59 Standard", desc: "Bis 15 Seiten", price: 59, compareAt: 99 },
-      { id: "plus", label: "€99 Plus", desc: "Bis 50 Seiten", price: 99, compareAt: 149 },
+      { id: "mini", label: "Mini", desc: "Bis 5 Seiten", price: 29, compareAt: 49 },
+      { id: "standard", label: "Standard", desc: "Bis 15 Seiten", price: 59, compareAt: 99 },
+      { id: "plus", label: "Plus", desc: "Bis 50 Seiten", price: 99, compareAt: 149 },
     ],
     []
   );
@@ -811,14 +811,19 @@ function ScanContent() {
                       {!record?.isPaid && (
                         <>
                           <p className="mt-3 text-xs text-center text-slate-600">
-                            Danach einmalig{" "}
-                            <span className="font-extrabold text-slate-900">{priceText}</span>{" "}
-                            <span className="ml-1 text-slate-400 line-through">{compareAtText}</span>
-                            <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-black text-emerald-700">
-                              Februar‑Special: spare €{savings}
-                            </span>
-                            <span className="ml-2">· PDF sofort · kein Abo</span>
+                            Heute <span className="font-extrabold text-slate-900">{priceText}</span>
+                            <span className="mx-1 text-slate-400">statt</span>
+                            <span className="text-slate-400 line-through">{compareAtText}</span>
+                            <span className="mx-2 text-slate-400">•</span>
+                            <span className="font-extrabold text-emerald-700">spare €{savings}</span>
+                            <span className="mx-2 text-slate-400">•</span>
+                            <span>PDF sofort · kein Abo</span>
                           </p>
+                          <div className="mt-2 flex items-center justify-center">
+                            <span className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-black text-emerald-700">
+                              Februar‑Special
+                            </span>
+                          </div>
                           <p className="mt-2 text-[11px] text-center text-slate-500 font-semibold">
                             Bereits 100+ technische Checks erstellt · WCAG / BITV / EN 301 549
                           </p>
@@ -848,7 +853,7 @@ function ScanContent() {
                       <p className="text-sm text-muted-foreground">Plan wählen (Preis &amp; Scan-Umfang):</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {tiers.map((t) => {
                         const isRec = t.id === recommendedTier;
                         const isSelected = tier === t.id;
@@ -858,53 +863,75 @@ function ScanContent() {
                           <button
                             key={t.id}
                             onClick={() => setTier(t.id)}
-                            className={`text-left p-4 rounded-2xl border transition-all relative ${
+                            className={`text-left rounded-3xl border transition-all relative p-5 ${
                               isSelected
-                                ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-blue-200"
+                                ? "bg-slate-900 border-slate-900 text-white shadow-xl"
+                                : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
                             }`}
                           >
-                            {isRec && (
-                              <span
-                                className={`absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                                  isSelected
-                                    ? "bg-white/10 text-white border-white/25"
-                                    : "bg-slate-50 text-slate-700 border-slate-200"
-                                }`}
-                              >
-                                Empfohlen
-                              </span>
-                            )}
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <div className={`text-lg font-black tracking-tight ${isSelected ? "text-white" : "text-slate-900"}`}>{t.label}</div>
+                                <div className={`mt-1 text-xs font-bold uppercase tracking-wider ${isSelected ? "text-white/70" : "text-slate-500"}`}>{t.desc}</div>
+                              </div>
 
-                            <div className="font-bold">{t.label}</div>
-                            <div className={`mt-1 text-xs font-extrabold ${isSelected ? "text-white/90" : "text-slate-900"}`}>
-                              <span className={isSelected ? "text-white" : "text-slate-900"}>€{t.price}</span>{" "}
-                              <span className={isSelected ? "text-white/60 line-through" : "text-slate-400 line-through"}>€{t.compareAt}</span>
-                              <span className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black border ${isSelected ? "bg-white/10 border-white/25 text-white" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`}>
-                                Februar‑Special: spare €{save}
-                              </span>
+                              {isRec && (
+                                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black border ${isSelected ? "bg-white/10 border-white/20 text-white" : "bg-blue-50 border-blue-200 text-blue-700"}`}>
+                                  Empfohlen
+                                </span>
+                              )}
                             </div>
 
-                            <div className={`text-[10px] uppercase font-bold mt-2 ${isSelected ? "text-white/80" : "text-slate-500"}`}>{t.desc}</div>
+                            <div className="mt-4 flex items-baseline gap-2">
+                              <div className={`text-3xl font-black ${isSelected ? "text-white" : "text-slate-900"}`}>€{t.price}</div>
+                              <div className={`text-sm font-bold line-through ${isSelected ? "text-white/50" : "text-slate-400"}`}>€{t.compareAt}</div>
+                            </div>
+
+                            <div className="mt-3 flex items-center justify-between gap-3">
+                              <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-black border ${isSelected ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-200" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`}>
+                                Februar‑Special · spare €{save}
+                              </span>
+                              <span className={`text-[11px] font-semibold ${isSelected ? "text-white/70" : "text-slate-500"}`}>Einmalig · kein Abo</span>
+                            </div>
                           </button>
                         );
                       })}
                     </div>
 
-                    <div className="max-w-md mx-auto text-xs text-slate-600 bg-white border border-slate-200 rounded-2xl p-4">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-center">Welches Paket passt?</div>
-                      <ul className="space-y-1 list-disc pl-5">
-                        <li><b>Mini</b>: bis 5 Seiten – schnelle Einschätzung.</li>
-                        <li><b>Standard</b>: bis 15 Seiten – die wichtigsten Seiten/Flows.</li>
-                        <li><b>Plus</b>: bis 50 Seiten – repräsentativer Audit für größere Websites/Shops.</li>
-                      </ul>
-                      <div className="mt-3 text-[11px] text-slate-500">
-                        Empfehlung basiert primär auf der geschätzten Seitenanzahl{estimatedPages ? ` (~${estimatedPages})` : ""}. Du kannst jederzeit umstellen.
+                    <div className="max-w-2xl mx-auto rounded-3xl border border-slate-200 bg-white p-6">
+                      <div className="text-center">
+                        <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Paket‑Empfehlung</div>
+                        <div className="mt-1 text-sm font-semibold text-slate-700">
+                          {typeof estimatedPages === "number" ? (
+                            <>Geschätzte Seiten: <span className="font-black text-slate-900">~{estimatedPages}</span></>
+                          ) : (
+                            <>Wir schätzen den Umfang nach Scan‑Fortschritt.</>
+                          )}
+                        </div>
                       </div>
+
+                      <div className="mt-5 grid gap-3 md:grid-cols-3">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="text-xs font-black text-slate-900">Mini</div>
+                          <div className="mt-1 text-xs text-slate-600">Für eine schnelle Einschätzung.</div>
+                          <div className="mt-3 text-[11px] font-semibold text-slate-600">Bis 5 Seiten</div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="text-xs font-black text-slate-900">Standard</div>
+                          <div className="mt-1 text-xs text-slate-600">Wichtigste Seiten &amp; Flows.</div>
+                          <div className="mt-3 text-[11px] font-semibold text-slate-600">Bis 15 Seiten</div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="text-xs font-black text-slate-900">Plus</div>
+                          <div className="mt-1 text-xs text-slate-600">Repräsentativer Audit für größere Websites/Shops.</div>
+                          <div className="mt-3 text-[11px] font-semibold text-slate-600">Bis 50 Seiten</div>
+                        </div>
+                      </div>
+
                       {typeof estimatedPages === "number" && estimatedPages > 50 && (
-                        <div className="mt-3 text-[11px] font-semibold text-slate-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
-                          Hinweis: Es wurden mehr als 50 Seiten entdeckt. „Plus“ ist dann am sinnvollsten (repräsentativ) –
-                          für 100% Abdeckung bitte Scope/Unterseiten eingrenzen.
+                        <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-[12px] text-amber-900">
+                          <span className="font-black">Hinweis:</span> Es wurden mehr als 50 Seiten entdeckt.
+                          "Plus" ist dann am sinnvollsten (repräsentativ). Für 100% Abdeckung bitte Scope/Unterseiten eingrenzen.
                         </div>
                       )}
                     </div>
