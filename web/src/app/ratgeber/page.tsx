@@ -43,6 +43,19 @@ export default function RatgeberIndex() {
         </p>
 
         <div className="mt-10 grid gap-4">
+          <Link
+            href="/ratgeber/faq"
+            className="group rounded-3xl border border-blue-100 bg-blue-50 p-6 hover:bg-blue-100/60 transition"
+          >
+            <div className="text-xl font-extrabold text-slate-900 group-hover:text-blue-800 transition">
+              BFSG FAQ: 60 Fragen & Antworten
+            </div>
+            <div className="mt-2 text-sm text-slate-700 leading-relaxed">
+              Der Schnellstart für Teams: Geltung, Fristen, Anforderungen, Tests, Kosten, Risiken – kompakt erklärt.
+            </div>
+            <div className="mt-3 text-sm font-bold text-blue-800">Zur FAQ →</div>
+          </Link>
+
           {posts.map((p) => (
             <Link
               key={p.slug}
