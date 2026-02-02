@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { markdownToHtml } from "@/app/lib/markdown";
+import { RELATED_POSTS } from "@/app/lib/relatedPosts";
 
 function postDir() {
   return path.join(process.cwd(), "content/ratgeber");
@@ -28,6 +29,15 @@ function getPostBySlug(slug: string) {
     ogImage: data.ogImage ? String(data.ogImage) : undefined,
     content,
   };
+}
+
+function tryLoadTitle(slug: string): string {
+  try {
+    const p = getPostBySlug(slug);
+    return p.title;
+  } catch {
+    return slug;
+  }
 }
 
 export function generateStaticParams() {
@@ -69,12 +79,17 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
   const post = getPostBySlug(slug);
   const html = await markdownToHtml(post.content);
 
+  const related = (RELATED_POSTS[post.slug] || []).slice(0, 3);
+
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 px-4 md:px-6 py-16">
       <article className="max-w-3xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <Link href="/ratgeber" className="text-sm font-bold text-blue-700 hover:text-blue-800">
             ← Zur Ratgeber-Übersicht
+          </Link>
+          <Link href="/" className="text-sm font-black text-slate-900 hover:text-blue-700">
+            BFSG Check starten
           </Link>
         </div>
 
@@ -86,6 +101,23 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
           {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
+            <div className="font-extrabold text-slate-900">Weiterführende Artikel</div>
+            <div className="mt-4 grid gap-3">
+              {related.map((slug) => (
+                <Link
+                  key={slug}
+                  href={`/ratgeber/${slug}`}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100"
+                >
+                  {tryLoadTitle(slug)}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
           <div className="font-extrabold text-slate-900">Direkt prüfen</div>
