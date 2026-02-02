@@ -1,13 +1,13 @@
 {
   "redirects": [
     {
-      "source": "(.*)",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "bfsg.vercel.app" }],
       "destination": "https://bfsg-webcheck.de/$1",
       "permanent": true
     },
     {
-      "source": "(.*)",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.bfsg-webcheck.de" }],
       "destination": "https://bfsg-webcheck.de/$1",
       "permanent": true
