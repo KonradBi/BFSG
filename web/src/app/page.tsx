@@ -274,8 +274,8 @@ export default function Home() {
               </p>
 
               <div className="mt-6 grid md:grid-cols-3 gap-4">
-                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                  <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
+                <a href="/muster-report#summary" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-summary.png" alt="Beispiel: Summary" className="w-full h-auto block" />
                   <div className="p-4">
                     <div className="font-extrabold text-slate-900">Summary</div>
                     <div className="mt-1 text-sm text-slate-600">Status, Scores, Highlights</div>
@@ -283,8 +283,8 @@ export default function Home() {
                   </div>
                 </a>
 
-                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                  <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
+                <a href="/muster-report#issues" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-issues.png" alt="Beispiel: Issues" className="w-full h-auto block" />
                   <div className="p-4">
                     <div className="font-extrabold text-slate-900">Issues</div>
                     <div className="mt-1 text-sm text-slate-600">P0–P2, betroffene Seiten</div>
@@ -292,8 +292,8 @@ export default function Home() {
                   </div>
                 </a>
 
-                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                  <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
+                <a href="/muster-report#fixes" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-fixes.png" alt="Beispiel: Fixes" className="w-full h-auto block" />
                   <div className="p-4">
                     <div className="font-extrabold text-slate-900">Fix‑Schritte</div>
                     <div className="mt-1 text-sm text-slate-600">konkret & priorisiert</div>
