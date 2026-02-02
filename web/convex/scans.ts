@@ -69,6 +69,20 @@ export const get = query({
   },
 });
 
+export const listByUserId = query({
+  args: { userId: v.string(), limit: v.optional(v.number()) },
+  handler: async (ctx, { userId, limit }) => {
+    const n = Math.max(1, Math.min(100, limit ?? 50));
+    // No index yet; filter is acceptable for current scale.
+    const rows = await ctx.db
+      .query("scans")
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .order("desc")
+      .take(n);
+    return rows;
+  },
+});
+
 function planForTier(tier?: string | null) {
   const t = String(tier || "mini");
   if (t === "plus") {
