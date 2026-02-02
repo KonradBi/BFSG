@@ -648,7 +648,23 @@ export async function GET(req: Request) {
   if (scan.accessToken !== token) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const url = scan.url;
-  const findings = Array.isArray(scan.findings) ? (scan.findings as Finding[]) : [];
+
+  // Prefer findings stored in the reports table (richer + consistent with /api/scans/get).
+  let findings: Finding[] = [];
+  try {
+    const report = await convex.query((api as any).reports.getByScan, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      scanId: scanId as any,
+    });
+    if (Array.isArray((report as any)?.findings)) findings = (report as any).findings as Finding[];
+  } catch {
+    // ignore
+  }
+
+  if (!findings.length) {
+    findings = Array.isArray((scan as any).findings) ? ((scan as any).findings as Finding[]) : [];
+  }
+
   const totals =
     scan.totals ??
     ({
