@@ -66,6 +66,30 @@ export default async function AuditKostenPage() {
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
 
+        <section className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
+          <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Beispiel</div>
+          <div className="mt-2 text-xl font-black text-slate-900">So sieht ein Report aus</div>
+          <div className="mt-2 text-sm text-slate-700 leading-relaxed">
+            Technischer Prüfbericht mit Prioritäten (P0–P2) und konkreten Fix‑Schritten. Hinweis: keine Rechtsberatung.
+          </div>
+
+          <div className="mt-5 grid md:grid-cols-3 gap-3">
+            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+              <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
+            </a>
+            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+              <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
+            </a>
+            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+              <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
+            </a>
+          </div>
+
+          <a href="/muster-report" className="mt-4 inline-flex font-black text-blue-700 hover:text-blue-800">
+            Muster‑Report ansehen →
+          </a>
+        </section>
+
         <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
           <div className="font-extrabold text-slate-900">Weiterführende Artikel</div>
           <div className="mt-4 grid gap-3">
