@@ -196,7 +196,7 @@ function ScanContent() {
 
     if (prefillTier) setTier(prefillTier);
 
-    // Persist token from redirect (Stripe success/cancel) if present.
+    // Persist token from redirect (Stripe success/cancel) or auth callback if present.
     if (scanId && token) setToken(scanId, token);
 
     if (prefillUrl) {
@@ -209,7 +209,7 @@ function ScanContent() {
     }
 
     if (scanId) {
-      // Returned from Stripe (success/canceled) or deep-link.
+      // Returned from Stripe (success/canceled) or deep-link or auth callback.
       setBusy(true);
 
       const success = searchParams.get("success");
@@ -520,6 +520,93 @@ function ScanContent() {
     }
   }
 
+  function getPendingCheckout(): { scanId: string; tier: string } | null {
+    try {
+      const raw = localStorage.getItem("als_pendingCheckout");
+      if (!raw) return null;
+      const data = JSON.parse(raw) as { scanId?: string; tier?: string; ts?: number };
+      if (!data?.scanId) return null;
+      // Auto-expire after 30 minutes.
+      if (data.ts && Date.now() - data.ts > 30 * 60 * 1000) {
+        localStorage.removeItem("als_pendingCheckout");
+        return null;
+      }
+      return { scanId: String(data.scanId), tier: String(data.tier || "mini") };
+    } catch {
+      return null;
+    }
+  }
+
+  function setPendingCheckout(scanId: string, tier: string) {
+    try {
+      localStorage.setItem("als_pendingCheckout", JSON.stringify({ scanId, tier, ts: Date.now() }));
+    } catch {
+      // ignore
+    }
+  }
+
+  function clearPendingCheckout() {
+    try {
+      localStorage.removeItem("als_pendingCheckout");
+    } catch {
+      // ignore
+    }
+  }
+
+  async function startCheckout(scanId: string, effectiveTier: string) {
+    const token = getToken(scanId);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ scanId, tier: effectiveTier, scanToken: token }),
+      });
+
+      if (res.status === 401) {
+        // Should not happen if we're authenticated, but handle gracefully.
+        setPendingCheckout(scanId, effectiveTier);
+        await signIn("google", {
+          callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(
+            effectiveTier
+          )}`,
+        });
+        return;
+      }
+
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!data.url) throw new Error(data.error || "checkout_failed");
+      clearPendingCheckout();
+      window.location.href = data.url;
+    } catch (e) {
+      console.error(e);
+      alert("Checkout konnte nicht gestartet werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    // After Google login, resume the checkout automatically (prevents "landing back" on /scan).
+    if (authStatus !== "authenticated") return;
+    if (!record?.scanId) return;
+    if (record.isPaid) {
+      clearPendingCheckout();
+      return;
+    }
+
+    const pending = getPendingCheckout();
+    if (!pending) return;
+    if (pending.scanId !== record.scanId) return;
+
+    // Sync tier from pending (in case state reset during redirect).
+    if (pending.tier && pending.tier !== tier) setTier(pending.tier);
+
+    // Fire & forget; it will redirect to Stripe.
+    startCheckout(record.scanId, pending.tier || tier);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authStatus, record?.scanId]);
+
   async function unlock() {
     const scanId = record?.scanId || teaser?.scanId;
     if (!scanId) return;
@@ -533,36 +620,16 @@ function ScanContent() {
       return;
     }
 
-    if (!teaser) return;
-
     // Require Google login before Stripe checkout
     if (authStatus !== "authenticated") {
-      await signIn("google", { callbackUrl: window.location.href });
+      setPendingCheckout(scanId, tier);
+      await signIn("google", {
+        callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(tier)}`,
+      });
       return;
     }
 
-    setBusy(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ scanId: teaser.scanId, tier, scanToken: token }),
-      });
-
-      if (res.status === 401) {
-        await signIn("google", { callbackUrl: window.location.href });
-        return;
-      }
-
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!data.url) throw new Error(data.error || "checkout_failed");
-      window.location.href = data.url;
-    } catch (e) {
-      console.error(e);
-      alert("Checkout konnte nicht gestartet werden.");
-    } finally {
-      setBusy(false);
-    }
+    await startCheckout(scanId, tier);
   }
 
   async function rerunPaidScan() {
