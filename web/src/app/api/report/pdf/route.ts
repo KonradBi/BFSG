@@ -185,6 +185,7 @@ function escapeHtml(s: string) {
 
 function reportHtml(params: {
   url: string;
+  urlDisplay: string;
   generatedAt: string;
   auditId: string;
   findingsHash: string;
@@ -193,7 +194,9 @@ function reportHtml(params: {
   findings: Finding[];
   brandLogoDataUrl?: string | null;
 }) {
-  const { url, generatedAt, auditId, findingsHash, totals, pageShot, findings, brandLogoDataUrl } = params;
+  const { url, urlDisplay, generatedAt, auditId, findingsHash, totals, pageShot, findings, brandLogoDataUrl } = params;
+
+  const urlLabel = urlDisplay.includes("example.com") ? `Demo-Website: ${urlDisplay}` : urlDisplay;
 
   // Executive summary / quick recommendation
   const recos = [
@@ -314,8 +317,8 @@ function reportHtml(params: {
     }
 
     .brand { display:flex; align-items:flex-start; gap:18px; }
-    .brand img { width: 128px; height: 128px; object-fit: contain; display:block; }
-    .brand h1 { font-size: 24px; }
+    .brand img { width: 44px; height: 44px; object-fit: contain; display:block; }
+    .brand h1 { font-size: 18px; }
 
     h1 { font-size: 20px; margin: 0; letter-spacing: -0.02em; }
 
@@ -466,8 +469,8 @@ function reportHtml(params: {
           <div>
             <h1 style="margin:0">BFSG-WebCheck – Barrierefreiheits‑Prüfbericht</h1>
             <div class="sub">
-              Website: <b>${escapeHtml(url)}</b><br />
-              Hinweis: Technischer Report (WCAG/EN 301 549/BITV) – <b>keine Rechtsberatung</b> und <b>keine Garantie auf BFSG-/WCAG-Konformität</b>.
+              Website: <b>${escapeHtml(urlLabel)}</b><br />
+              Hinweis: Technischer Report (WCAG/EN 301 549/BITV) – <b>keine Rechtsberatung</b>.
             </div>
           </div>
         </div>
@@ -476,14 +479,14 @@ function reportHtml(params: {
         Generiert: ${escapeHtml(generatedAt)}<br />
         Prüf-ID: ${escapeHtml(auditId)}<br />
         Ergebnis-Hash: ${escapeHtml(findingsHash)}<br />
-        Version: MVP
+        Version: 1.0
       </div>
     </div>
 
     <div class="card">
       <div class="h2">Kurzfazit (Executive Summary)</div>
       <div class="sub" style="margin-bottom:10px">
-        Kurzfazit für Entscheider:innen – technische Prüfung nach WCAG/EN 301 549/BITV (keine Rechtsberatung).
+        Technische Momentaufnahme: automatisierte Checks + konkrete Fix‑Schritte. Für vollständige BFSG‑Bewertung empfehlen wir zusätzlich manuelle Prüfungen.
       </div>
 
       <div class="kpis">
@@ -647,8 +650,19 @@ export async function GET(req: Request) {
     brandLogoDataUrl = null;
   }
 
+  const urlDisplay = (() => {
+    try {
+      const u = new URL(url);
+      const p = u.pathname && u.pathname !== "/" ? u.pathname : "";
+      return `${u.host}${p}`;
+    } catch {
+      return url;
+    }
+  })();
+
   const html = reportHtml({
     url,
+    urlDisplay,
     generatedAt: new Date().toISOString(),
     auditId,
     findingsHash,
@@ -680,7 +694,7 @@ export async function GET(req: Request) {
       // Keep header empty (clean look). Branding is handled inside the PDF body.
       headerTemplate: `<div></div>`,
       footerTemplate: `<div style="font-size:9px;width:100%;padding:0 14mm;color:#64748b;display:flex;justify-content:space-between;">
-          <span>${escapeHtml(url)}</span>
+          <span>${escapeHtml(urlDisplay)}</span>
           <span><span class=\"pageNumber\"></span>/<span class=\"totalPages\"></span></span>
         </div>`,
     });

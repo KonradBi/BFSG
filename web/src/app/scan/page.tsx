@@ -675,7 +675,7 @@ function ScanContent() {
                         onClick={unlock}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white font-bold"
                       >
-                        PDF öffnen
+                        PDF‑Report öffnen
                       </button>
                       {/* Re-Scan disabled */}
                     </div>
