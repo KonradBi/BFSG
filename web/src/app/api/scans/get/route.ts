@@ -48,9 +48,14 @@ export async function GET(req: Request) {
   if (!scan.isPaid) return NextResponse.json(base);
 
   // Paid scans require proof of possession (token) in MVP.
+  // BUT: the dashboard (/scans) should still be able to list items even if the token
+  // isn't present (e.g. different device / cleared storage). So we return `base`
+  // without findings/pdfUrl when locked.
   const storedToken = (scan as any).accessToken ? String((scan as any).accessToken) : "";
-  if (!token || token !== storedToken) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const hasAccess = !!token && token === storedToken;
+
+  if (!hasAccess) {
+    return NextResponse.json({ ...base, locked: true }, { status: 200 });
   }
 
   // Pull findings from the reports table (preferred), fallback to scan.findings.
@@ -70,6 +75,7 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     ...base,
+    locked: false,
     findings: (report as any)?.findings ?? (scan as any).findings ?? [],
     pdfUrl: (pdf as any)?.url ?? null,
   });

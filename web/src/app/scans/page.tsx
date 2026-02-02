@@ -9,6 +9,8 @@ type Scan = {
   status: string;
   isPaid: boolean;
   tier: string | null;
+  locked?: boolean;
+  pdfUrl?: string | null;
   progress?: { pagesDone: number; pagesTotal: number } | null;
   totals?: { p0: number; p1: number; p2: number; total: number } | null;
   error?: string | null;
@@ -18,6 +20,15 @@ export default function ScansPage() {
   const [ids, setIds] = useState<string[]>([]);
   const [rows, setRows] = useState<Scan[]>([]);
   const [busy, setBusy] = useState(false);
+
+  function getToken(scanId: string) {
+    try {
+      const map = JSON.parse(localStorage.getItem("als_scanTokens") || "{}") as Record<string, string>;
+      return map[scanId] || "";
+    } catch {
+      return "";
+    }
+  }
 
   useEffect(() => {
     try {
@@ -40,7 +51,11 @@ export default function ScansPage() {
       try {
         const items: Scan[] = [];
         for (const id of ids) {
-          const res = await fetch(`/api/scans/get?scanId=${encodeURIComponent(id)}`, { cache: "no-store" });
+          const token = getToken(id);
+          const res = await fetch(`/api/scans/get?scanId=${encodeURIComponent(id)}`, {
+            cache: "no-store",
+            headers: { accept: "application/json", ...(token ? { "x-scan-token": token } : {}) },
+          });
           if (!res.ok) continue;
           const data = (await res.json()) as Scan;
           items.push(data);
@@ -75,30 +90,55 @@ export default function ScansPage() {
         {busy && <div className="text-sm text-slate-600">Lade…</div>}
 
         <div className="space-y-3">
-          {rows.map((r) => (
-            <Link
-              key={r.scanId}
-              href={`/scan?scanId=${encodeURIComponent(r.scanId)}`}
-              className="block bg-white rounded-2xl border border-slate-200 p-5 hover:border-blue-200 hover:bg-slate-50 transition"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-slate-500 uppercase">{r.tier ?? "teaser"}</div>
-                  <div className="font-extrabold text-slate-900 truncate">{r.url}</div>
-                  <div className="mt-2 text-xs font-bold text-slate-600">
-                    Status: {r.status}
-                    {r.progress ? ` · ${r.progress.pagesDone}/${r.progress.pagesTotal}` : ""}
-                    {r.isPaid ? " · bezahlt" : ""}
+          {rows.map((r) => {
+            const token = typeof window !== "undefined" ? getToken(r.scanId) : "";
+            const scanHref = `/scan?scanId=${encodeURIComponent(r.scanId)}${token ? `&token=${encodeURIComponent(token)}` : ""}`;
+            const pdfHref = token ? `/api/report/pdf?scanId=${encodeURIComponent(r.scanId)}&token=${encodeURIComponent(token)}` : "";
+
+            return (
+              <div
+                key={r.scanId}
+                className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-blue-200 hover:bg-slate-50 transition"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-500 uppercase">{r.tier ?? "teaser"}</div>
+                    <Link href={scanHref} className="font-extrabold text-slate-900 truncate block">
+                      {r.url}
+                    </Link>
+                    <div className="mt-2 text-xs font-bold text-slate-600">
+                      Status: {r.status}
+                      {r.progress ? ` · ${r.progress.pagesDone}/${r.progress.pagesTotal}` : ""}
+                      {r.isPaid ? " · bezahlt" : ""}
+                      {r.locked ? " · gesperrt (Token fehlt)" : ""}
+                    </div>
+                    {r.error && <div className="mt-2 text-xs font-bold text-red-700">Fehler: {r.error}</div>}
+
+                    <div className="mt-4 flex items-center gap-3">
+                      <Link href={scanHref} className="text-sm font-black text-blue-700 hover:text-blue-800">
+                        Öffnen
+                      </Link>
+                      {r.isPaid && token && (
+                        <a
+                          href={pdfHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-black text-slate-900 hover:text-slate-700"
+                        >
+                          PDF herunterladen
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  {r.error && <div className="mt-2 text-xs font-bold text-red-700">Fehler: {r.error}</div>}
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-black text-slate-900">{r.totals?.total ?? "–"}</div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
+
+                  <div className="text-right">
+                    <div className="text-2xl font-black text-slate-900">{r.totals?.total ?? "–"}</div>
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
+                  </div>
                 </div>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-10 text-xs text-slate-500">
