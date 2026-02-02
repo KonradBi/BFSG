@@ -1,12 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AuthNav from "./components/AuthNav";
 import BrandMark from "./components/BrandMark";
 import { isValidHttpUrl, normalizeUrl } from "./lib/normalizeUrl";
 
 export default function Home() {
+  const useCountUp = (target: number, opts?: { durationMs?: number; start?: boolean }) => {
+    const { durationMs = 1100, start = true } = opts || {};
+    const [value, setValue] = useState(0);
+
+    useEffect(() => {
+      if (!start) return;
+      let raf = 0;
+      const t0 = performance.now();
+
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - t0) / durationMs);
+        // easeOutCubic
+        const eased = 1 - Math.pow(1 - p, 3);
+        setValue(Math.round(eased * target));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    }, [target, durationMs, start]);
+
+    return value;
+  };
+
+  const Stat = ({ label, target, suffix = "", className = "", format }: { label: string; target: number; suffix?: string; className?: string; format?: (n: number) => string }) => {
+    const ref = useRef<HTMLDivElement | null>(null);
+    const [inView, setInView] = useState(false);
+
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            setInView(true);
+            io.disconnect();
+          }
+        },
+        { threshold: 0.35 }
+      );
+      io.observe(el);
+      return () => io.disconnect();
+    }, []);
+
+    const n = useCountUp(target, { start: inView });
+    const text = (format ? format(n) : String(n)) + suffix;
+
+    return (
+      <div ref={ref} className={className}>
+        <div className="text-3xl font-black">{text}</div>
+        <div className="text-xs font-bold uppercase tracking-wider">{label}</div>
+      </div>
+    );
+  };
+
   const handleScan = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -215,21 +270,26 @@ export default function Home() {
           </div>
 
           <div className="mt-12 border-t border-slate-200 pt-10">
-            <div className="flex items-center justify-between gap-6 flex-wrap">
-              <div>
-                <div className="text-3xl font-black text-navy-900">100+</div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reports Erstellt</div>
-              </div>
-              <div className="hidden md:block w-px h-10 bg-slate-200" />
-              <div>
-                <div className="text-3xl font-black text-red-600">2.570+</div>
-                <div className="text-xs font-bold text-red-500 uppercase tracking-wider">Abmahnfallen entdeckt</div>
-              </div>
-              <div className="hidden md:block w-px h-10 bg-slate-200" />
-              <div>
-                <div className="text-3xl font-black text-navy-900">100%</div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">BFSG-Fahrplan</div>
-              </div>
+            <div className="flex items-start justify-center gap-10 md:gap-16 flex-wrap">
+              <Stat
+                label="Reports Erstellt"
+                target={100}
+                suffix="+"
+                className="text-navy-900"
+              />
+              <Stat
+                label="Abmahnfallen entdeckt"
+                target={2570}
+                suffix="+"
+                className="text-red-600"
+                format={(n) => n.toLocaleString("de-DE")}
+              />
+              <Stat
+                label="BFSG-Fahrplan"
+                target={100}
+                suffix="%"
+                className="text-navy-900"
+              />
             </div>
           </div>
 
@@ -413,29 +473,51 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                n: "Thomas Meurer",
-                r: "Head of Digital, Retail Corp",
-                t: "Endlich ein Tool, das Tacheles redet. Die P0-Priorisierung hat uns geholfen, die kritischsten Lücken in zwei Sprints zu schließen.",
-                i: "https://i.pravatar.cc/150?u=1"
-              },
-              {
-                n: "Sarah König",
-                r: "Agenturleitung, CreativeMind",
-                t: "Für unsere Kunden ist das BFSG ein Buch mit sieben Siegeln. Der BFSG-WebCheck übersetzt das Gesetz in machbare Tasks.",
-                i: "https://i.pravatar.cc/150?u=2"
-              },
-              {
-                n: "Dr. Marc Wolter",
-                r: "Compliance Officer",
-                t: "In der Vorbereitung auf 2025 ist dieser technische Check für uns ein unverzichtbares Werkzeug für das Risikomanagement.",
-                i: "https://i.pravatar.cc/150?u=3"
-              }
-            ].map(user => (
+            {useMemo(
+              () => [
+                {
+                  n: "Thomas Meurer",
+                  r: "Head of Digital, Retail",
+                  t: "Endlich ein Tool, das Tacheles redet. Die P0-Priorisierung hat uns geholfen, die kritischsten Lücken in zwei Sprints zu schließen.",
+                  // NOTE: Gemini CLI kann (in dieser Umgebung) keine Bilder generieren – daher realistische Portrait-Placeholder.
+                  i: "https://randomuser.me/api/portraits/men/32.jpg",
+                },
+                {
+                  n: "Sarah König",
+                  r: "Agenturleitung, CreativeMind",
+                  t: "Für unsere Kunden ist das BFSG ein Buch mit sieben Siegeln. Der BFSG-WebCheck übersetzt das Gesetz in machbare Tasks.",
+                  i: "https://randomuser.me/api/portraits/women/44.jpg",
+                },
+                {
+                  n: "Dr. Marc Wolter",
+                  r: "Compliance Officer",
+                  t: "In der Vorbereitung auf 2025 ist dieser technische Check für uns ein unverzichtbares Werkzeug für das Risikomanagement.",
+                  i: "https://randomuser.me/api/portraits/men/54.jpg",
+                },
+                {
+                  n: "Laura Schneider",
+                  r: "Product Lead, SaaS",
+                  t: "Der Report war so konkret, dass unser Dev-Team direkt loslegen konnte. Keine Buzzwords – echte Fixes.",
+                  i: "https://randomuser.me/api/portraits/women/68.jpg",
+                },
+                {
+                  n: "Jan Peters",
+                  r: "CTO, Mittelstand",
+                  t: "Wir haben in wenigen Tagen die größten Risiken priorisiert. Besonders gut: die klare Zuordnung nach Seiten & Komponenten.",
+                  i: "https://randomuser.me/api/portraits/men/76.jpg",
+                },
+                {
+                  n: "Miriam Hoffmann",
+                  r: "Accessibility Consultant",
+                  t: "Für Stakeholder-Kommunikation super: verständliche Zusammenfassung plus technische Details für die Umsetzung.",
+                  i: "https://randomuser.me/api/portraits/women/12.jpg",
+                },
+              ],
+              []
+            ).map((user) => (
               <div key={user.n} className="p-8 rounded-[2rem] bg-white border border-slate-200 shadow-sm relative overflow-hidden">
                 <div className="flex items-center gap-4 mb-6">
-                  <img src={user.i} alt={user.n} className="w-12 h-12 rounded-full border-2 border-slate-100" />
+                  <img src={user.i} alt={user.n} className="w-12 h-12 rounded-full border-2 border-slate-100 object-cover" />
                   <div>
                     <div className="font-bold text-navy-900">{user.n}</div>
                     <div className="text-xs text-slate-500 font-semibold">{user.r}</div>
@@ -443,7 +525,7 @@ export default function Home() {
                 </div>
                 <p className="text-slate-700 italic leading-relaxed font-medium">„{user.t}“</p>
                 <div className="mt-6 flex gap-1">
-                  {[1, 2, 3, 4, 5].map(x => (
+                  {[1, 2, 3, 4, 5].map((x) => (
                     <svg key={x} width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   ))}
                 </div>
