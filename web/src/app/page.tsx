@@ -157,100 +157,161 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Trust: Beispiel-Report */}
-              <section className="mt-10 rounded-[2.5rem] border border-slate-200 bg-white p-8 max-w-5xl">
-                <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Beispiel</div>
-                <h2 className="mt-2 text-2xl md:text-3xl font-black text-navy-900">So sieht ein Report aus</h2>
-                <p className="mt-4 text-sm md:text-base text-slate-700 leading-relaxed font-semibold max-w-2xl">
-                  Ein technischer Prüfbericht mit Prioritäten (P0–P2) und konkreten Fix‑Schritten – verständlich für Teams aus
-                  Produkt, Design und Entwicklung. Hinweis: keine Rechtsberatung.
-                </p>
-
-                <div className="mt-6 grid md:grid-cols-3 gap-4">
-                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                    <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
-                    <div className="p-4">
-                      <div className="font-extrabold text-slate-900">Summary</div>
-                      <div className="mt-1 text-sm text-slate-600">Status, Scores, Highlights</div>
-                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
-                    </div>
-                  </a>
-
-                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                    <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
-                    <div className="p-4">
-                      <div className="font-extrabold text-slate-900">Issues</div>
-                      <div className="mt-1 text-sm text-slate-600">P0–P2, betroffene Seiten</div>
-                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
-                    </div>
-                  </a>
-
-                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-                    <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
-                    <div className="p-4">
-                      <div className="font-extrabold text-slate-900">Fix‑Schritte</div>
-                      <div className="mt-1 text-sm text-slate-600">konkret & priorisiert</div>
-                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
-                    </div>
-                  </a>
-                </div>
-              </section>
-
-              {/* E-E-A-T: Methodik */}
-              <section className="mt-10 rounded-[2.5rem] border border-slate-200 bg-white p-8 max-w-xl">
-                <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Methodik & Transparenz</div>
-                <h2 className="mt-2 text-2xl font-black text-navy-900">Wie wir prüfen</h2>
-                <p className="mt-4 text-sm text-slate-700 leading-relaxed font-semibold">
-                  Unsere Analyseplattform identifiziert technische Barrieren auf Basis der WCAG 2.2 und BITV 2.0.
-                  Wir liefern eine technische Entscheidungsgrundlage zur Verbesserung Ihrer Barrierefreiheit.
-                  Hinweis: keine Rechtsberatung.
-                </p>
-
-                <ul className="mt-5 space-y-2 text-sm text-slate-700 list-disc pl-5">
-                  <li>Automatisierte Prüfung auf kritische Kriterien (z.B. Kontrast, semantische Struktur, ARIA‑Attribute).</li>
-                  <li>Empfehlung für ergänzende manuelle Checks (Tastatur‑Fokus, Screenreader‑Abfolge, Flows).</li>
-                  <li>Priorisierung (P0–P2) und konkrete Fix‑Schritte für schnelle Umsetzung.</li>
-                </ul>
-
-                <p className="mt-5 text-xs text-slate-600 leading-relaxed">
-                  Datenschutz hat Priorität: Wir prüfen datensparsam anhand der öffentlich abrufbaren Frontend‑Struktur Ihrer Website.
-                </p>
-
-                <a href="/ratgeber" className="mt-5 inline-flex font-black text-blue-700 hover:text-blue-800">
-                  Zum Ratgeber für digitale Barrierefreiheit →
-                </a>
-              </section>
-
-              <div className="flex items-center gap-8 border-t border-slate-200 pt-10">
-                <div>
-                  <div className="text-3xl font-black text-navy-900">100+</div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reports Erstellt</div>
-                </div>
-                <div className="w-px h-10 bg-slate-200" />
-                <div>
-                  <div className="text-3xl font-black text-red-600">2.570+</div>
-                  <div className="text-xs font-bold text-red-500 uppercase tracking-wider">Abmahnfallen entdeckt</div>
-                </div>
-                <div className="w-px h-10 bg-slate-200" />
-                <div>
-                  <div className="text-3xl font-black text-navy-900">100%</div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">BFSG-Fahrplan</div>
-                </div>
-              </div>
             </div>
 
             <div className="relative lg:block">
               <div className="absolute -inset-20 bg-blue-100/50 blur-[100px] rounded-full pointer-events-none" />
-              <div className="relative z-10 transform lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                <div className="glass rounded-[2.5rem] p-4 shadow-2xl border border-white/40">
-                  <img 
-                    src="/images/report-mockup.png" 
-                    alt="BFSG WebCheck Dashboard Mockup" 
-                    className="rounded-[1.75rem] shadow-lg w-full h-auto animate-float"
-                  />
+              <div className="relative z-10">
+                <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl p-8">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Report Summary</div>
+                      <h3 className="mt-2 text-3xl font-black text-navy-900 leading-[1.1]">Kompakte Übersicht</h3>
+                      <p className="mt-3 text-sm text-slate-600 font-semibold max-w-md">
+                        Prioritäten (P0–P2), Issues‑Liste und klare Fix‑Schritte – wie im Dashboard.
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-4xl font-black text-slate-900">12</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3 rounded-2xl border bg-red-50 text-red-700 border-red-100">
+                      <div className="text-xl font-black">3</div>
+                      <div className="text-[10px] uppercase font-bold opacity-80">P0</div>
+                    </div>
+                    <div className="p-3 rounded-2xl border bg-orange-50 text-orange-700 border-orange-100">
+                      <div className="text-xl font-black">5</div>
+                      <div className="text-[10px] uppercase font-bold opacity-80">P1</div>
+                    </div>
+                    <div className="p-3 rounded-2xl border bg-yellow-50 text-yellow-800 border-yellow-100">
+                      <div className="text-xl font-black">4</div>
+                      <div className="text-[10px] uppercase font-bold opacity-80">P2</div>
+                    </div>
+                    <div className="p-3 rounded-2xl border bg-slate-50 text-slate-700 border-slate-200">
+                      <div className="text-xl font-black">PDF</div>
+                      <div className="text-[10px] uppercase font-bold opacity-80">Download</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 h-2 w-full rounded-full overflow-hidden bg-slate-200 flex">
+                    <div className="h-full bg-red-500" style={{ width: "25%" }} />
+                    <div className="h-full bg-orange-500" style={{ width: "42%" }} />
+                    <div className="h-full bg-yellow-400" style={{ width: "33%" }} />
+                  </div>
+
+                  <div className="mt-7 rounded-2xl border border-slate-200 overflow-hidden">
+                    <div className="px-4 py-3 bg-slate-50 flex items-center justify-between">
+                      <div className="text-xs font-black uppercase tracking-widest text-slate-600">Issues</div>
+                      <div className="text-xs font-bold text-slate-500">Top 8</div>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {[
+                        { s: "P0", t: "Kontrast zu niedrig", c: "bg-red-100 text-red-700" },
+                        { s: "P0", t: "Kein Label am Input", c: "bg-red-100 text-red-700" },
+                        { s: "P1", t: "Heading-Struktur unsauber", c: "bg-orange-100 text-orange-700" },
+                        { s: "P2", t: "ARIA Attribut prüfen", c: "bg-yellow-100 text-yellow-800" },
+                      ].map((it, i) => (
+                        <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-slate-900 truncate">{it.t}</div>
+                            <div className="text-xs text-slate-500 truncate">/beispielseite</div>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black ${it.c}`}>{it.s}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-12 border-t border-slate-200 pt-10">
+            <div className="flex items-center justify-between gap-6 flex-wrap">
+              <div>
+                <div className="text-3xl font-black text-navy-900">100+</div>
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reports Erstellt</div>
+              </div>
+              <div className="hidden md:block w-px h-10 bg-slate-200" />
+              <div>
+                <div className="text-3xl font-black text-red-600">2.570+</div>
+                <div className="text-xs font-bold text-red-500 uppercase tracking-wider">Abmahnfallen entdeckt</div>
+              </div>
+              <div className="hidden md:block w-px h-10 bg-slate-200" />
+              <div>
+                <div className="text-3xl font-black text-navy-900">100%</div>
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">BFSG-Fahrplan</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 grid lg:grid-cols-2 gap-8 items-start">
+            {/* Trust: Beispiel-Report */}
+            <section className="rounded-[2.5rem] border border-slate-200 bg-white p-8">
+              <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Beispiel</div>
+              <h2 className="mt-2 text-2xl md:text-3xl font-black text-navy-900">So sieht ein Report aus</h2>
+              <p className="mt-4 text-sm md:text-base text-slate-700 leading-relaxed font-semibold max-w-2xl">
+                Ein technischer Prüfbericht mit Prioritäten (P0–P2) und konkreten Fix‑Schritten – verständlich für Teams aus
+                Produkt, Design und Entwicklung. Hinweis: keine Rechtsberatung.
+              </p>
+
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
+                  <div className="p-4">
+                    <div className="font-extrabold text-slate-900">Summary</div>
+                    <div className="mt-1 text-sm text-slate-600">Status, Scores, Highlights</div>
+                    <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                  </div>
+                </a>
+
+                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
+                  <div className="p-4">
+                    <div className="font-extrabold text-slate-900">Issues</div>
+                    <div className="mt-1 text-sm text-slate-600">P0–P2, betroffene Seiten</div>
+                    <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                  </div>
+                </a>
+
+                <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                  <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
+                  <div className="p-4">
+                    <div className="font-extrabold text-slate-900">Fix‑Schritte</div>
+                    <div className="mt-1 text-sm text-slate-600">konkret & priorisiert</div>
+                    <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                  </div>
+                </a>
+              </div>
+            </section>
+
+            {/* E-E-A-T: Methodik */}
+            <section className="rounded-[2.5rem] border border-slate-200 bg-white p-8">
+              <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Methodik & Transparenz</div>
+              <h2 className="mt-2 text-2xl font-black text-navy-900">Wie wir prüfen</h2>
+              <p className="mt-4 text-sm text-slate-700 leading-relaxed font-semibold">
+                Unsere Analyseplattform identifiziert technische Barrieren auf Basis der WCAG 2.2 und BITV 2.0.
+                Wir liefern eine technische Entscheidungsgrundlage zur Verbesserung Ihrer Barrierefreiheit.
+                Hinweis: keine Rechtsberatung.
+              </p>
+
+              <ul className="mt-5 space-y-2 text-sm text-slate-700 list-disc pl-5">
+                <li>Automatisierte Prüfung auf kritische Kriterien (z.B. Kontrast, semantische Struktur, ARIA‑Attribute).</li>
+                <li>Empfehlung für ergänzende manuelle Checks (Tastatur‑Fokus, Screenreader‑Abfolge, Flows).</li>
+                <li>Priorisierung (P0–P2) und konkrete Fix‑Schritte für schnelle Umsetzung.</li>
+              </ul>
+
+              <p className="mt-5 text-xs text-slate-600 leading-relaxed">
+                Datenschutz hat Priorität: Wir prüfen datensparsam anhand der öffentlich abrufbaren Frontend‑Struktur Ihrer Website.
+              </p>
+
+              <a href="/ratgeber" className="mt-5 inline-flex font-black text-blue-700 hover:text-blue-800">
+                Zum Ratgeber für digitale Barrierefreiheit →
+              </a>
+            </section>
           </div>
         </div>
       </section>
