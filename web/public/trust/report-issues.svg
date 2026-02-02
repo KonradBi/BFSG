@@ -1,0 +1,47 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="520" fill="#f1f5f9"/>
+  <rect x="40" y="40" width="720" height="440" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <path d="M40 52C40 45.3726 45.3726 40 52 40H748C754.627 40 760 45.3726 760 52V84H40V52Z" fill="#ffffff"/>
+  <circle cx="64" cy="62" r="6" fill="#e2e8f0"/>
+  <circle cx="84" cy="62" r="6" fill="#e2e8f0"/>
+  <circle cx="104" cy="62" r="6" fill="#e2e8f0"/>
+  <rect x="132" y="54" width="580" height="16" rx="8" fill="#f1f5f9"/>
+  <line x1="40" y1="84" x2="760" y2="84" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="72" y="128" font-family="sans-serif" font-size="20" font-weight="700" fill="#0f172a">Accessibility Issues</text>
+  <rect x="630" y="110" width="90" height="28" rx="6" fill="#2563eb"/>
+  <text x="648" y="128" font-family="sans-serif" font-size="12" font-weight="600" fill="white">Export PDF</text>
+  <rect x="72" y="164" width="656" height="40" rx="0" fill="#f8fafc"/>
+  <text x="88" y="189" font-family="sans-serif" font-size="11" font-weight="600" fill="#64748b">ISSUE DESCRIPTION</text>
+  <text x="440" y="189" font-family="sans-serif" font-size="11" font-weight="600" fill="#64748b">PRIORITY</text>
+  <text x="560" y="189" font-family="sans-serif" font-size="11" font-weight="600" fill="#64748b">CATEGORY</text>
+  <line x1="72" y1="204" x2="728" y2="204" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="88" y="234" font-family="sans-serif" font-size="14" fill="#0f172a">Missing alt text on primary logo image</text>
+  <rect x="440" y="218" width="32" height="20" rx="4" fill="#0f172a"/>
+  <text x="447" y="232" font-family="sans-serif" font-size="10" font-weight="800" fill="white">P0</text>
+  <rect x="560" y="218" width="60" height="20" rx="4" fill="#f1f5f9"/>
+  <text x="572" y="232" font-family="sans-serif" font-size="10" font-weight="600" fill="#2563eb">Images</text>
+  <line x1="72" y1="254" x2="728" y2="254" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="88" y="284" font-family="sans-serif" font-size="14" fill="#0f172a">Contrast ratio below 4.5:1 in footer navigation</text>
+  <rect x="440" y="268" width="32" height="20" rx="4" fill="#2563eb"/>
+  <text x="447" y="282" font-family="sans-serif" font-size="10" font-weight="800" fill="white">P1</text>
+  <rect x="560" y="268" width="60" height="20" rx="4" fill="#f1f5f9"/>
+  <text x="572" y="282" font-family="sans-serif" font-size="10" font-weight="600" fill="#2563eb">Colors</text>
+  <line x1="72" y1="304" x2="728" y2="304" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="88" y="334" font-family="sans-serif" font-size="14" fill="#0f172a">Interactive element missing keyboard focus</text>
+  <rect x="440" y="318" width="32" height="20" rx="4" fill="#0f172a"/>
+  <text x="447" y="332" font-family="sans-serif" font-size="10" font-weight="800" fill="white">P0</text>
+  <rect x="560" y="318" width="60" height="20" rx="4" fill="#f1f5f9"/>
+  <text x="568" y="332" font-family="sans-serif" font-size="10" font-weight="600" fill="#2563eb">Keyboard</text>
+  <line x1="72" y1="354" x2="728" y2="354" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="88" y="384" font-family="sans-serif" font-size="14" fill="#0f172a">Form input field missing explicit label</text>
+  <rect x="440" y="368" width="32" height="20" rx="4" fill="#2563eb"/>
+  <text x="447" y="382" font-family="sans-serif" font-size="10" font-weight="800" fill="white">P1</text>
+  <rect x="560" y="368" width="60" height="20" rx="4" fill="#f1f5f9"/>
+  <text x="574" y="382" font-family="sans-serif" font-size="10" font-weight="600" fill="#2563eb">Forms</text>
+  <line x1="72" y1="404" x2="728" y2="404" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="88" y="434" font-family="sans-serif" font-size="14" fill="#0f172a">Heading structure skips H3 level</text>
+  <rect x="440" y="418" width="32" height="20" rx="4" fill="#e2e8f0"/>
+  <text x="447" y="432" font-family="sans-serif" font-size="10" font-weight="800" fill="#0f172a">P2</text>
+  <rect x="560" y="418" width="60" height="20" rx="4" fill="#f1f5f9"/>
+  <text x="570" y="432" font-family="sans-serif" font-size="10" font-weight="600" fill="#2563eb">Structure</text>
+</svg>

@@ -140,6 +140,45 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Trust: Beispiel-Report */}
+              <section className="mt-10 rounded-[2.5rem] border border-slate-200 bg-white p-8 max-w-5xl">
+                <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Beispiel</div>
+                <h2 className="mt-2 text-2xl md:text-3xl font-black text-navy-900">So sieht ein Report aus</h2>
+                <p className="mt-4 text-sm md:text-base text-slate-700 leading-relaxed font-semibold max-w-2xl">
+                  Ein technischer Prüfbericht mit Prioritäten (P0–P2) und konkreten Fix‑Schritten – verständlich für Teams aus
+                  Produkt, Design und Entwicklung. Hinweis: keine Rechtsberatung.
+                </p>
+
+                <div className="mt-6 grid md:grid-cols-3 gap-4">
+                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                    <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
+                    <div className="p-4">
+                      <div className="font-extrabold text-slate-900">Summary</div>
+                      <div className="mt-1 text-sm text-slate-600">Status, Scores, Highlights</div>
+                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                    </div>
+                  </a>
+
+                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                    <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
+                    <div className="p-4">
+                      <div className="font-extrabold text-slate-900">Issues</div>
+                      <div className="mt-1 text-sm text-slate-600">P0–P2, betroffene Seiten</div>
+                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                    </div>
+                  </a>
+
+                  <a href="/muster-report" className="group rounded-3xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
+                    <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
+                    <div className="p-4">
+                      <div className="font-extrabold text-slate-900">Fix‑Schritte</div>
+                      <div className="mt-1 text-sm text-slate-600">konkret & priorisiert</div>
+                      <div className="mt-3 text-sm font-black text-blue-700 group-hover:text-blue-800">Muster ansehen →</div>
+                    </div>
+                  </a>
+                </div>
+              </section>
+
               {/* E-E-A-T: Methodik */}
               <section className="mt-10 rounded-[2.5rem] border border-slate-200 bg-white p-8 max-w-xl">
                 <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Methodik & Transparenz</div>
