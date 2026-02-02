@@ -428,6 +428,7 @@ function ScanContent() {
 
     setBusy(true);
     setTeaser(null);
+    setRecord(null);
     setLiveProgress(null);
     setLiveStep("Vorbereitung…");
     try {
@@ -665,7 +666,11 @@ function ScanContent() {
           />
           <button
             onClick={() => runScan(urlDraftRef.current || urlSeed || url)}
-            disabled={busy || !(urlDraftRef.current || urlSeed || url).trim().startsWith("http")}
+            disabled={(() => {
+              const raw = String(urlDraftRef.current || urlSeed || url).trim();
+              const normalized = normalizeUrl(raw);
+              return busy || !isValidHttpUrl(normalized);
+            })()}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
             {busy ? (
