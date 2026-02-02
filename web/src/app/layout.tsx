@@ -6,13 +6,13 @@ const SITE = {
   name: "BFSG‑WebCheck",
   url: "https://bfsg.vercel.app",
   description:
-    "Technische Barrierefreiheits-Checks (WCAG/BITV/EN 301 549) mit klaren Befunden und konkreten Fix-Schritten. Kein Rechtsrat.",
+    "BFSG Check: Barrierefreiheit Ihrer Website prüfen – technische Analyse nach WCAG/BITV/EN 301 549 mit klaren Befunden & Fix‑Schritten. Keine Rechtsberatung.",
 } as const;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "BFSG‑WebCheck | Barrierefreiheits-Checks & Audit-Reports",
+    default: "BFSG Check: Website-Barrierefreiheit prüfen | BFSG‑WebCheck",
     template: "%s | BFSG‑WebCheck",
   },
   description: SITE.description,
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE.url,
-    title: "BFSG‑WebCheck | Barrierefreiheit prüfen (BFSG 2025)",
+    title: "BFSG Check: Website-Barrierefreiheit prüfen (BFSG 2025)",
     description: SITE.description,
     siteName: SITE.name,
     locale: "de_DE",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BFSG‑WebCheck | Barrierefreiheit prüfen (BFSG 2025)",
+    title: "BFSG Check: Website-Barrierefreiheit prüfen (BFSG 2025)",
     description: SITE.description,
     images: ["/og.png"],
   },
@@ -76,7 +76,7 @@ export default function RootLayout({
       },
       {
         "@type": "WebPage",
-        name: "BFSG‑WebCheck | Barrierefreiheits-Checks & Audit-Reports",
+        name: "BFSG Check: Website-Barrierefreiheit prüfen | BFSG‑WebCheck",
         url: SITE.url,
         description: SITE.description,
       },

@@ -50,9 +50,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
           <BrandMark />
           <div className="hidden lg:flex items-center gap-10 text-sm font-semibold text-slate-600">
-            <Link href="#leistungen" className="hover:text-blue-600 transition-colors">Leistungen</Link>
-            <Link href="#ablauf" className="hover:text-blue-600 transition-colors">Ablauf</Link>
-            <Link href="#testimonials" className="hover:text-blue-600 transition-colors">Referenzen</Link>
+            <Link href="/ratgeber" className="hover:text-blue-600 transition-colors">Ratgeber</Link>
+            <Link href="/bfsg-2025" className="hover:text-blue-600 transition-colors">BFSG 2025</Link>
+            <Link href="/audit-kosten" className="hover:text-blue-600 transition-colors">Audit-Kosten</Link>
             <Link href="#pakete" className="hover:text-blue-600 transition-colors">Preise</Link>
           </div>
           <div className="flex items-center gap-4">
@@ -81,15 +81,15 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                 </span>
-                BFSG 2025: Dringlichkeit Hoch
+                BFSG Check: Website-Barrierefreiheit in 2 Minuten prüfen
               </div>
               
               <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 text-navy-900 leading-[1.1]">
-                Barrierefreiheit ist kein Zufall – es ist Ihr <span className="text-blue-600">Schutzschild</span>.
+                BFSG Check: Barrierefreiheit Ihrer Website <span className="text-blue-600">prüfen</span> – schnell & verständlich.
               </h1>
               
               <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
-                Sichern Sie Ihre digitale Präsenz ab. Mit dem BFSG-WebCheck identifizieren Sie Compliance-Lücken in Sekunden und erhalten einen glasklaren Fahrplan zur WCAG & BITV Konformität.
+                Automatisierte Analyse nach WCAG, BITV und EN 301 549: Wir finden Barrieren, priorisieren (P0–P2) und geben konkrete Fix‑Schritte. Hinweis: keine Rechtsberatung.
               </p>
 
               <ScanInput id="audit" />
