@@ -137,6 +137,7 @@ function ScanContent() {
   const [liveStep, setLiveStep] = useState<string>("");
   // Default to the cheapest plan; we can show a recommendation separately.
   const [tier, setTier] = useState("mini");
+  const [wantInvoice, setWantInvoice] = useState(false);
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
 
@@ -521,26 +522,26 @@ function ScanContent() {
     }
   }
 
-  function getPendingCheckout(): { scanId: string; tier: string } | null {
+  function getPendingCheckout(): { scanId: string; tier: string; invoice?: boolean } | null {
     try {
       const raw = localStorage.getItem("als_pendingCheckout");
       if (!raw) return null;
-      const data = JSON.parse(raw) as { scanId?: string; tier?: string; ts?: number };
+      const data = JSON.parse(raw) as { scanId?: string; tier?: string; invoice?: boolean; ts?: number };
       if (!data?.scanId) return null;
       // Auto-expire after 30 minutes.
       if (data.ts && Date.now() - data.ts > 30 * 60 * 1000) {
         localStorage.removeItem("als_pendingCheckout");
         return null;
       }
-      return { scanId: String(data.scanId), tier: String(data.tier || "mini") };
+      return { scanId: String(data.scanId), tier: String(data.tier || "mini"), invoice: Boolean(data.invoice) };
     } catch {
       return null;
     }
   }
 
-  function setPendingCheckout(scanId: string, tier: string) {
+  function setPendingCheckout(scanId: string, tier: string, invoice?: boolean) {
     try {
-      localStorage.setItem("als_pendingCheckout", JSON.stringify({ scanId, tier, ts: Date.now() }));
+      localStorage.setItem("als_pendingCheckout", JSON.stringify({ scanId, tier, invoice: Boolean(invoice), ts: Date.now() }));
     } catch {
       // ignore
     }
@@ -554,19 +555,19 @@ function ScanContent() {
     }
   }
 
-  async function startCheckout(scanId: string, effectiveTier: string) {
+  async function startCheckout(scanId: string, effectiveTier: string, invoice?: boolean) {
     const token = getToken(scanId);
     setBusy(true);
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ scanId, tier: effectiveTier, scanToken: token }),
+        body: JSON.stringify({ scanId, tier: effectiveTier, scanToken: token, invoice: Boolean(invoice) }),
       });
 
       if (res.status === 401) {
         // Should not happen if we're authenticated, but handle gracefully.
-        setPendingCheckout(scanId, effectiveTier);
+        setPendingCheckout(scanId, effectiveTier, invoice);
         await signIn("google", {
           callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(
             effectiveTier
@@ -604,7 +605,7 @@ function ScanContent() {
     if (pending.tier && pending.tier !== tier) setTier(pending.tier);
 
     // Fire & forget; it will redirect to Stripe.
-    startCheckout(record.scanId, pending.tier || tier);
+    startCheckout(record.scanId, pending.tier || tier, pending.invoice);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authStatus, record?.scanId]);
 
@@ -625,14 +626,14 @@ function ScanContent() {
 
     // Require Google login before Stripe checkout
     if (authStatus !== "authenticated") {
-      setPendingCheckout(scanId, tier);
+      setPendingCheckout(scanId, tier, wantInvoice);
       await signIn("google", {
         callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(tier)}`,
       });
       return;
     }
 
-    await startCheckout(scanId, tier);
+    await startCheckout(scanId, tier, wantInvoice);
   }
 
   async function rerunPaidScan() {
@@ -1075,6 +1076,16 @@ function ScanContent() {
 
                       {!record?.isPaid && (
                         <>
+                          <label className="mt-4 flex items-start justify-center gap-3 text-sm text-slate-700">
+                            <input type="checkbox" checked={wantInvoice} onChange={(e) => setWantInvoice(e.target.checked)} className="mt-1" />
+                            <span>
+                              Firmenrechnung (B2B) anfordern
+                              <span className="block text-[11px] text-slate-500 mt-1">
+                                Dann sammelt Stripe Firmenname, Rechnungsadresse und optional USt‑ID und erstellt eine Rechnung.
+                              </span>
+                            </span>
+                          </label>
+
                           <p className="mt-3 text-xs text-center text-slate-600">
                             Heute <span className="font-extrabold text-slate-900">{priceText}</span>
                             <span className="mx-1 text-slate-400">statt</span>
