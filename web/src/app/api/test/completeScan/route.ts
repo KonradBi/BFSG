@@ -70,7 +70,7 @@ function fixtureFindings(kind: "A" | "B", url: string) {
       description: "Ensure all page content is contained by landmarks",
       helpUrl: "https://dequeuniversity.com/rules/axe/4.11/region?application=axeAPI",
       selector: "div",
-      snippet: "<div>Example Domain</div>",
+      snippet: "<div>Demo Website</div>",
       failureSummary: "Some page content is not contained by landmarks",
       fixSteps: ["Wrap content in landmarks."],
       pageUrl: url,

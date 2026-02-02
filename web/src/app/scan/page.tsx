@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, Suspense } from "react";
+import { useMemo, useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
@@ -122,7 +122,13 @@ function severityBadge(sev: "P0" | "P1" | "P2") {
 
 function ScanContent() {
   const searchParams = useSearchParams();
+
+  // PERF: keep the URL input responsive by avoiding a full React re-render on every keystroke.
+  // Store the draft value in a ref (uncontrolled input) and only commit to state when starting a scan.
+  const urlDraftRef = useRef<string>("");
+  const [urlSeed, setUrlSeed] = useState("");
   const [url, setUrl] = useState("");
+
   const [busy, setBusy] = useState(false);
   const [teaser, setTeaser] = useState<Teaser | null>(null);
   const [discoveredPages, setDiscoveredPages] = useState<number | null>(null);
@@ -193,6 +199,8 @@ function ScanContent() {
     if (scanId && token) setToken(scanId, token);
 
     if (prefillUrl) {
+      urlDraftRef.current = prefillUrl;
+      setUrlSeed(prefillUrl);
       setUrl(prefillUrl);
       // Auto-scan if URL is prefilled
       runScan(prefillUrl);
@@ -347,8 +355,13 @@ function ScanContent() {
   const savings = Math.max(0, selectedTier.compareAt - selectedTier.price);
 
   async function runScan(targetUrl?: string) {
-    const scanUrlRaw = targetUrl || url;
+    const scanUrlRaw = String(targetUrl ?? urlDraftRef.current ?? urlSeed ?? url).trim();
     const scanUrl = normalizeUrl(scanUrlRaw);
+
+    // Commit URL state only when we actually start work.
+    setUrl(scanUrlRaw);
+    setUrlSeed(scanUrlRaw);
+    urlDraftRef.current = scanUrlRaw;
     if (!isValidHttpUrl(scanUrl)) {
       alert("Bitte eine gültige URL oder Domain eingeben (z.B. welt.de oder https://welt.de).");
       return;
@@ -515,14 +528,21 @@ function ScanContent() {
         <label className="block text-sm font-semibold mb-3 text-slate-600">Website‑URL zum Scannen</label>
         <div className="flex flex-col md:flex-row gap-3">
           <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            key={urlSeed}
+            defaultValue={urlSeed}
+            onChange={(e) => {
+              urlDraftRef.current = e.target.value;
+            }}
             className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 placeholder-slate-400"
             placeholder="https://ihre-website.de"
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <button
-            onClick={() => runScan()}
-            disabled={busy || !url.startsWith("http")}
+            onClick={() => runScan(urlDraftRef.current || urlSeed || url)}
+            disabled={busy || !(urlDraftRef.current || urlSeed || url).trim().startsWith("http")}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
             {busy ? (
@@ -590,7 +610,7 @@ function ScanContent() {
                 </div>
                 <div className="text-right">
                   <div className="text-4xl font-black text-slate-900">{(record?.totals?.total ?? teaser?.totals.total) ?? 0}</div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase">Probleme</div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
                 </div>
               </div>
 
@@ -601,10 +621,30 @@ function ScanContent() {
                   { l: "P2 (mittel)", v: (record?.totals?.p2 ?? teaser?.totals.p2) ?? 0, c: "bg-yellow-50 text-yellow-600 border-yellow-100" },
                 ].map((stat) => (
                   <div key={stat.l} className={`p-4 rounded-2xl border ${stat.c}`}>
-                    <div className="text-2xl font-bold">{stat.v}</div>
+                    <div className="text-2xl font-black">{stat.v}</div>
                     <div className="text-[10px] uppercase font-bold opacity-80">{stat.l}</div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5">
+                {(() => {
+                  const totals = record?.totals ?? teaser?.totals;
+                  const p0 = totals?.p0 ?? 0;
+                  const p1 = totals?.p1 ?? 0;
+                  const p2 = totals?.p2 ?? 0;
+                  const total = Math.max(1, (totals?.total ?? 0) || p0 + p1 + p2);
+                  const w0 = Math.round((100 * p0) / total);
+                  const w1 = Math.round((100 * p1) / total);
+                  const w2 = Math.max(0, 100 - w0 - w1);
+                  return (
+                    <div className="h-2 w-full rounded-full overflow-hidden bg-slate-200 flex">
+                      <div className="h-full bg-red-500" style={{ width: `${w0}%` }} />
+                      <div className="h-full bg-orange-500" style={{ width: `${w1}%` }} />
+                      <div className="h-full bg-yellow-400" style={{ width: `${w2}%` }} />
+                    </div>
+                  );
+                })()}
               </div>
 
               {record?.isPaid && (
