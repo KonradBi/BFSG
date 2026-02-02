@@ -142,21 +142,6 @@ export default function Home() {
                   <div className="mt-3 text-sm font-black text-blue-700">Alle Artikel →</div>
                 </a>
               </div>
-              
-              <div className="mt-4 flex items-center gap-3 px-2 mb-12">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Standards:</span>
-                <div className="flex gap-2">
-                  {["WCAG 2.2", "BITV 2.0", "EN 301 549"].map((s) => (
-                    <span
-                      key={s}
-                      className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-black text-slate-500 bg-white"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
             </div>
 
             <div className="relative lg:block">
@@ -312,6 +297,17 @@ export default function Home() {
                 Zum Ratgeber für digitale Barrierefreiheit →
               </a>
             </section>
+          </div>
+
+          <div className="mt-12 flex items-center gap-3 px-2">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Standards:</span>
+            <div className="flex gap-2 flex-wrap">
+              {["WCAG 2.2", "BITV 2.0", "EN 301 549"].map((s) => (
+                <span key={s} className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-black text-slate-500 bg-white">
+                  {s}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
