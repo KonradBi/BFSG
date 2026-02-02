@@ -58,3 +58,48 @@ export const listByScan = query({
     return await ctx.db.query("payments").withIndex("by_scan", (q) => q.eq("scanId", scanId)).order("desc").take(10);
   },
 });
+
+export const backfillFromPaidScans = mutation({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const n = Math.max(1, Math.min(200, limit ?? 50));
+
+    const scans = await ctx.db
+      .query("scans")
+      .withIndex("by_paid", (q) => q.eq("isPaid", true))
+      .order("desc")
+      .take(n);
+
+    let created = 0;
+    let already = 0;
+
+    for (const s of scans) {
+      const existing = await ctx.db
+        .query("payments")
+        .withIndex("by_scan", (q) => q.eq("scanId", s._id))
+        .first();
+
+      if (existing) {
+        already += 1;
+        continue;
+      }
+
+      await ctx.db.insert("payments", {
+        scanId: s._id,
+        userId: (s as any).userId,
+        tier: String((s as any).tier || "mini"),
+        status: "PAID",
+        currency: undefined,
+        amount: undefined,
+        stripeCheckoutSessionId: undefined,
+        stripePaymentIntentId: undefined,
+        createdAt: (s as any).paidAt ?? Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      created += 1;
+    }
+
+    return { ok: true, scanned: scans.length, created, already };
+  },
+});
