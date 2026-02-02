@@ -94,6 +94,37 @@ export default function Home() {
               </p>
 
               <ScanInput id="audit" />
+
+              {/* SEO: internal linking block to push authority from homepage into key clusters */}
+              <div className="mt-8 grid md:grid-cols-2 gap-4 max-w-xl">
+                <a href="/bfsg-2025" className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition">
+                  <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Cornerstone</div>
+                  <div className="mt-1 text-lg font-extrabold text-slate-900">BFSG 2025 Guide</div>
+                  <div className="mt-2 text-sm text-slate-600 leading-relaxed">Anforderungen, Fristen & Checkliste – kompakt und praxisnah.</div>
+                  <div className="mt-3 text-sm font-black text-blue-700">Zum Guide →</div>
+                </a>
+
+                <a href="/ratgeber/faq" className="rounded-3xl border border-blue-100 bg-blue-50 p-5 hover:bg-blue-100/60 transition">
+                  <div className="text-[11px] font-black uppercase tracking-widest text-blue-700">FAQ</div>
+                  <div className="mt-1 text-lg font-extrabold text-slate-900">BFSG: 60 Fragen & Antworten</div>
+                  <div className="mt-2 text-sm text-slate-700 leading-relaxed">Der Schnellstart für Teams – Geltung, Tests, Kosten, Dokumentation.</div>
+                  <div className="mt-3 text-sm font-black text-blue-800">Zur FAQ →</div>
+                </a>
+
+                <a href="/audit-kosten" className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition">
+                  <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Cornerstone</div>
+                  <div className="mt-1 text-lg font-extrabold text-slate-900">Audit‑Kosten</div>
+                  <div className="mt-2 text-sm text-slate-600 leading-relaxed">Preise, Umfang & Auswahl – inkl. Checkliste für Anbieter.</div>
+                  <div className="mt-3 text-sm font-black text-blue-700">Zu den Kosten →</div>
+                </a>
+
+                <a href="/ratgeber" className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition">
+                  <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Ratgeber</div>
+                  <div className="mt-1 text-lg font-extrabold text-slate-900">Praxisartikel & Fixes</div>
+                  <div className="mt-2 text-sm text-slate-600 leading-relaxed">Kontrast, Formulare, Tastatur, ARIA, PDFs – Schritt für Schritt.</div>
+                  <div className="mt-3 text-sm font-black text-blue-700">Alle Artikel →</div>
+                </a>
+              </div>
               
               <div className="mt-4 flex items-center gap-3 px-2 mb-12">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Standards:</span>
