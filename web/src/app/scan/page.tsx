@@ -46,6 +46,7 @@ type Finding = {
   fixSteps?: string[];
   pageUrl?: string;
   capturedAt?: string;
+  screenshotDataUrl?: string | null;
 };
 
 const DE_RULE_TITLES: Record<string, { title: string; description?: string }> = {
@@ -353,6 +354,59 @@ function ScanContent() {
   const priceText = `€${selectedTier.price}`;
   const compareAtText = `€${selectedTier.compareAt}`;
   const savings = Math.max(0, selectedTier.compareAt - selectedTier.price);
+  const summaryTotals = record?.totals ?? teaser?.totals ?? null;
+  const nextSteps = useMemo(() => {
+    const totals = summaryTotals ?? { p0: 0, p1: 0, p2: 0, total: 0 };
+    return [
+      totals.p0
+        ? `P0 priorisieren: ${totals.p0} kritische Befunde innerhalb von 24–72h beheben.`
+        : "Keine P0-Befunde (kritisch) gefunden.",
+      totals.p1
+        ? `P1 einplanen: ${totals.p1} wichtige Befunde zeitnah beheben.`
+        : "Keine P1-Befunde (hoch) gefunden.",
+      totals.total
+        ? "Nach Behebungen: erneuten Scan durchführen und Änderungen verifizieren."
+        : "Nach dem Scan: erste Fixes sammeln und erneut prüfen.",
+    ];
+  }, [summaryTotals]);
+
+  const issueRows = useMemo(() => {
+    const order: Record<Finding["severity"], number> = { P0: 0, P1: 1, P2: 2 };
+    if (record?.isPaid && Array.isArray(record.findings)) {
+      const list = [...(record.findings as Finding[])];
+      return list
+        .sort((a, b) => order[a.severity] - order[b.severity])
+        .slice(0, 8)
+        .map((f) => ({
+          severity: f.severity,
+          title: translateFinding(f).title || f.ruleId || "Befund",
+          pageUrl: f.pageUrl || record.url || teaser?.url || "",
+        }));
+    }
+    const sample = record?.sampleFinding ?? teaser?.sampleFinding;
+    if (sample) {
+      return [
+        {
+          severity: sample.severity,
+          title: sample.title,
+          pageUrl: record?.url || teaser?.url || "",
+        },
+      ];
+    }
+    return [];
+  }, [record?.isPaid, record?.findings, record?.sampleFinding, record?.url, teaser?.sampleFinding, teaser?.url]);
+
+  const groupedFindings = useMemo(() => {
+    if (!record?.isPaid || !Array.isArray(record.findings)) {
+      return { P0: [], P1: [], P2: [] } as Record<"P0" | "P1" | "P2", Finding[]>;
+    }
+    const list = record.findings as Finding[];
+    return {
+      P0: list.filter((f) => f.severity === "P0"),
+      P1: list.filter((f) => f.severity === "P1"),
+      P2: list.filter((f) => f.severity === "P2"),
+    };
+  }, [record?.isPaid, record?.findings]);
 
   async function runScan(targetUrl?: string) {
     const scanUrlRaw = String(targetUrl ?? urlDraftRef.current ?? urlSeed ?? url).trim();
@@ -681,6 +735,93 @@ function ScanContent() {
             </div>
 
             <div className="p-8 bg-slate-50/50">
+              <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr] mb-8">
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-bold text-slate-500 uppercase tracking-wider">Report Summary</div>
+                      <h3 className="text-xl font-black text-slate-900">Kompakte Übersicht</h3>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-black text-slate-900">{summaryTotals?.total ?? 0}</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase">Befunde</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { l: "P0", v: summaryTotals?.p0 ?? 0, c: "bg-red-50 text-red-700 border-red-100" },
+                      { l: "P1", v: summaryTotals?.p1 ?? 0, c: "bg-orange-50 text-orange-700 border-orange-100" },
+                      { l: "P2", v: summaryTotals?.p2 ?? 0, c: "bg-yellow-50 text-yellow-800 border-yellow-100" },
+                      { l: "Gesamt", v: summaryTotals?.total ?? 0, c: "bg-slate-50 text-slate-700 border-slate-200" },
+                    ].map((stat) => (
+                      <div key={stat.l} className={`p-3 rounded-2xl border ${stat.c}`}>
+                        <div className="text-xl font-black">{stat.v}</div>
+                        <div className="text-[10px] uppercase font-bold opacity-80">{stat.l}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4">
+                    {(() => {
+                      const totals = summaryTotals ?? { p0: 0, p1: 0, p2: 0, total: 0 };
+                      const total = Math.max(1, totals.total || totals.p0 + totals.p1 + totals.p2);
+                      const w0 = Math.round((100 * totals.p0) / total);
+                      const w1 = Math.round((100 * totals.p1) / total);
+                      const w2 = Math.max(0, 100 - w0 - w1);
+                      return (
+                        <div className="h-2 w-full rounded-full overflow-hidden bg-slate-200 flex">
+                          <div className="h-full bg-red-500" style={{ width: `${w0}%` }} />
+                          <div className="h-full bg-orange-500" style={{ width: `${w1}%` }} />
+                          <div className="h-full bg-yellow-400" style={{ width: `${w2}%` }} />
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Next steps</div>
+                    <ul className="text-sm text-slate-700 space-y-1 list-disc pl-5">
+                      {nextSteps.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                      <div className="text-sm font-bold text-slate-500 uppercase tracking-wider">Issues</div>
+                      <h3 className="text-xl font-black text-slate-900">Auffällige Befunde</h3>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-500">{record?.isPaid ? "Top 8" : "Vorschau"}</span>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden">
+                    {issueRows.length ? (
+                      issueRows.map((issue, idx) => (
+                        <div key={`${issue.title}-${idx}`} className="flex items-center justify-between gap-3 p-3 bg-white">
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-slate-900 truncate">{issue.title}</div>
+                            <div className="text-xs text-slate-500 truncate">{issue.pageUrl || "—"}</div>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black ${severityBadge(issue.severity)}`}>{issue.severity}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-sm text-slate-500">Noch keine Issues verfügbar.</div>
+                    )}
+                  </div>
+
+                  {!record?.isPaid && (
+                    <div className="mt-4 text-xs text-slate-500">
+                      Vollständige Liste und Details im freigeschalteten Report.
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {(record?.sampleFinding || teaser?.sampleFinding) && (
                 <>
                   <div className="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
@@ -722,76 +863,97 @@ function ScanContent() {
                   </div>
 
                   <div className="space-y-4">
-                    {(record.findings as Finding[]).map((f, idx) => (
-                      <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-black ${severityBadge(f.severity)}`}>{f.severity}</span>
-                          <div className="font-extrabold text-slate-900">{(f.title || f.ruleId) ? (translateFinding(f).title || f.ruleId) : "Befund"}</div>
-                        </div>
-
-                        {translateFinding(f).description && <p className="text-sm text-slate-700 leading-relaxed mb-3">{translateFinding(f).description}</p>}
-
-                        {(f.selector || f.snippet) && (
-                          <details className="mb-3">
-                            <summary className="cursor-pointer text-xs font-bold text-slate-600 uppercase tracking-wider">
-                              Technische Details
-                            </summary>
-                            <div className="mt-2 space-y-2">
-                              {f.selector && (
-                                <div>
-                                  <div className="text-[10px] font-bold text-slate-500 uppercase">Selektor</div>
-                                  <code className="block text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto">{f.selector}</code>
-                                </div>
-                              )}
-                              {f.pageUrl && (
-                                <div>
-                                  <div className="text-[10px] font-bold text-slate-500 uppercase">URL</div>
-                                  <div className="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto">{f.pageUrl}</div>
-                                </div>
-                              )}
-                              {f.capturedAt && (
-                                <div>
-                                  <div className="text-[10px] font-bold text-slate-500 uppercase">Zeitpunkt</div>
-                                  <div className="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto">{f.capturedAt}</div>
-                                </div>
-                              )}
-                              {f.snippet && (
-                                <div>
-                                  <div className="text-[10px] font-bold text-slate-500 uppercase">Snippet</div>
-                                  <pre className="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{f.snippet}</pre>
-                                </div>
-                              )}
-                              {f.failureSummary && (
-                                <div>
-                                  <div className="text-[10px] font-bold text-slate-500 uppercase">Fehlerbeschreibung</div>
-                                  <pre className="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{translateFinding(f).failureSummary}</pre>
-
-                                  {translateFinding(f).originalFailureSummary && translateFinding(f).originalFailureSummary !== translateFinding(f).failureSummary && (
-                                    <details className="mt-2">
-                                      <summary className="cursor-pointer text-[10px] font-bold text-slate-500 uppercase">Original (EN)</summary>
-                                      <pre className="mt-2 text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{translateFinding(f).originalFailureSummary}</pre>
-                                    </details>
-                                  )}
-                                </div>
-                              )}
+                    {(["P0", "P1", "P2"] as const).map((sev) => {
+                      const items = groupedFindings[sev];
+                      if (!items.length) return null;
+                      return (
+                        <details key={sev} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden" open={sev === "P0"}>
+                          <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-black ${severityBadge(sev)}`}>{sev}</span>
+                              <div className="font-extrabold text-slate-900">Befunde {sev}</div>
+                              <div className="text-xs text-slate-500">{items.length} Einträge</div>
                             </div>
-                          </details>
-                        )}
+                            <span className="text-xs text-slate-500">Ein-/Ausklappen</span>
+                          </summary>
 
-                        {Array.isArray(f.fixSteps) && f.fixSteps.length > 0 && (
-                          <div className="mt-3">
-                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Fix-Rezept</div>
-                            <ol className="list-decimal pl-5 space-y-1 text-sm text-slate-700">
-                              {f.fixSteps.map((s, i) => (
-                                <li key={i}>{s}</li>
-                              ))}
-                            </ol>
+                          <div className="px-5 pb-5 space-y-4 bg-slate-50/60">
+                            {items.map((f, idx) => {
+                              const t = translateFinding(f);
+                              const steps = (f.fixSteps || []).slice(0, 3);
+                              return (
+                                <div key={`${f.ruleId}-${idx}`} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] font-black ${severityBadge(f.severity)}`}>{f.severity}</span>
+                                      <div className="font-extrabold text-slate-900">
+                                        {(f.title || f.ruleId) ? (t.title || f.ruleId) : "Befund"}
+                                      </div>
+                                    </div>
+                                    {f.ruleId && (
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{f.ruleId}</span>
+                                    )}
+                                  </div>
+
+                                  {t.description && <p className="mt-2 text-sm text-slate-700 leading-relaxed">{t.description}</p>}
+
+                                  <div className="mt-4 grid gap-3 md:grid-cols-3">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                      <div className="text-[10px] font-bold text-slate-500 uppercase">URL</div>
+                                      <div className="text-xs text-slate-700 break-words">{f.pageUrl || "—"}</div>
+                                    </div>
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                      <div className="text-[10px] font-bold text-slate-500 uppercase">Zeitpunkt</div>
+                                      <div className="text-xs text-slate-700 break-words">{f.capturedAt || "—"}</div>
+                                    </div>
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                      <div className="text-[10px] font-bold text-slate-500 uppercase">Selektor</div>
+                                      <div className="text-xs text-slate-700 break-words">{f.selector || "—"}</div>
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-4">
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Evidence</div>
+                                    <div className="space-y-3">
+                                      {t.failureSummary && (
+                                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                          <div className="text-[10px] font-bold text-slate-500 uppercase">Fehlerbeschreibung</div>
+                                          <div className="text-xs text-slate-700 whitespace-pre-wrap">{t.failureSummary}</div>
+                                        </div>
+                                      )}
+                                      {f.screenshotDataUrl && (
+                                        <div className="rounded-xl border border-slate-200 overflow-hidden">
+                                          <img src={f.screenshotDataUrl} alt="Element-Screenshot" className="w-full block" />
+                                        </div>
+                                      )}
+                                      {f.snippet && (
+                                        <pre className="text-xs bg-slate-900 text-slate-100 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{f.snippet}</pre>
+                                      )}
+                                      {!t.failureSummary && !f.screenshotDataUrl && !f.snippet && (
+                                        <div className="text-xs text-slate-500">Keine Belege verfügbar.</div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-4">
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Fix steps</div>
+                                    {steps.length ? (
+                                      <ol className="list-decimal pl-5 space-y-1 text-sm text-slate-700">
+                                        {steps.map((s, i) => (
+                                          <li key={i}>{s}</li>
+                                        ))}
+                                      </ol>
+                                    ) : (
+                                      <div className="text-sm text-slate-500">Keine konkreten Schritte verfügbar.</div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        )}
-
-                        {/* Optionaler Link entfernt: statt nur Link lieber konkrete Fix-Schritte (siehe oben). */}
-                      </div>
-                    ))}
+                        </details>
+                      );
+                    })}
                   </div>
                 </div>
               )}

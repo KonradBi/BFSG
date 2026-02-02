@@ -196,7 +196,7 @@ function reportHtml(params: {
 }) {
   const { url, urlDisplay, generatedAt, auditId, findingsHash, totals, pageShot, findings, brandLogoDataUrl } = params;
 
-  const urlLabel = urlDisplay.includes("example.com") ? `Demo-Website: ${urlDisplay}` : urlDisplay;
+  const urlLabel = urlDisplay.includes("example.com") ? `Demo Website: ${urlDisplay}` : urlDisplay;
 
   // Executive summary / quick recommendation
   const recos = [
@@ -212,6 +212,11 @@ function reportHtml(params: {
     P1: findings.filter((f) => f.severity === "P1"),
     P2: findings.filter((f) => f.severity === "P2"),
   } as const;
+
+  const totalsSum = Math.max(1, totals.total || totals.p0 + totals.p1 + totals.p2);
+  const w0 = Math.round((100 * totals.p0) / totalsSum);
+  const w1 = Math.round((100 * totals.p1) / totalsSum);
+  const w2 = Math.max(0, 100 - w0 - w1);
 
   const section = (label: Severity, arr: Finding[]) => {
     if (!arr.length) return "";
@@ -231,9 +236,10 @@ function reportHtml(params: {
               </div>
 
               <div class="finding__meta">
-                <div><span class="label">Regel</span> <code>${escapeHtml(f.ruleId)}</code></div>
-                ${f.pageUrl ? `<div><span class="label">URL</span> <span>${escapeHtml(f.pageUrl)}</span></div>` : ""}
-                ${f.capturedAt ? `<div><span class="label">Zeit</span> <span>${escapeHtml(f.capturedAt)}</span></div>` : ""}
+                <div><span class="label">Regel</span> <code class="wrap">${escapeHtml(f.ruleId)}</code></div>
+                <div><span class="label">URL</span> <span class="wrap">${escapeHtml(f.pageUrl || "—")}</span></div>
+                <div><span class="label">Zeit</span> <span class="wrap">${escapeHtml(f.capturedAt || "—")}</span></div>
+                <div><span class="label">Selektor</span> <span class="wrap">${escapeHtml(f.selector || "—")}</span></div>
               </div>
 
               <div class="finding__desc">${escapeHtml(t.description)}</div>
@@ -249,8 +255,6 @@ function reportHtml(params: {
 
               ${t.failureSummary ? `<div class="kv"><span class="label">Warum</span><span>${escapeHtml(t.failureSummary!)}</span></div>` : ""}
               ${translateFinding(f).originalFailureSummary && translateFinding(f).originalFailureSummary !== translateFinding(f).failureSummary ? `<div class="kv" style="font-size:10.5px;"><span class="label">Original</span><span>${escapeHtml(String(translateFinding(f).originalFailureSummary).slice(0, 900))}${String(translateFinding(f).originalFailureSummary).length > 900 ? "…" : ""}</span></div>` : ""}
-              ${f.selector ? `<div class="kv"><span class="label">Selektor</span><code>${escapeHtml(f.selector)}</code></div>` : ""}
-
               ${steps.length ? `
                 <div class="steps">
                   <div class="steps__title">Behebung in 3 Schritten</div>
@@ -284,13 +288,14 @@ function reportHtml(params: {
   <style>
     :root {
       --text: #0f172a;
-      --muted: #475569;
+      --muted: #64748b;
       --line: #e2e8f0;
-      --bg: #ffffff;
-      --bg2: #f8fafc;
-      --p0: #b91c1c;
-      --p1: #b45309;
-      --p2: #1d4ed8;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --bg2: #f1f5f9;
+      --p0: #ef4444;
+      --p1: #f97316;
+      --p2: #f59e0b;
     }
 
     * { box-sizing: border-box; }
@@ -304,16 +309,19 @@ function reportHtml(params: {
       print-color-adjust: exact;
     }
 
-    .page { padding: 22px 26px; }
+    .page { padding: 26px 28px; }
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      margin-bottom: 14px;
     }
 
     .brand { display:flex; align-items:flex-start; gap:18px; }
@@ -328,6 +336,7 @@ function reportHtml(params: {
       font-size: 12px;
       line-height: 1.35;
       word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .meta {
@@ -335,14 +344,17 @@ function reportHtml(params: {
       color: var(--muted);
       font-size: 12px;
       line-height: 1.35;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .card {
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      background: var(--bg2);
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--card);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
     }
 
     .kpis {
@@ -354,8 +366,8 @@ function reportHtml(params: {
 
     .kpi {
       border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 12px;
+      background: var(--card);
+      border-radius: 14px;
       padding: 10px 12px;
     }
 
@@ -364,14 +376,29 @@ function reportHtml(params: {
 
     .h2 { font-size: 14px; font-weight: 800; margin: 14px 0 8px; }
 
+    .stacked {
+      height: 8px;
+      width: 100%;
+      border-radius: 999px;
+      background: var(--bg2);
+      overflow: hidden;
+      display: flex;
+      margin: 10px 0 4px;
+    }
+    .stacked span { height: 100%; display: block; }
+    .stacked .p0 { background: var(--p0); }
+    .stacked .p1 { background: var(--p1); }
+    .stacked .p2 { background: var(--p2); }
+
     .finding {
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px 14px;
+      border-radius: 16px;
+      padding: 14px 16px;
       margin-bottom: 10px;
       break-inside: avoid;
       page-break-inside: avoid;
-      background: #fff;
+      background: var(--card);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.04);
     }
 
     .finding__header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -393,11 +420,17 @@ function reportHtml(params: {
 
     .finding__meta {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
       color: var(--muted);
       font-size: 12px;
       margin-bottom: 8px;
+    }
+    .finding__meta > div {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--bg2);
+      padding: 8px 10px;
     }
 
     .finding__desc { font-size: 12px; line-height: 1.45; margin-bottom: 8px; }
@@ -408,7 +441,7 @@ function reportHtml(params: {
     .plain {
       border: 1px solid #dbeafe;
       background: #eff6ff;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 10px 12px;
       margin: 10px 0;
       color: var(--text);
@@ -419,20 +452,24 @@ function reportHtml(params: {
 
     .steps {
       border: 1px dashed var(--line);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 10px 12px;
       margin: 10px 0;
-      background: #fcfdff;
+      background: #fbfdff;
     }
     .steps__title { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
     .steps ol { margin: 0; padding-left: 18px; color: var(--text); font-size: 12px; line-height: 1.45; }
 
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
 
     .code {
       background: #0b1220;
       color: #e2e8f0;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 10px 12px;
       overflow: hidden;
       margin: 0;
@@ -442,7 +479,7 @@ function reportHtml(params: {
       word-break: break-word;
     }
 
-    .shot { margin: 8px 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .shot { margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
     .shot img { width: 100%; display: block; }
 
     .evidence {
@@ -452,7 +489,9 @@ function reportHtml(params: {
     }
     .evidence__title { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
 
-    a { color: #0b5bd3; text-decoration: none; word-break: break-word; }
+    .wrap { word-break: break-word; overflow-wrap: anywhere; }
+
+    a { color: #0b5bd3; text-decoration: none; word-break: break-word; overflow-wrap: anywhere; }
     a:hover { text-decoration: underline; }
 
     .footerNote { margin-top: 12px; color: var(--muted); font-size: 10.5px; line-height: 1.35; }
@@ -469,7 +508,7 @@ function reportHtml(params: {
           <div>
             <h1 style="margin:0">BFSG-WebCheck – Barrierefreiheits‑Prüfbericht</h1>
             <div class="sub">
-              Website: <b>${escapeHtml(urlLabel)}</b><br />
+              Website: <b class="wrap">${escapeHtml(urlLabel)}</b><br />
               Hinweis: Technischer Report (WCAG/EN 301 549/BITV) – <b>keine Rechtsberatung</b>.
             </div>
           </div>
@@ -494,6 +533,12 @@ function reportHtml(params: {
         <div class="kpi"><div class="label">P1 (hoch)</div><div class="val">${totals.p1}</div></div>
         <div class="kpi"><div class="label">P2 (mittel)</div><div class="val">${totals.p2}</div></div>
         <div class="kpi"><div class="label">Gesamt</div><div class="val">${totals.total}</div></div>
+      </div>
+
+      <div class="stacked" aria-hidden="true">
+        <span class="p0" style="width:${w0}%"></span>
+        <span class="p1" style="width:${w1}%"></span>
+        <span class="p2" style="width:${w2}%"></span>
       </div>
 
       <div class="footerNote" style="margin-top:10px">
@@ -693,8 +738,8 @@ export async function GET(req: Request) {
       displayHeaderFooter: true,
       // Keep header empty (clean look). Branding is handled inside the PDF body.
       headerTemplate: `<div></div>`,
-      footerTemplate: `<div style="font-size:9px;width:100%;padding:0 14mm;color:#64748b;display:flex;justify-content:space-between;">
-          <span>${escapeHtml(urlDisplay)}</span>
+      footerTemplate: `<div style="font-size:9px;width:100%;padding:0 14mm;color:#64748b;display:flex;justify-content:space-between;gap:8px;">
+          <span style="max-width:75%;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(urlDisplay)}</span>
           <span><span class=\"pageNumber\"></span>/<span class=\"totalPages\"></span></span>
         </div>`,
     });
