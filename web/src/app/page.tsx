@@ -129,11 +129,41 @@ export default function Home() {
               <div className="mt-4 flex items-center gap-3 px-2 mb-12">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Standards:</span>
                 <div className="flex gap-2">
-                  {["WCAG 2.2", "BITV 2.0", "EN 301 549"].map(s => (
-                    <span key={s} className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-black text-slate-500 bg-white">{s}</span>
+                  {["WCAG 2.2", "BITV 2.0", "EN 301 549"].map((s) => (
+                    <span
+                      key={s}
+                      className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-black text-slate-500 bg-white"
+                    >
+                      {s}
+                    </span>
                   ))}
                 </div>
               </div>
+
+              {/* E-E-A-T: Methodik */}
+              <section className="mt-10 rounded-[2.5rem] border border-slate-200 bg-white p-8 max-w-xl">
+                <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Methodik & Transparenz</div>
+                <h2 className="mt-2 text-2xl font-black text-navy-900">Wie wir prüfen</h2>
+                <p className="mt-4 text-sm text-slate-700 leading-relaxed font-semibold">
+                  Unsere Analyseplattform identifiziert technische Barrieren auf Basis der WCAG 2.2 und BITV 2.0.
+                  Wir liefern eine technische Entscheidungsgrundlage zur Verbesserung Ihrer Barrierefreiheit.
+                  Hinweis: keine Rechtsberatung.
+                </p>
+
+                <ul className="mt-5 space-y-2 text-sm text-slate-700 list-disc pl-5">
+                  <li>Automatisierte Prüfung auf kritische Kriterien (z.B. Kontrast, semantische Struktur, ARIA‑Attribute).</li>
+                  <li>Empfehlung für ergänzende manuelle Checks (Tastatur‑Fokus, Screenreader‑Abfolge, Flows).</li>
+                  <li>Priorisierung (P0–P2) und konkrete Fix‑Schritte für schnelle Umsetzung.</li>
+                </ul>
+
+                <p className="mt-5 text-xs text-slate-600 leading-relaxed">
+                  Datenschutz hat Priorität: Wir prüfen datensparsam anhand der öffentlich abrufbaren Frontend‑Struktur Ihrer Website.
+                </p>
+
+                <a href="/ratgeber" className="mt-5 inline-flex font-black text-blue-700 hover:text-blue-800">
+                  Zum Ratgeber für digitale Barrierefreiheit →
+                </a>
+              </section>
 
               <div className="flex items-center gap-8 border-t border-slate-200 pt-10">
                 <div>
