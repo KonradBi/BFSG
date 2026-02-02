@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteNav from "../components/SiteNav";
 
 const tiers = [
   {
@@ -27,28 +28,7 @@ const tiers = [
 export default function PricingPage() {
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6 overflow-x-hidden">
-      <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">A</div>
-            <span className="font-bold tracking-tight text-lg text-slate-900">Shield</span>
-          </Link>
-          {/* Mobile: icon only */}
-          <Link
-            href="/"
-            aria-label="Zur Startseite"
-            className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          </Link>
-
-          {/* Desktop */}
-          <Link href="/" className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            Zurück
-          </Link>
-        </div>
-      </nav>
+      <SiteNav />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="text-center mb-12 md:mb-20 animate-fade-in">

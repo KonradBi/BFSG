@@ -2,9 +2,13 @@ export const metadata = {
   title: "Impressum | BFSG-WebCheck",
 };
 
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
+
 export default function ImpressumPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-blue-500/30">
+    <main className="min-h-screen bg-background text-foreground selection:bg-blue-500/30 pt-24 pb-20">
+      <SiteNav />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-10 text-slate-900">Impressum</h1>
 
@@ -38,14 +42,14 @@ export default function ImpressumPage() {
 
           <h2>Steuernummer</h2>
           <p>
-            Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:
+            Steuernummer:
             <br />
             202/297/04991
           </p>
 
           <h2>Streitschlichtung</h2>
           <p>
-            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: {" "}
+            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
             <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noreferrer">
               https://ec.europa.eu/consumers/odr
             </a>
@@ -84,6 +88,7 @@ export default function ImpressumPage() {
             Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.
           </p>
         </section>
+        <SiteFooter note="" />
       </div>
     </main>
   );

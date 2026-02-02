@@ -4,10 +4,13 @@ export const metadata = {
 };
 
 import Link from "next/link";
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
 
 export default function MusterReportPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground px-6 py-16">
+    <main className="min-h-screen bg-background text-foreground px-6 pt-24 pb-20">
+      <SiteNav />
       <div className="max-w-5xl mx-auto">
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div>
@@ -56,6 +59,8 @@ export default function MusterReportPage() {
             <img src="/trust/report-fixes.png" alt="Beispielreport: Fix‑Schritte" className="w-full h-auto" />
           </div>
         </section>
+
+        <SiteFooter note="" />
 
         <div className="mt-8 text-xs text-slate-500">
           Hinweis: Technischer Report (WCAG / BITV / EN 301 549) – keine Rechtsberatung.

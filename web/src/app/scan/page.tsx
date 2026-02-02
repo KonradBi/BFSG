@@ -137,7 +137,8 @@ function ScanContent() {
   const [liveStep, setLiveStep] = useState<string>("");
   // Default to the cheapest plan; we can show a recommendation separately.
   const [tier, setTier] = useState("mini");
-  const [wantInvoice, setWantInvoice] = useState(false);
+  // Invoice creation is always enabled (UI does not expose a checkbox).
+  const wantInvoice = true;
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
 
@@ -496,6 +497,17 @@ function ScanContent() {
 
           setTeaser(teaserData);
 
+          // Make the teaser shareable/reload-safe: persist scanId (+ token) into the URL.
+          // This prevents losing the "Jetzt Report freischalten" CTA after back/refresh.
+          try {
+            const u = new URL(window.location.href);
+            u.searchParams.set("scanId", teaserData.scanId);
+            u.searchParams.set("token", started.scanToken);
+            window.history.replaceState({}, "", u.toString());
+          } catch {
+            // ignore
+          }
+
           try {
             const key = "als_scanIds";
             const existing = JSON.parse(localStorage.getItem(key) || "[]") as string[];
@@ -565,6 +577,13 @@ function ScanContent() {
         body: JSON.stringify({ scanId, tier: effectiveTier, scanToken: token, invoice: Boolean(invoice) }),
       });
 
+      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+
+      if (!res.ok) {
+        // Surface a useful error message (helps debug env misconfig in prod).
+        throw new Error(data.error || `checkout_failed_${res.status}`);
+      }
+
       if (res.status === 401) {
         // Should not happen if we're authenticated, but handle gracefully.
         setPendingCheckout(scanId, effectiveTier, invoice);
@@ -576,13 +595,13 @@ function ScanContent() {
         return;
       }
 
-      const data = (await res.json()) as { url?: string; error?: string };
       if (!data.url) throw new Error(data.error || "checkout_failed");
       clearPendingCheckout();
       window.location.href = data.url;
     } catch (e) {
       console.error(e);
-      alert("Checkout konnte nicht gestartet werden.");
+      const msg = e instanceof Error ? e.message : String(e);
+      alert(`Checkout konnte nicht gestartet werden (${msg}).`);
     } finally {
       setBusy(false);
     }
@@ -1066,7 +1085,7 @@ function ScanContent() {
                       <button
                         onClick={unlock}
                         disabled={busy}
-                        className="w-full bg-slate-900 text-white hover:bg-slate-800 py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tight shadow-xl disabled:opacity-50"
+                        className="w-full bg-red-600 text-white hover:bg-red-700 py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tight shadow-xl shadow-red-600/20 disabled:opacity-50"
                       >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5 5 5-5m-5 5V3" />
@@ -1075,47 +1094,8 @@ function ScanContent() {
                       </button>
 
                       {!record?.isPaid && (
-                        <>
-                          <label className="mt-4 flex items-start justify-center gap-3 text-sm text-slate-700">
-                            <input type="checkbox" checked={wantInvoice} onChange={(e) => setWantInvoice(e.target.checked)} className="mt-1" />
-                            <span>
-                              Firmenrechnung (B2B) anfordern
-                              <span className="block text-[11px] text-slate-500 mt-1">
-                                Dann sammelt Stripe Firmenname, Rechnungsadresse und optional USt‑ID und erstellt eine Rechnung.
-                              </span>
-                            </span>
-                          </label>
-
-                          <p className="mt-3 text-xs text-center text-slate-600">
-                            Heute <span className="font-extrabold text-slate-900">{priceText}</span>
-                            <span className="mx-1 text-slate-400">statt</span>
-                            <span className="text-slate-400 line-through">{compareAtText}</span>
-                            <span className="mx-2 text-slate-400">•</span>
-                            <span className="font-extrabold text-emerald-700">spare €{savings}</span>
-                            <span className="mx-2 text-slate-400">•</span>
-                            <span>PDF sofort · kein Abo</span>
-                          </p>
-                          <div className="mt-2 flex items-center justify-center">
-                            <span className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-black text-emerald-700">
-                              Februar‑Special
-                            </span>
-                          </div>
-                          <p className="mt-2 text-[11px] text-center text-slate-500 font-semibold">
-                            Bereits 100+ technische Checks erstellt · WCAG / BITV / EN 301 549
-                          </p>
-                        </>
-                      )}
-
-                      {!record?.isPaid && (
-                        <div className="mt-5">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-center">Im Report enthalten</div>
-                          <ul className="text-sm text-slate-700 space-y-1 list-disc pl-5 max-w-md mx-auto">
-                            <li>Alle Findings mit Priorität</li>
-                            <li>Konkrete Fix-Anleitungen</li>
-                            <li>PDF als technischer Prüfbericht (kein Rechtsgutachten)</li>
-                          </ul>
-
-                          {/* Google Login Hinweis entfernt (UI cleaner) */}
+                        <div className="mt-4 text-center text-xs text-slate-600">
+                          Firmenrechnung möglich (Firmenname, Rechnungsadresse &amp; Steuer‑ID im Checkout).
                         </div>
                       )}
                     </div>
@@ -1207,7 +1187,7 @@ function ScanContent() {
                       {typeof estimatedPages === "number" && estimatedPages > 50 && (
                         <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-[12px] text-amber-900">
                           <span className="font-black">Hinweis:</span> Es wurden mehr als 50 Seiten entdeckt.
-                          "Plus" ist dann am sinnvollsten (repräsentativ). Für 100% Abdeckung bitte Scope/Unterseiten eingrenzen.
+                          Plus ist dann am sinnvollsten (repräsentativ). Für 100% Abdeckung bitte Scope/Unterseiten eingrenzen.
                         </div>
                       )}
                     </div>

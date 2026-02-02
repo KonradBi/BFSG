@@ -4,6 +4,8 @@ import matter from "gray-matter";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { markdownToHtml } from "@/app/lib/markdown";
+import SiteNav from "../../components/SiteNav";
+import SiteFooter from "../../components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "BFSG FAQ: 60 Fragen & Antworten",
@@ -26,7 +28,8 @@ export default async function FaqPage() {
   const html = await markdownToHtml(content);
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 px-4 md:px-6 py-16">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-4 md:px-6">
+      <SiteNav backHref="/ratgeber" backLabel="Ratgeber" />
       <article className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between gap-4">
           <Link href="/ratgeber" className="text-sm font-bold text-blue-700 hover:text-blue-800">
@@ -45,6 +48,8 @@ export default async function FaqPage() {
           {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
+
+        <SiteFooter note="" />
 
         <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
           <div className="font-extrabold text-slate-900">Direkt prüfen</div>

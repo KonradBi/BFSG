@@ -4,6 +4,8 @@ import matter from "gray-matter";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { markdownToHtml } from "@/app/lib/markdown";
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
 
 function getDoc() {
   const fullPath = path.join(process.cwd(), "content/cornerstones/audit-kosten.md");
@@ -46,69 +48,47 @@ export default async function AuditKostenPage() {
   const html = await markdownToHtml(content);
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 px-4 md:px-6 py-16">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-4 md:px-6">
+      <SiteNav />
+
       <article className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <Link href="/" className="text-sm font-bold text-blue-700 hover:text-blue-800">
-            ← Zur Startseite
-          </Link>
           <Link href="/ratgeber" className="text-sm font-bold text-slate-700 hover:text-blue-700">
-            Ratgeber
+            ← Ratgeber
+          </Link>
+          <Link href="/scan" className="text-sm font-bold text-blue-700 hover:text-blue-800">
+            Kurz‑Check starten
           </Link>
         </div>
 
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-          {String(data.title || "WCAG/BITV Audit Kosten")}
+          {String(data.title || "Audit Kosten")}
         </h1>
 
-        <div className="prose prose-slate max-w-none mt-8">
-          {/* eslint-disable-next-line react/no-danger */}
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        </div>
+        {data.subtitle && (
+          <p className="mt-4 text-lg text-slate-700 leading-relaxed">{String(data.subtitle)}</p>
+        )}
 
-        <section className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
-          <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Beispiel</div>
-          <div className="mt-2 text-xl font-black text-slate-900">So sieht ein Report aus</div>
-          <div className="mt-2 text-sm text-slate-700 leading-relaxed">
-            Technischer Prüfbericht mit Prioritäten (P0–P2) und konkreten Fix‑Schritten. Hinweis: keine Rechtsberatung.
-          </div>
+        <div
+          className="prose prose-slate max-w-none mt-10"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
 
-          <div className="mt-5 grid md:grid-cols-3 gap-3">
-            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-              <img src="/trust/report-summary.svg" alt="Beispiel: Summary" className="w-full h-auto block" />
-            </a>
-            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-              <img src="/trust/report-issues.svg" alt="Beispiel: Issues" className="w-full h-auto block" />
-            </a>
-            <a href="/muster-report" className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden hover:bg-slate-100 transition">
-              <img src="/trust/report-fixes.svg" alt="Beispiel: Fixes" className="w-full h-auto block" />
-            </a>
-          </div>
-
-          <a href="/muster-report" className="mt-4 inline-flex font-black text-blue-700 hover:text-blue-800">
-            Muster‑Report ansehen →
-          </a>
-        </section>
-
-        <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
-          <div className="font-extrabold text-slate-900">Weiterführende Artikel</div>
-          <div className="mt-4 grid gap-3">
-            <Link href="/ratgeber/barrierefreiheit-audit-kosten-faktoren" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Welche Faktoren treiben Audit‑Kosten?</Link>
-            <Link href="/ratgeber/bfsg-website-testen-automatisch-manuell" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Automatischer Check vs. manuelles Audit</Link>
-            <Link href="/ratgeber/bitv-test-vs-bfsg-check-unterschiede" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">BITV‑Test vs. Schnellcheck: Unterschiede</Link>
-            <Link href="/ratgeber/wcag-kontrastwerte-pruefen-einfach-erklaert" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Kontrast prüfen (WCAG): Werte &amp; Praxis</Link>
-          </div>
-        </div>
-
-        <div className="mt-8 rounded-3xl border border-blue-100 bg-blue-50 p-6">
-          <div className="font-extrabold text-slate-900">Direkt prüfen</div>
+        <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+          <div className="font-extrabold text-slate-900">Nächster Schritt</div>
           <div className="mt-1 text-slate-700">
-            Nutzen Sie den Kurz‑Check und erhalten Sie sofort technische Hinweise (kein Rechtsrat).
+            Sie wollen Klarheit über Ihre eigene Website? Starten Sie einen Kurz‑Check.
           </div>
-          <Link href="/" className="mt-4 inline-flex rounded-xl bg-blue-600 text-white px-5 py-3 font-black">
-            BFSG Check starten
+          <Link
+            href="/"
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+          >
+            Zum Scan
           </Link>
         </div>
+
+        <SiteFooter note="" />
       </article>
     </main>
   );

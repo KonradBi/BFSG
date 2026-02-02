@@ -2,9 +2,13 @@ export const metadata = {
   title: "Datenschutzerklärung | BFSG-WebCheck",
 };
 
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
+
 export default function DatenschutzPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-blue-500/30">
+    <main className="min-h-screen bg-background text-foreground selection:bg-blue-500/30 pt-24 pb-20">
+      <SiteNav />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-10 text-slate-900">Datenschutzerklärung</h1>
 
@@ -127,6 +131,7 @@ export default function DatenschutzPage() {
             Hierzu sowie zu weiteren Fragen zum Thema personenbezogene Daten können Sie sich jederzeit an uns wenden.
           </p>
         </section>
+        <SiteFooter note="" />
       </div>
     </main>
   );

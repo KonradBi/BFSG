@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
 
 type Scan = {
   scanId: string;
@@ -52,10 +54,12 @@ export default function ScansPage() {
         const items: Scan[] = [];
         for (const id of ids) {
           const token = getToken(id);
-          const res = await fetch(`/api/scans/get?scanId=${encodeURIComponent(id)}`, {
-            cache: "no-store",
-            headers: { accept: "application/json", ...(token ? { "x-scan-token": token } : {}) },
-          });
+          const res = await fetch(`/api/scans/get?scanId=${encodeURIComponent(id)}`,
+            {
+              cache: "no-store",
+              headers: { accept: "application/json", ...(token ? { "x-scan-token": token } : {}) },
+            }
+          );
           if (!res.ok) continue;
           const data = (await res.json()) as Scan;
           items.push(data);
@@ -73,17 +77,27 @@ export default function ScansPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient pt-24 pb-20 px-6">
+      <SiteNav />
+
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black text-slate-900">Ihre Scans</h1>
           <Link href="/scan" className="text-sm font-bold text-blue-700 hover:text-blue-800">
-+ Neuer Scan
+            + Neuer Scan
           </Link>
         </div>
 
         {!ids.length && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 text-slate-600">
-            Noch keine Scans auf diesem Gerät gespeichert.
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 text-slate-700">
+            <div className="font-extrabold text-slate-900">Noch keine Scans gespeichert.</div>
+            <div className="mt-2 text-sm text-slate-600">
+              Starten Sie einen neuen Scan. Diese Übersicht speichert Scan-IDs lokal in Ihrem Browser (localStorage).
+            </div>
+            <div className="mt-4">
+              <Link href="/scan" className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">
+                Neuen Scan starten
+              </Link>
+            </div>
           </div>
         )}
 
@@ -141,9 +155,7 @@ export default function ScansPage() {
           })}
         </div>
 
-        <div className="mt-10 text-xs text-slate-500">
-          Hinweis: Diese Übersicht zeigt Scans, die lokal (localStorage) gespeichert sind.
-        </div>
+        <SiteFooter note="Hinweis: Diese Übersicht speichert Scan-IDs lokal im Browser (localStorage)." />
       </div>
     </main>
   );

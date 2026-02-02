@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
-import Link from "next/link";
+import SiteNav from "../components/SiteNav";
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -9,12 +9,10 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-6">
+      <SiteNav />
       <div className="max-w-xl mx-auto glass rounded-[2rem] p-10 border border-slate-200 shadow-2xl">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black text-slate-900">Login</h1>
-          <Link href="/" className="text-sm font-bold text-slate-600 hover:text-blue-600">
-            Zurück
-          </Link>
         </div>
 
         {status === "loading" ? (
