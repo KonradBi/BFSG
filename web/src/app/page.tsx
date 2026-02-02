@@ -1,37 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback } from "react";
 import AuthNav from "./components/AuthNav";
 import BrandMark from "./components/BrandMark";
 import { isValidHttpUrl, normalizeUrl } from "./lib/normalizeUrl";
 
 export default function Home() {
-  const [url, setUrl] = useState("");
-
-  const handleScan = (e: React.FormEvent) => {
+  const handleScan = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const normalized = normalizeUrl(url);
-    if (!normalized || !isValidHttpUrl(normalized)) return;
-    window.location.href = `/scan?url=${encodeURIComponent(normalized)}`;
-  };
 
-  const ScanInput = ({ id, label = "Scan Starten", variant = "default" }: { id: string, label?: string, variant?: "default" | "red" }) => (
+    // PERF: keep inputs snappy. We read the value from the form on submit instead of
+    // controlling it via React state (otherwise the whole landing page rerenders per keystroke).
+    const form = e.currentTarget;
+    const raw = String(new FormData(form).get("url") || "");
+    const normalized = normalizeUrl(raw);
+    if (!normalized || !isValidHttpUrl(normalized)) return;
+
+    window.location.href = `/scan?url=${encodeURIComponent(normalized)}`;
+  }, []);
+
+  const ScanInput = ({ id, label = "Scan Starten", variant = "default" }: { id: string; label?: string; variant?: "default" | "red" }) => (
     <div id={id} className="max-w-xl mx-auto mb-12">
       <form onSubmit={handleScan} className="relative group">
-        <div className={`absolute -inset-1.5 rounded-2xl blur opacity-25 group-focus-within:opacity-40 transition duration-500 ${variant === "red" ? "bg-red-600" : "bg-gradient-to-r from-blue-600 to-indigo-600"}`}></div>
+        <div
+          className={`absolute -inset-1.5 rounded-2xl blur opacity-25 group-focus-within:opacity-40 transition duration-500 ${
+            variant === "red" ? "bg-red-600" : "bg-gradient-to-r from-blue-600 to-indigo-600"
+          }`}
+        ></div>
         <div className="relative flex flex-col sm:flex-row gap-2 bg-white border border-slate-200 p-2.5 rounded-2xl shadow-2xl overflow-hidden">
           <input
+            name="url"
             type="url"
             placeholder="https://ihre-website.de"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
             required
             className="flex-1 px-6 py-4 outline-none text-lg text-navy-900 placeholder-slate-400 font-medium"
           />
           <button
             type="submit"
-            className={`${variant === "red" ? "bg-red-600 hover:bg-red-700 shadow-red-500/20" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20"} text-white px-10 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 button-glow shadow-xl active:scale-[0.98]`}
+            className={`${
+              variant === "red"
+                ? "bg-red-600 hover:bg-red-700 shadow-red-500/20"
+                : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20"
+            } text-white px-10 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 button-glow shadow-xl active:scale-[0.98]`}
           >
             {label}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
