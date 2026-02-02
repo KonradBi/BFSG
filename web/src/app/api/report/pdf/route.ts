@@ -6,6 +6,8 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { chromium as playwrightChromium } from "playwright-core";
+import chromiumLambda from "@sparticuz/chromium";
 
 export const runtime = "nodejs";
 
@@ -719,7 +721,13 @@ export async function GET(req: Request) {
 
   // Render PDF from HTML
   // (no navigation, no external fetches needed)
-  const browser = await (await import("playwright")).chromium.launch();
+  // Use playwright-core + @sparticuz/chromium so this works reliably on serverless.
+  const executablePath = await chromiumLambda.executablePath();
+  const browser = await playwrightChromium.launch({
+    executablePath,
+    args: chromiumLambda.args,
+    headless: true,
+  });
   const context = await browser.newContext({
     bypassCSP: true,
     viewport: { width: 1280, height: 720 },
@@ -779,7 +787,17 @@ export async function GET(req: Request) {
       },
     });
   } catch (e: any) {
-    return NextResponse.json({ error: "pdf_failed", details: String(e?.message || e) }, { status: 500 });
+    const msg = String(e?.message || e);
+    // Return an HTML error page (better UX than a blank tab).
+    return new NextResponse(
+      `<!doctype html><meta charset="utf-8"/><title>PDF Fehler</title>
+       <div style="font-family:ui-sans-serif,system-ui;max-width:720px;margin:40px auto;padding:24px;border:1px solid #e2e8f0;border-radius:16px;">
+         <h1 style="margin:0 0 12px;font-size:20px;">PDF konnte nicht erstellt werden</h1>
+         <p style="margin:0 0 16px;color:#475569;">Bitte erneut versuchen. Wenn es weiter passiert: Screenshot an Support schicken.</p>
+         <pre style="white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:12px;">${escapeHtml(msg)}</pre>
+       </div>`,
+      { status: 500, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } }
+    );
   } finally {
     await pdfPage.close().catch(() => {});
     await context.close().catch(() => {});
