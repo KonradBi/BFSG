@@ -53,6 +53,7 @@ export default function Home() {
             <Link href="/ratgeber" className="hover:text-blue-600 transition-colors">Ratgeber</Link>
             <Link href="/bfsg-2025" className="hover:text-blue-600 transition-colors">BFSG 2025</Link>
             <Link href="/audit-kosten" className="hover:text-blue-600 transition-colors">Audit-Kosten</Link>
+            <Link href="/ratgeber/faq" className="hover:text-blue-600 transition-colors">FAQ</Link>
             <Link href="#pakete" className="hover:text-blue-600 transition-colors">Preise</Link>
           </div>
           <div className="flex items-center gap-4">

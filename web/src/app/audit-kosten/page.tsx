@@ -66,7 +66,17 @@ export default async function AuditKostenPage() {
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
 
-        <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+        <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
+          <div className="font-extrabold text-slate-900">Weiterführende Artikel</div>
+          <div className="mt-4 grid gap-3">
+            <Link href="/ratgeber/barrierefreiheit-audit-kosten-faktoren" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Welche Faktoren treiben Audit‑Kosten?</Link>
+            <Link href="/ratgeber/bfsg-website-testen-automatisch-manuell" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Automatischer Check vs. manuelles Audit</Link>
+            <Link href="/ratgeber/bitv-test-vs-bfsg-check-unterschiede" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">BITV‑Test vs. Schnellcheck: Unterschiede</Link>
+            <Link href="/ratgeber/wcag-kontrastwerte-pruefen-einfach-erklaert" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Kontrast prüfen (WCAG): Werte &amp; Praxis</Link>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-blue-100 bg-blue-50 p-6">
           <div className="font-extrabold text-slate-900">Direkt prüfen</div>
           <div className="mt-1 text-slate-700">
             Nutzen Sie den Kurz‑Check und erhalten Sie sofort technische Hinweise (kein Rechtsrat).

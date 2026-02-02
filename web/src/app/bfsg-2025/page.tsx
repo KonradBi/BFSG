@@ -66,7 +66,17 @@ export default async function Bfsg2025Page() {
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
 
-        <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+        <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-6">
+          <div className="font-extrabold text-slate-900">Weiterführende Artikel</div>
+          <div className="mt-4 grid gap-3">
+            <Link href="/ratgeber/bfsg-anwendbarkeit-website-check" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">Gilt das BFSG für meine Website? (Schnell‑Check)</Link>
+            <Link href="/ratgeber/bfsg-frist-2025-timeline-todo-liste" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">BFSG‑Frist 2025: Timeline &amp; To‑do‑Liste</Link>
+            <Link href="/ratgeber/bfsg-fuer-onlineshops-anforderungen-checkliste" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">BFSG für Onlineshops: Anforderungen &amp; Checkliste</Link>
+            <Link href="/ratgeber/wcag-bitv-en301549-unterschiede-einfach-erklaert" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-900 hover:bg-slate-100">WCAG vs. BITV vs. EN 301 549: die Unterschiede</Link>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-blue-100 bg-blue-50 p-6">
           <div className="font-extrabold text-slate-900">Direkt prüfen</div>
           <div className="mt-1 text-slate-700">
             Nutzen Sie den Kurz‑Check und erhalten Sie sofort technische Hinweise (kein Rechtsrat).

@@ -1,0 +1,26 @@
+export const PILLAR_LINKS: Record<string, Array<{ slug: string; anchor: string }>> = {
+  "bfsg-2025": [
+    { slug: "bfsg-anwendbarkeit-website-check", anchor: "Gilt das BFSG für meine Website? (Schnell-Check)" },
+    { slug: "bfsg-frist-2025-timeline-todo-liste", anchor: "BFSG-Frist 2025: Timeline & To-do-Liste" },
+    { slug: "bfsg-fuer-onlineshops-anforderungen-checkliste", anchor: "BFSG für Onlineshops: Anforderungen & Checkliste" },
+    { slug: "bfsg-website-testen-automatisch-manuell", anchor: "Wie testen? Automatischer Check vs. manuelles Audit" },
+    { slug: "was-ist-eaa-und-bfsg", anchor: "EAA & BFSG: Zusammenhang einfach erklärt" },
+    { slug: "wcag-bitv-en301549-unterschiede-einfach-erklaert", anchor: "WCAG vs. BITV vs. EN 301 549: die Unterschiede" },
+    { slug: "bitv-test-vs-bfsg-check-unterschiede", anchor: "BITV-Test vs. BFSG-Check: wann welcher sinnvoll ist" },
+    { slug: "top-15-barrierefreiheit-fehler-websites-fixes", anchor: "Top 15 Barrieren auf Websites – typische Fixes" },
+    { slug: "barrierefreiheitserklaerung-inhalt-vorlage", anchor: "Barrierefreiheitserklärung: Inhalt & Vorlage (DE)" },
+    { slug: "barrierefreie-pdfs-probleme-und-fixes", anchor: "Barrierefreie PDFs: typische Probleme & Quick-Fixes" },
+  ],
+  "audit-kosten": [
+    { slug: "barrierefreiheit-audit-kosten-faktoren", anchor: "Welche Faktoren treiben Audit-Kosten?" },
+    { slug: "bfsg-website-testen-automatisch-manuell", anchor: "Was deckt ein automatischer Check ab – und was nicht?" },
+    { slug: "bitv-test-vs-bfsg-check-unterschiede", anchor: "Unterschiede: offizieller BITV-Test vs. Schnellcheck" },
+    { slug: "barrierefreie-formulare-best-practices", anchor: "Aufwandstreiber: Formulare & Validierung" },
+    { slug: "wcag-kontrastwerte-pruefen-einfach-erklaert", anchor: "Aufwandstreiber: Kontrastmessung & Design-Anpassungen" },
+    { slug: "barrierefreie-navigation-menues-skip-links-landmarken", anchor: "Aufwandstreiber: Navigation, Landmarken, Skip-Links" },
+    { slug: "aria-richtig-einsetzen-fehler-patterns", anchor: "Aufwandstreiber: ARIA-Fehler und technische Korrekturen" },
+    { slug: "tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge", anchor: "Manuelle Prüfung: Tastaturbedienbarkeit" },
+    { slug: "screenreader-test-nvda-voiceover-quickchecks", anchor: "Manuelle Prüfung: Screenreader-Checks" },
+    { slug: "barrierefreie-pdfs-probleme-und-fixes", anchor: "Zusatzaufwand: Dokumente/PDFs" },
+  ],
+};
