@@ -31,7 +31,13 @@ export default function Home() {
         <div className="relative flex flex-col sm:flex-row gap-2 bg-white border border-slate-200 p-2.5 rounded-2xl shadow-2xl overflow-hidden">
           <input
             name="url"
-            type="url"
+            // Use a plain text field so users can paste/enter domains like "www.welt.de".
+            // We normalize to https:// on submit.
+            type="text"
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="https://ihre-website.de"
             required
             className="flex-1 px-6 py-4 outline-none text-lg text-navy-900 placeholder-slate-400 font-medium"
