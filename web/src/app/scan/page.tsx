@@ -616,7 +616,9 @@ function ScanContent() {
     // If already paid, just open the PDF.
     if (record?.isPaid) {
       const pdfUrl = `/api/report/pdf?scanId=${encodeURIComponent(record.scanId)}&token=${encodeURIComponent(token)}`;
-      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      // Some browsers block window.open; fall back to same-tab navigation so the user always gets a result.
+      const win = window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = pdfUrl;
       return;
     }
 
