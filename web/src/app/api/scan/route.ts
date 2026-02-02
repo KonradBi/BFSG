@@ -326,31 +326,74 @@ export async function POST(req: Request) {
   async function discoverCount(startUrl: string, max = 60) {
     const start = new URL(startUrl);
     const origin = start.origin;
-    const seen = new Set<string>();
+
+    // Two sets: one for URLs we've already fetched, and one for HTML pages we actually counted.
+    const fetched = new Set<string>();
+    const htmlPages = new Set<string>();
     const q: string[] = [start.toString()];
     let fetches = 0;
 
     const normalize = (u: URL) => {
       u.hash = "";
       u.search = "";
+
+      // Treat /index.html and trailing slashes as the same page.
+      u.pathname = u.pathname.replace(/\/index\.html?$/i, "/");
+      if (u.pathname.length > 1 && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
+
       return u.toString();
     };
 
     const isHtmlish = (u: URL) => {
       const p = u.pathname.toLowerCase();
-      const bad = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg", ".pdf", ".zip", ".mp4", ".mp3", ".webm", ".css", ".js", ".json", ".xml"];
-      return !bad.some((ext) => p.endsWith(ext));
+      const badExt = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".gif",
+        ".svg",
+        ".pdf",
+        ".zip",
+        ".mp4",
+        ".mp3",
+        ".webm",
+        ".css",
+        ".js",
+        ".json",
+        ".xml",
+        ".txt",
+        ".ico",
+      ];
+      if (badExt.some((ext) => p.endsWith(ext))) return false;
+
+      // Avoid common CMS/API endpoints that are not "pages".
+      const badPrefixes = ["/wp-json", "/wp-admin", "/wp-content", "/wp-includes", "/feed", "/sitemap", "/xmlrpc.php"];
+      if (badPrefixes.some((pre) => p === pre || p.startsWith(`${pre}/`))) return false;
+
+      return true;
     };
 
-    while (q.length && seen.size < max && fetches < max) {
+    while (q.length && htmlPages.size < max && fetches < max) {
       const cur = q.shift()!;
-      if (seen.has(cur)) continue;
-      seen.add(cur);
+      const curUrl = new URL(cur);
+      if (curUrl.origin !== origin) continue;
+      if (!isHtmlish(curUrl)) continue;
+
+      const curNorm = normalize(curUrl);
+      if (fetched.has(curNorm)) continue;
+      fetched.add(curNorm);
 
       try {
-        const res = await fetch(cur, { headers: { accept: "text/html,application/xhtml+xml" } });
+        const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
         fetches += 1;
         if (!res.ok) continue;
+
+        const ct = String(res.headers.get("content-type") || "");
+        if (!ct.includes("text/html")) continue;
+
+        htmlPages.add(curNorm);
+
         const html = await res.text();
         const re = /href\s*=\s*["']([^"']+)["']/gi;
         let m: RegExpExecArray | null = null;
@@ -359,22 +402,23 @@ export async function POST(req: Request) {
           if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
           let u: URL;
           try {
-            u = new URL(href, cur);
+            u = new URL(href, curNorm);
           } catch {
             continue;
           }
           if (u.origin !== origin) continue;
           if (!isHtmlish(u)) continue;
+
           const norm = normalize(u);
-          if (!seen.has(norm)) q.push(norm);
-          if (seen.size >= max) break;
+          if (!fetched.has(norm)) q.push(norm);
+          if (htmlPages.size >= max) break;
         }
       } catch {
         // ignore
       }
     }
 
-    return seen.size;
+    return htmlPages.size || 1;
   }
 
   const discoveredPages = await discoverCount(safeUrl, 60).catch(() => 1);
