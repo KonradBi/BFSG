@@ -1,8 +1,8 @@
 ---
 slug: barrierefreie-formulare-best-practices
 title: "Barrierefreie Formulare: Labels, Fehler & Pflichtfelder"
+ogImage: "/ratgeber/og/barrierefreie-formulare-best-practices.svg"
 ---
-
 **Dateiname (Slug):** `barrierefreie-formulare-best-practices`
 
 **Meta Title (58 Zeichen):** Barrierefreie Formulare: Labels, Fehler & Pflichtfelder

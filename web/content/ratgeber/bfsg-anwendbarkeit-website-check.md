@@ -1,8 +1,8 @@
 ---
 slug: bfsg-anwendbarkeit-website-check
 title: "Ist meine Website vom Barrierefreiheitsstärkungsgesetz (BFSG) betroffen?"
+ogImage: "/ratgeber/og/bfsg-anwendbarkeit-website-check.svg"
 ---
-
 **Dateiname:** `bfsg-anwendbarkeit-website-check.md`
 
 **Meta Title:** Gilt das BFSG für meine Website? Schneller Check für 2025

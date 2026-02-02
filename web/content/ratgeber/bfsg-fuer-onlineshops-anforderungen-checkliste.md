@@ -1,8 +1,8 @@
 ---
 slug: bfsg-fuer-onlineshops-anforderungen-checkliste
 title: "BFSG für Onlineshops: Konkrete Anforderungen & Checkliste 2025"
+ogImage: "/ratgeber/og/bfsg-fuer-onlineshops-anforderungen-checkliste.svg"
 ---
-
 **Vorschlag Dateiname:** `bfsg-fuer-onlineshops-anforderungen-checkliste.md`
 
 **Meta Title:** BFSG für Onlineshops: Konkrete Anforderungen & Checkliste 2025

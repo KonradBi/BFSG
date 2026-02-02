@@ -1,8 +1,8 @@
 ---
 slug: barrierefreie-pdfs-probleme-und-fixes
 title: "Barrierefreie PDFs: Probleme erkennen & einfach beheben | BFSG"
+ogImage: "/ratgeber/og/barrierefreie-pdfs-probleme-und-fixes.svg"
 ---
-
 **Dateiname:** `barrierefreie-pdfs-probleme-und-fixes`
 
 **Meta Title:** Barrierefreie PDFs: Probleme erkennen & einfach beheben | BFSG

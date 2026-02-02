@@ -1,8 +1,8 @@
 ---
 slug: faq
 title: "BFSG FAQ: 60 Fragen & Antworten"
+ogImage: "/ratgeber/og/faq.svg"
 ---
-
 # FAQ-Hub: Das Barrierefreiheitsstärkungsgesetz (BFSG) und digitale Barrierefreiheit für Unternehmen
 
 Das Barrierefreiheitsstärkungsgesetz (BFSG) markiert einen Wendepunkt für die digitale Landschaft in Deutschland. Es verpflichtet ab dem 28. Juni 2025 zahlreiche privatwirtschaftliche Akteure, ihre digitalen Produkte und Dienstleistungen – insbesondere Websites und mobile Anwendungen – barrierefrei zu gestalten. Ziel ist es, Menschen mit Behinderungen eine uneingeschränkte Teilhabe am digitalen Leben zu ermöglichen. Diese Neuregelung, basierend auf dem European Accessibility Act (EAA), schafft neue Standards und Pflichten, die weit über den öffentlichen Sektor hinausgehen. Für Unternehmen, Onlineshop-Betreiber und Agenturen ist es entscheidend, die Anforderungen zu verstehen und rechtzeitig umzusetzen, um rechtliche Risiken zu vermeiden und neue Zielgruppen zu erschließen. Dieser FAQ-Hub beantwortet die 60 wichtigsten Fragen.

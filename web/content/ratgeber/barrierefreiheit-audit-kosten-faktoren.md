@@ -1,8 +1,8 @@
 ---
 slug: barrierefreiheit-audit-kosten-faktoren
 title: "Was kostet ein Barrierefreiheits-Audit für eine Website?"
+ogImage: "/ratgeber/og/barrierefreiheit-audit-kosten-faktoren.svg"
 ---
-
 **Dateiname:** `barrierefreiheit-audit-kosten-faktoren.md`
 
 **Meta Title:** Barrierefreiheits-Audit: Welche Kosten entstehen? Ein Überblick.

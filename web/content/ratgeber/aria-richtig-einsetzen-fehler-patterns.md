@@ -1,8 +1,8 @@
 ---
 slug: aria-richtig-einsetzen-fehler-patterns
 title: "ARIA-Attribute richtig einsetzen: So vermeiden Sie häufige Fehler und nutzen sichere Patterns"
+ogImage: "/ratgeber/og/aria-richtig-einsetzen-fehler-patterns.svg"
 ---
-
 **Dateiname:** `aria-richtig-einsetzen-fehler-patterns.md`
 
 **Meta Title:** ARIA richtig einsetzen: Häufige Fehler & sichere Patterns | BFSG

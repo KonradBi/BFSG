@@ -1,8 +1,8 @@
 ---
 slug: bfsg-website-testen-automatisch-manuell
 title: "Website auf BFSG-Konformität prüfen: Automatische vs. manuelle Tests"
+ogImage: "/ratgeber/og/bfsg-website-testen-automatisch-manuell.svg"
 ---
-
 **Dateiname:** `bfsg-website-testen-automatisch-manuell.md`
 
 **Meta Title:** BFSG-Check: Website richtig prüfen (automatisch vs. manuell)

@@ -1,8 +1,8 @@
 ---
 slug: bitv-test-vs-bfsg-check-unterschiede
 title: "BITV-Test vs. BFSG-Check: Was ist der Unterschied & was brauchen Sie?"
+ogImage: "/ratgeber/og/bitv-test-vs-bfsg-check-unterschiede.svg"
 ---
-
 **Dateiname:** `bitv-test-vs-bfsg-check-unterschiede`
 
 **Meta Title:** BITV-Test vs. BFSG-Check: Was ist der Unterschied & was brauchen Sie?

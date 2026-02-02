@@ -1,0 +1,13 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="630" fill="#ffffff"/>
+<defs>
+<clipPath id="clip-left-contrast">
+<rect x="0" y="0" width="597" height="630"/>
+</clipPath>
+<clipPath id="clip-right-contrast">
+<rect x="603" y="0" width="597" height="630"/>
+</clipPath>
+</defs>
+<circle cx="600" cy="315" r="200" fill="#0f172a" clip-path="url(#clip-left-contrast)"/>
+<circle cx="600" cy="315" r="200" fill="#2563eb" clip-path="url(#clip-right-contrast)"/>
+</svg>

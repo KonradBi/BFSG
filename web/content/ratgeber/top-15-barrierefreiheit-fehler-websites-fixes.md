@@ -1,8 +1,8 @@
 ---
 slug: top-15-barrierefreiheit-fehler-websites-fixes
 title: "Die 15 häufigsten Barrierefreiheits-Fehler – und wie Sie sie einfach beheben"
+ogImage: "/ratgeber/og/top-15-barrierefreiheit-fehler-websites-fixes.svg"
 ---
-
 **Dateiname:** `top-15-barrierefreiheit-fehler-websites-fixes.md`
 
 **Meta Title:** Top 15 Barrierefreiheits-Fehler auf Websites & wie man sie behebt

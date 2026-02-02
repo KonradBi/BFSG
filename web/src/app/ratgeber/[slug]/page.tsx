@@ -25,6 +25,7 @@ function getPostBySlug(slug: string) {
     title: String(data.title || slug),
     metaTitle: data.metaTitle ? String(data.metaTitle) : undefined,
     metaDescription: data.metaDescription ? String(data.metaDescription) : undefined,
+    ogImage: data.ogImage ? String(data.ogImage) : undefined,
     content,
   };
 }
@@ -41,6 +42,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     post.metaDescription ||
     "Ratgeberartikel zu BFSG 2025, Barrierefreiheit, WCAG und BITV. Keine Rechtsberatung.";
 
+  const ogImage = (post as any).ogImage as string | undefined;
+
   return {
     title,
     description,
@@ -50,6 +53,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: "article",
       url: `https://bfsg.vercel.app/ratgeber/${post.slug}`,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ogImage ? [ogImage] : undefined,
     },
   };
 }
