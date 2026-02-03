@@ -19,10 +19,9 @@ export default function AuthNav({ className, callbackUrl }: Props) {
   }
 
   if (session?.user) {
-    const label = session.user.email || session.user.name || "Account";
     return (
       <div className={"flex items-center gap-2 md:gap-3 " + (className || "")}>
-        <div className="hidden md:block text-xs font-bold text-slate-600 max-w-[220px] truncate">{label}</div>
+        {/* Email/name hidden to reduce clutter */}
         {/* Mobile: icon-only logout */}
         <button
           onClick={() => signOut({ callbackUrl: cb })}
