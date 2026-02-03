@@ -5,7 +5,7 @@ export default function BrandMark({ href = "/" }: { href?: string }) {
     <Link href={href} className="flex items-center gap-2 md:gap-3 shrink-0">
       {/* Logo without container chrome (no border/white tile) */}
       <img
-        src="/brand/logo-mark.jpg"
+        src="/brand/logo-mark.png"
         alt="BFSG WebCheck"
         className="h-12 w-12 md:h-14 md:w-14 object-contain"
       />
