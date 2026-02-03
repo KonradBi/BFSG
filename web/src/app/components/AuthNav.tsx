@@ -11,7 +11,8 @@ type Props = {
 export default function AuthNav({ className, callbackUrl }: Props) {
   const { data: session, status } = useSession();
 
-  const cb = callbackUrl || (typeof window !== "undefined" ? window.location.href : "/");
+  // Default: after sign-in/sign-out go back to landing page (avoid returning to /scan or dashboard after logout).
+  const cb = callbackUrl || "/";
 
   if (status === "loading") {
     return <div className={className} />;
