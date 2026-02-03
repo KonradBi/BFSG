@@ -32,7 +32,9 @@ export async function POST(req: Request) {
   const price = PRICE_BY_TIER[tier];
   if (!price) return NextResponse.json({ error: "missing_price" }, { status: 400 });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("x-forwarded-host") || req.headers.get("host")}`;
 
   // MVP: we pass scanId (+token for client-side access) in metadata.
   // Webhook will mark the scan as paid.
