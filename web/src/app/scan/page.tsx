@@ -15,6 +15,7 @@ type Teaser = {
   totals: { p0: number; p1: number; p2: number; total: number };
   sampleFinding: { title: string; severity: "P0" | "P1" | "P2"; hint: string };
   pdfUrl?: string;
+  limits?: { findingsReturned: number; note: string };
 };
 
 type ScanRecord = {
@@ -141,6 +142,11 @@ function ScanContent() {
   const wantInvoice = true;
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState(0);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const scanInFlightRef = useRef(false);
+  const cooldownUntilRef = useRef(0);
 
   const { status: authStatus } = useSession();
   const [localDiff, setLocalDiff] = useState<{ fixed: number; new: number; persisting: number } | null>(null);
@@ -398,6 +404,26 @@ function ScanContent() {
     return [];
   }, [record?.isPaid, record?.findings, record?.sampleFinding, record?.url, teaser?.sampleFinding, teaser?.url]);
 
+  useEffect(() => {
+    if (!cooldownUntil) {
+      setCooldownRemaining(0);
+      return;
+    }
+
+    const updateRemaining = () => {
+      const remaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+      setCooldownRemaining(remaining);
+      if (remaining <= 0) {
+        cooldownUntilRef.current = 0;
+        setCooldownUntil(0);
+      }
+    };
+
+    updateRemaining();
+    const timer = window.setInterval(updateRemaining, 250);
+    return () => window.clearInterval(timer);
+  }, [cooldownUntil]);
+
   const groupedFindings = useMemo(() => {
     if (!record?.isPaid || !Array.isArray(record.findings)) {
       return { P0: [], P1: [], P2: [] } as Record<"P0" | "P1" | "P2", Finding[]>;
@@ -411,6 +437,9 @@ function ScanContent() {
   }, [record?.isPaid, record?.findings]);
 
   async function runScan(targetUrl?: string) {
+    if (scanInFlightRef.current) return;
+    if (cooldownUntilRef.current && cooldownUntilRef.current > Date.now()) return;
+
     const scanUrlRaw = String(targetUrl ?? urlDraftRef.current ?? urlSeed ?? url).trim();
     const scanUrl = normalizeUrl(scanUrlRaw);
 
@@ -427,6 +456,12 @@ function ScanContent() {
       alert("Bitte bestätigen Sie, dass Sie berechtigt sind, diese Website zu scannen.");
       return;
     }
+
+    scanInFlightRef.current = true;
+    setIsScanning(true);
+    const cooldownTarget = Date.now() + 5_000;
+    cooldownUntilRef.current = cooldownTarget;
+    setCooldownUntil(cooldownTarget);
 
     setBusy(true);
     setTeaser(null);
@@ -468,7 +503,17 @@ function ScanContent() {
       for (let i = 0; i < 180; i++) {
         await new Promise((r) => setTimeout(r, 900));
         const sres = await fetch(`/api/scan/status?jobId=${encodeURIComponent(started.jobId)}`, { cache: "no-store" });
-        const sdata = (await sres.json()) as any;
+        const sdata = (await sres.json()) as unknown as {
+          status?: string;
+          scanStatus?: string;
+          scanId?: string;
+          url?: string;
+          totals?: Teaser["totals"];
+          sampleFinding?: Teaser["sampleFinding"];
+          pdfUrl?: string;
+          error?: string;
+          progress?: { pagesDone: number; pagesTotal: number };
+        };
 
         const p = sdata?.progress;
         if (p && typeof p.pagesDone === "number" && typeof p.pagesTotal === "number") {
@@ -486,14 +531,18 @@ function ScanContent() {
 
         if (sdata?.status === "DONE") { 
           const teaserData: Teaser = {
-            scanId: sdata.scanId,
+            scanId: sdata.scanId || "",
             scanToken: started.scanToken,
-            url: sdata.url,
-            totals: sdata.totals,
-            sampleFinding: sdata.sampleFinding,
+            url: sdata.url || "",
+            totals: sdata.totals || { p0: 0, p1: 0, p2: 0, total: 0 },
+            sampleFinding: sdata.sampleFinding || {
+              title: "Befund",
+              severity: "P2",
+              hint: "",
+            },
             pdfUrl: sdata.pdfUrl,
             limits: { findingsReturned: sdata?.totals?.total ?? 0, note: "" },
-          } as any;
+          };
 
           setTeaser(teaserData);
 
@@ -531,6 +580,8 @@ function ScanContent() {
       console.error(e);
     } finally {
       setBusy(false);
+      scanInFlightRef.current = false;
+      setIsScanning(false);
     }
   }
 
@@ -670,7 +721,13 @@ function ScanContent() {
 
       <div className="glass rounded-3xl p-5 md:p-8 border border-slate-200 shadow-2xl">
         <label className="block text-sm font-semibold mb-3 text-slate-600">Website‑URL zum Scannen</label>
-        <div className="flex flex-col md:flex-row gap-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            runScan(urlDraftRef.current || urlSeed || url);
+          }}
+          className="flex flex-col md:flex-row gap-3"
+        >
           <input
             key={urlSeed}
             defaultValue={urlSeed}
@@ -685,11 +742,11 @@ function ScanContent() {
             spellCheck={false}
           />
           <button
-            onClick={() => runScan(urlDraftRef.current || urlSeed || url)}
+            type="submit"
             disabled={(() => {
               const raw = String(urlDraftRef.current || urlSeed || url).trim();
               const normalized = normalizeUrl(raw);
-              return busy || !isValidHttpUrl(normalized);
+              return busy || isScanning || cooldownRemaining > 0 || !isValidHttpUrl(normalized);
             })()}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
@@ -700,7 +757,12 @@ function ScanContent() {
               </span>
             ) : "Scan starten"}
           </button>
-        </div>
+        </form>
+        {cooldownRemaining > 0 && (
+          <div className="mt-2 text-xs text-slate-500">
+            Bitte {cooldownRemaining}s warten, bevor Sie erneut scannen.
+          </div>
+        )}
 
         <label className="mt-4 flex items-start gap-3 text-sm text-slate-600">
           <input

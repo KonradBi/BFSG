@@ -28,6 +28,21 @@ const RATE_BUCKET: Map<RateKey, { resetAt: number; count: number }> =
 // eslint-disable-next-line no-var
 (globalThis as any).__als_rate_bucket = RATE_BUCKET;
 
+type DedupeKey = string;
+type DedupePayload = {
+  jobId: string;
+  scanId: string;
+  scanToken: string;
+  discoveredPages: number;
+  recommendedTier: string;
+};
+const DEDUPE_BUCKET: Map<DedupeKey, { createdAt: number; promise: Promise<DedupePayload> }> =
+  // eslint-disable-next-line no-var
+  (globalThis as any).__als_scan_dedupe || new Map();
+// eslint-disable-next-line no-var
+(globalThis as any).__als_scan_dedupe = DEDUPE_BUCKET;
+const DEDUPE_WINDOW_MS = 15_000;
+
 function getClientIp(req: Request) {
   // Basic best-effort IP extraction (works behind common proxies).
   const fwd = req.headers.get("x-forwarded-for") || "";
@@ -40,7 +55,7 @@ function rateLimitOrNull(req: Request) {
   const now = Date.now();
 
   const windowMs = Number(process.env.SCAN_RATE_LIMIT_WINDOW_MS || 60_000);
-  const max = Number(process.env.SCAN_RATE_LIMIT_MAX || 10);
+  const max = Math.max(1, Number(process.env.SCAN_RATE_LIMIT_MAX || 10));
 
   const key = `scan:${ip}`;
   const cur = RATE_BUCKET.get(key);
@@ -284,14 +299,6 @@ async function processQueueOnce(convex: ConvexHttpClient) {
 }
 
 export async function POST(req: Request) {
-  const limited = rateLimitOrNull(req);
-  if (limited) {
-    return NextResponse.json(
-      { error: "rate_limited", retryAfterSec: limited.retryAfterSec },
-      { status: 429, headers: { "retry-after": String(limited.retryAfterSec) } }
-    );
-  }
-
   const body = (await req.json()) as { url?: string; authorizedToScan?: boolean };
   const safeUrl = String(body?.url || "").trim();
   const authorizedToScan = Boolean(body?.authorizedToScan);
@@ -306,147 +313,185 @@ export async function POST(req: Request) {
   const convex = getConvexClient();
   if (!convex) return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
 
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id as string | undefined;
-
-  // Keep a user row for reporting & future history.
-  if (userId) {
-    await convex
-      .mutation((api as any).users.upsert, {
-        userId,
-        email: (session?.user as any)?.email ?? undefined,
-        name: (session?.user as any)?.name ?? undefined,
-        image: (session?.user as any)?.image ?? undefined,
-      })
-      .catch(() => {});
+  const ip = getClientIp(req);
+  const dedupeKey = `scan:${ip}:${safeUrl}`;
+  const now = Date.now();
+  const existing = DEDUPE_BUCKET.get(dedupeKey);
+  if (existing) {
+    if (now - existing.createdAt <= DEDUPE_WINDOW_MS) {
+      const payload = await existing.promise;
+      return NextResponse.json({ ...payload, deduped: true });
+    }
+    DEDUPE_BUCKET.delete(dedupeKey);
   }
 
-  // Autoplan (discovery): estimate internal page count so the user doesn't need to know it.
-  // This is intentionally lightweight (fetch + href parsing) to keep latency reasonable.
-  async function discoverCount(startUrl: string, max = 60) {
-    const start = new URL(startUrl);
-    const origin = start.origin;
-
-    // Two sets: one for URLs we've already fetched, and one for HTML pages we actually counted.
-    const fetched = new Set<string>();
-    const htmlPages = new Set<string>();
-    const q: string[] = [start.toString()];
-    let fetches = 0;
-
-    const normalize = (u: URL) => {
-      u.hash = "";
-      u.search = "";
-
-      // Treat /index.html and trailing slashes as the same page.
-      u.pathname = u.pathname.replace(/\/index\.html?$/i, "/");
-      if (u.pathname.length > 1 && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
-
-      return u.toString();
-    };
-
-    const isHtmlish = (u: URL) => {
-      const p = u.pathname.toLowerCase();
-      const badExt = [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".gif",
-        ".svg",
-        ".pdf",
-        ".zip",
-        ".mp4",
-        ".mp3",
-        ".webm",
-        ".css",
-        ".js",
-        ".json",
-        ".xml",
-        ".txt",
-        ".ico",
-      ];
-      if (badExt.some((ext) => p.endsWith(ext))) return false;
-
-      // Avoid common CMS/API endpoints that are not "pages".
-      const badPrefixes = ["/wp-json", "/wp-admin", "/wp-content", "/wp-includes", "/feed", "/sitemap", "/xmlrpc.php"];
-      if (badPrefixes.some((pre) => p === pre || p.startsWith(`${pre}/`))) return false;
-
-      return true;
-    };
-
-    while (q.length && htmlPages.size < max && fetches < max) {
-      const cur = q.shift()!;
-      const curUrl = new URL(cur);
-      if (curUrl.origin !== origin) continue;
-      if (!isHtmlish(curUrl)) continue;
-
-      const curNorm = normalize(curUrl);
-      if (fetched.has(curNorm)) continue;
-      fetched.add(curNorm);
-
-      try {
-        const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
-        fetches += 1;
-        if (!res.ok) continue;
-
-        const ct = String(res.headers.get("content-type") || "");
-        if (!ct.includes("text/html")) continue;
-
-        htmlPages.add(curNorm);
-
-        const html = await res.text();
-        const re = /href\s*=\s*["']([^"']+)["']/gi;
-        let m: RegExpExecArray | null = null;
-        while ((m = re.exec(html))) {
-          const href = String(m[1] || "").trim();
-          if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
-          let u: URL;
-          try {
-            u = new URL(href, curNorm);
-          } catch {
-            continue;
-          }
-          if (u.origin !== origin) continue;
-          if (!isHtmlish(u)) continue;
-
-          const norm = normalize(u);
-          if (!fetched.has(norm)) q.push(norm);
-          if (htmlPages.size >= max) break;
-        }
-      } catch {
-        // ignore
-      }
+  const createPromise = (async () => {
+    const limited = rateLimitOrNull(req);
+    if (limited) {
+      const err = new Error("rate_limited");
+      (err as any).rateLimit = limited;
+      throw err;
     }
 
-    return htmlPages.size || 1;
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as any)?.id as string | undefined;
+
+    // Keep a user row for reporting & future history.
+    if (userId) {
+      await convex
+        .mutation((api as any).users.upsert, {
+          userId,
+          email: (session?.user as any)?.email ?? undefined,
+          name: (session?.user as any)?.name ?? undefined,
+          image: (session?.user as any)?.image ?? undefined,
+        })
+        .catch(() => {});
+    }
+
+    // Autoplan (discovery): estimate internal page count so the user doesn't need to know it.
+    // This is intentionally lightweight (fetch + href parsing) to keep latency reasonable.
+    async function discoverCount(startUrl: string, max = 60) {
+      const start = new URL(startUrl);
+      const origin = start.origin;
+
+      // Two sets: one for URLs we've already fetched, and one for HTML pages we actually counted.
+      const fetched = new Set<string>();
+      const htmlPages = new Set<string>();
+      const q: string[] = [start.toString()];
+      let fetches = 0;
+
+      const normalize = (u: URL) => {
+        u.hash = "";
+        u.search = "";
+
+        // Treat /index.html and trailing slashes as the same page.
+        u.pathname = u.pathname.replace(/\/index\.html?$/i, "/");
+        if (u.pathname.length > 1 && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
+
+        return u.toString();
+      };
+
+      const isHtmlish = (u: URL) => {
+        const p = u.pathname.toLowerCase();
+        const badExt = [
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".webp",
+          ".gif",
+          ".svg",
+          ".pdf",
+          ".zip",
+          ".mp4",
+          ".mp3",
+          ".webm",
+          ".css",
+          ".js",
+          ".json",
+          ".xml",
+          ".txt",
+          ".ico",
+        ];
+        if (badExt.some((ext) => p.endsWith(ext))) return false;
+
+        // Avoid common CMS/API endpoints that are not "pages".
+        const badPrefixes = ["/wp-json", "/wp-admin", "/wp-content", "/wp-includes", "/feed", "/sitemap", "/xmlrpc.php"];
+        if (badPrefixes.some((pre) => p === pre || p.startsWith(`${pre}/`))) return false;
+
+        return true;
+      };
+
+      while (q.length && htmlPages.size < max && fetches < max) {
+        const cur = q.shift()!;
+        const curUrl = new URL(cur);
+        if (curUrl.origin !== origin) continue;
+        if (!isHtmlish(curUrl)) continue;
+
+        const curNorm = normalize(curUrl);
+        if (fetched.has(curNorm)) continue;
+        fetched.add(curNorm);
+
+        try {
+          const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
+          fetches += 1;
+          if (!res.ok) continue;
+
+          const ct = String(res.headers.get("content-type") || "");
+          if (!ct.includes("text/html")) continue;
+
+          htmlPages.add(curNorm);
+
+          const html = await res.text();
+          const re = /href\s*=\s*["']([^"']+)["']/gi;
+          let m: RegExpExecArray | null = null;
+          while ((m = re.exec(html))) {
+            const href = String(m[1] || "").trim();
+            if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
+            let u: URL;
+            try {
+              u = new URL(href, curNorm);
+            } catch {
+              continue;
+            }
+            if (u.origin !== origin) continue;
+            if (!isHtmlish(u)) continue;
+
+            const norm = normalize(u);
+            if (!fetched.has(norm)) q.push(norm);
+            if (htmlPages.size >= max) break;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      return htmlPages.size || 1;
+    }
+
+    const discoveredPages = await discoverCount(safeUrl, 60).catch(() => 1);
+    const recommendedTier =
+      discoveredPages <= 5 ? "mini" : discoveredPages <= 15 ? "standard" : "plus";
+
+    const accessToken = newAccessToken();
+    const { scanId } = await convex.mutation(api.scans.createQueued, {
+      url: safeUrl,
+      accessToken,
+      authorizedToScan,
+      userId,
+    });
+
+    const { jobId } = await convex.mutation(api.scanJobs.enqueue, { scanId });
+
+    // Best-effort: try to process immediately (or on subsequent status polls).
+    // Best-effort: try to process immediately.
+    // Use the shared worker logic so we stay consistent with /api/scan/worker.
+    const { processQueueOnce: processQueueOnceShared } = await import("@/lib/scanQueueWorker");
+    await processQueueOnceShared(convex).catch(() => {});
+
+    return {
+      jobId,
+      scanId,
+      scanToken: accessToken,
+      discoveredPages,
+      recommendedTier,
+    };
+  })();
+
+  DEDUPE_BUCKET.set(dedupeKey, { createdAt: now, promise: createPromise });
+
+  try {
+    const payload = await createPromise;
+    return NextResponse.json(payload);
+  } catch (err: any) {
+    DEDUPE_BUCKET.delete(dedupeKey);
+    if (err?.rateLimit) {
+      const limited = err.rateLimit as { retryAfterSec: number };
+      return NextResponse.json(
+        { error: "rate_limited", retryAfterSec: limited.retryAfterSec },
+        { status: 429, headers: { "retry-after": String(limited.retryAfterSec) } }
+      );
+    }
+    throw err;
   }
 
-  const discoveredPages = await discoverCount(safeUrl, 60).catch(() => 1);
-
-  const recommendedTier =
-    discoveredPages <= 5 ? "mini" : discoveredPages <= 15 ? "standard" : "plus";
-
-  const accessToken = newAccessToken();
-  const { scanId } = await convex.mutation(api.scans.createQueued, {
-    url: safeUrl,
-    accessToken,
-    authorizedToScan,
-    userId,
-  });
-
-  const { jobId } = await convex.mutation(api.scanJobs.enqueue, { scanId });
-
-  // Best-effort: try to process immediately (or on subsequent status polls).
-  // Best-effort: try to process immediately.
-  // Use the shared worker logic so we stay consistent with /api/scan/worker.
-  const { processQueueOnce: processQueueOnceShared } = await import("@/lib/scanQueueWorker");
-  await processQueueOnceShared(convex).catch(() => {});
-
-  return NextResponse.json({
-    jobId,
-    scanId,
-    scanToken: accessToken,
-    discoveredPages,
-    recommendedTier,
-  });
 }

@@ -11,7 +11,7 @@ const olderThanMs = Math.max(1, RETENTION_DAYS) * 24 * 60 * 60 * 1000;
 crons.daily(
   "purge-old-scans",
   { hourUTC: 3, minuteUTC: 15 },
-  (internal as any).maintenance.purgeOldScans,
+  internal.maintenance.purgeOldScans,
   { olderThanMs }
 );
 
