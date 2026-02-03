@@ -6,7 +6,8 @@ import { authOptions } from "@/auth";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2025-12-15.clover" });
+  // Use Stripe account API version (or Stripe SDK default) to avoid invalid/unsupported versions breaking checkout.
+  return new Stripe(key);
 }
 
 const PRICE_BY_TIER: Record<string, string | undefined> = {
@@ -37,44 +38,56 @@ export async function POST(req: Request) {
   // Webhook will mark the scan as paid.
   const wantInvoice = Boolean(invoice);
 
-  const checkout = await stripe.checkout.sessions.create({
-    mode: "payment",
-    line_items: [{ price, quantity: 1 }],
+  try {
+    const checkout = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [{ price, quantity: 1 }],
 
-    // Pre-fill email so Stripe can deliver receipts and we can reconcile later.
-    customer_email: session.user.email,
+      // Pre-fill email so Stripe can deliver receipts and we can reconcile later.
+      customer_email: session.user.email,
 
-    // If the customer wants an invoice (B2B), we need address + (optional) tax ids.
-    ...(wantInvoice
-      ? {
-          invoice_creation: {
-            enabled: true,
-          },
-          billing_address_collection: "required",
-          tax_id_collection: { enabled: true },
-          // Persist customer so the invoice can attach address/tax details.
-          customer_creation: "always",
-          customer_update: {
-            name: "auto",
-            address: "auto",
-          },
-          // Ask for company name explicitly (Stripe's default "name" can be a person).
-          custom_fields: [
-            {
-              key: "company",
-              label: { type: "custom", custom: "Firma / Organisation" },
-              type: "text",
-              optional: false,
+      // If the customer wants an invoice (B2B), we need address + (optional) tax ids.
+      ...(wantInvoice
+        ? {
+            invoice_creation: {
+              enabled: true,
             },
-          ],
-        }
-      : {}),
+            billing_address_collection: "required",
+            tax_id_collection: { enabled: true },
+            // Persist customer so the invoice can attach address/tax details.
+            customer_creation: "always",
+            customer_update: {
+              name: "auto",
+              address: "auto",
+            },
+            // Ask for company name explicitly (Stripe's default "name" can be a person).
+            custom_fields: [
+              {
+                key: "company",
+                label: { type: "custom", custom: "Firma / Organisation" },
+                type: "text",
+                optional: false,
+              },
+            ],
+          }
+        : {}),
 
-    success_url: `${appUrl}/scan?success=1&scanId=${encodeURIComponent(scanId)}${scanToken ? `&token=${encodeURIComponent(scanToken)}` : ""}`,
-    cancel_url: `${appUrl}/scan?canceled=1&scanId=${encodeURIComponent(scanId)}${scanToken ? `&token=${encodeURIComponent(scanToken)}` : ""}`,
+      success_url: `${appUrl}/scan?success=1&scanId=${encodeURIComponent(scanId)}${scanToken ? `&token=${encodeURIComponent(scanToken)}` : ""}`,
+      cancel_url: `${appUrl}/scan?canceled=1&scanId=${encodeURIComponent(scanId)}${scanToken ? `&token=${encodeURIComponent(scanToken)}` : ""}`,
 
-    metadata: { scanId, tier, scanToken: scanToken ?? "", userEmail: session.user.email, invoice: wantInvoice ? "1" : "0" },
-  });
+      metadata: {
+        scanId,
+        tier,
+        scanToken: scanToken ?? "",
+        userEmail: session.user.email,
+        invoice: wantInvoice ? "1" : "0",
+      },
+    });
 
-  return NextResponse.json({ url: checkout.url });
+    return NextResponse.json({ url: checkout.url });
+  } catch (err: unknown) {
+    // Surface useful error details to logs, but keep response generic.
+    console.error("stripe_checkout_create_failed", err);
+    return NextResponse.json({ error: "checkout_create_failed" }, { status: 500 });
+  }
 }
