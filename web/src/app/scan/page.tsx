@@ -149,6 +149,7 @@ function ScanContent() {
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const scanInFlightRef = useRef(false);
   const cooldownUntilRef = useRef(0);
+  const urlInputElRef = useRef<HTMLInputElement | null>(null);
 
   const { status: authStatus } = useSession();
   const [localDiff, setLocalDiff] = useState<{ fixed: number; new: number; persisting: number } | null>(null);
@@ -407,6 +408,12 @@ function ScanContent() {
   }, [record?.isPaid, record?.findings, record?.sampleFinding, record?.url, teaser?.sampleFinding, teaser?.url]);
 
   useEffect(() => {
+    // Sync URL ref from the actual input element (important when the browser restores form state on back/forward navigation).
+    const domValue = urlInputElRef.current?.value;
+    if (domValue) urlDraftRef.current = domValue;
+  }, [urlSeed]);
+
+  useEffect(() => {
     if (!cooldownUntil) {
       setCooldownRemaining(0);
       return;
@@ -442,7 +449,7 @@ function ScanContent() {
     if (scanInFlightRef.current) return;
     if (cooldownUntilRef.current && cooldownUntilRef.current > Date.now()) return;
 
-    const scanUrlRaw = String(targetUrl ?? urlDraftRef.current ?? urlSeed ?? url).trim();
+    const scanUrlRaw = String(targetUrl ?? urlInputElRef.current?.value ?? urlDraftRef.current ?? urlSeed ?? url).trim();
     const scanUrl = normalizeUrl(scanUrlRaw);
 
     // Commit URL state only when we actually start work.
@@ -743,12 +750,13 @@ function ScanContent() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            runScan(urlDraftRef.current || urlSeed || url);
+            runScan(urlInputElRef.current?.value || urlDraftRef.current || urlSeed || url);
           }}
           className="flex flex-col md:flex-row gap-3"
         >
           <input
             key={urlSeed}
+            ref={urlInputElRef}
             defaultValue={urlSeed}
             onChange={(e) => {
               urlDraftRef.current = e.target.value;
@@ -763,7 +771,7 @@ function ScanContent() {
           <button
             type="submit"
             disabled={(() => {
-              const raw = String(urlDraftRef.current || urlSeed || url).trim();
+              const raw = String(urlInputElRef.current?.value || urlDraftRef.current || urlSeed || url).trim();
               const normalized = normalizeUrl(raw);
               return busy || isScanning || cooldownRemaining > 0 || !authorizedToScan || !isValidHttpUrl(normalized);
             })()}
