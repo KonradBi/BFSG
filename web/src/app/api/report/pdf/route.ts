@@ -127,7 +127,6 @@ type Finding = {
   snippet: string | null;
   failureSummary: string | null;
   fixSteps: string[];
-  screenshotDataUrl?: string | null;
   pageUrl?: string | null;
   capturedAt?: string | null;
 };
@@ -266,11 +265,10 @@ function reportHtml(params: {
                 </div>
               ` : ""}
 
-              ${f.screenshotDataUrl || f.snippet ? `
+              ${f.snippet ? `
                 <div class="evidence">
                   <div class="evidence__title">Beleg</div>
-                  ${f.screenshotDataUrl ? `<div class="shot"><img alt="Element-Screenshot" src="${f.screenshotDataUrl}" /></div>` : ""}
-                  ${f.snippet ? `<pre class="code"><code>${escapeHtml(f.snippet)}</code></pre>` : ""}
+                  <pre class="code"><code>${escapeHtml(f.snippet)}</code></pre>
                 </div>
               ` : ""}
             </section>

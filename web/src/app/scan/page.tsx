@@ -47,7 +47,8 @@ type Finding = {
   fixSteps?: string[];
   pageUrl?: string;
   capturedAt?: string;
-  screenshotDataUrl?: string | null;
+  // screenshotDataUrl disabled (keeps payload small + avoids PDF rendering issues)
+
 };
 
 const DE_RULE_TITLES: Record<string, { title: string; description?: string }> = {
@@ -1103,15 +1104,11 @@ function ScanContent() {
                                           <div className="text-xs text-slate-700 whitespace-pre-wrap">{t.failureSummary}</div>
                                         </div>
                                       )}
-                                      {f.screenshotDataUrl && (
-                                        <div className="rounded-xl border border-slate-200 overflow-hidden">
-                                          <img src={f.screenshotDataUrl} alt="Element-Screenshot" className="w-full block" />
-                                        </div>
-                                      )}
+                                      {/* screenshot removed */}
                                       {f.snippet && (
                                         <pre className="text-xs bg-slate-900 text-slate-100 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap">{f.snippet}</pre>
                                       )}
-                                      {!t.failureSummary && !f.screenshotDataUrl && !f.snippet && (
+                                      {!t.failureSummary && !f.snippet && (
                                         <div className="text-xs text-slate-500">Keine Belege verfügbar.</div>
                                       )}
                                     </div>

@@ -129,113 +129,89 @@ function isProbablyHtmlUrl(u: URL) {
     ".json",
     ".xml",
     ".txt",
+    ".ico",
   ];
-  return !badExt.some((ext) => p.endsWith(ext));
-}
+  if (badExt.some((ext) => p.endsWith(ext))) return false;
 
-function normalizeDiscoveredUrl(u: URL) {
-  // Remove hash + query to avoid duplicates from tracking params.
-  u.hash = "";
-  u.search = "";
-  return u.toString();
-}
+  const badPrefixes = [
+    "/wp-json",
+    "/wp-admin",
+    "/wp-content",
+    "/wp-includes",
+    "/feed",
+    "/sitemap",
+    "/xmlrpc.php",
+  ];
+  if (badPrefixes.some((pre) => p === pre || p.startsWith(`${pre}/`))) return false;
 
-async function fetchHtml(url: string, timeoutMs = 10_000) {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { accept: "text/html,application/xhtml+xml" },
-    });
-    const ct = res.headers.get("content-type") || "";
-    if (!res.ok) return null;
-    if (!ct.includes("text/html") && !ct.includes("application/xhtml") && !ct.includes("charset")) {
-      // Best-effort: if content-type is missing or weird, still try.
-      // But skip obvious binary.
-    }
-    return await res.text();
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(t);
-  }
-}
-
-function extractLinks(html: string): string[] {
-  const out: string[] = [];
-  const re = /href\s*=\s*["']([^"']+)["']/gi;
-  let m: RegExpExecArray | null = null;
-  while ((m = re.exec(html))) {
-    const href = String(m[1] || "").trim();
-    if (!href) continue;
-    out.push(href);
-  }
-  return out;
+  return true;
 }
 
 async function discoverInternalPages(startUrl: string, maxPages: number) {
   const start = new URL(startUrl);
   const origin = start.origin;
 
-  const seen = new Set<string>();
-  const queue: Array<{ url: string; depth: number }> = [{ url: start.toString(), depth: 0 }];
-
-  const MAX_DEPTH = 3;
-  const MAX_FETCHES = Math.max(5, Math.min(60, maxPages * 2));
+  const fetched = new Set<string>();
+  const htmlPages = new Set<string>();
+  const q: string[] = [start.toString()];
   let fetches = 0;
 
-  while (queue.length && seen.size < maxPages && fetches < MAX_FETCHES) {
-    const cur = queue.shift()!;
-    const curUrl = cur.url;
+  const normalize = (u: URL) => {
+    u.hash = "";
+    u.search = "";
 
-    if (seen.has(curUrl)) continue;
-    seen.add(curUrl);
+    // Treat /index.html and trailing slashes as the same page.
+    u.pathname = u.pathname.replace(/\/index\.html?$/i, "/");
+    if (u.pathname.length > 1 && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
 
-    if (cur.depth >= MAX_DEPTH) continue;
+    return u.toString();
+  };
 
-    const html = await fetchHtml(curUrl);
-    fetches += 1;
-    if (!html) continue;
+  while (q.length && htmlPages.size < maxPages && fetches < maxPages) {
+    const cur = q.shift()!;
+    const curUrl = new URL(cur);
+    if (curUrl.origin !== origin) continue;
+    if (!isProbablyHtmlUrl(curUrl)) continue;
 
-    const links = extractLinks(html);
-    for (const href of links) {
-      if (seen.size >= maxPages) break;
-      if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
+    const curNorm = normalize(curUrl);
+    if (fetched.has(curNorm)) continue;
+    fetched.add(curNorm);
 
-      let u: URL;
-      try {
-        u = new URL(href, curUrl);
-      } catch {
-        continue;
+    try {
+      const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
+      fetches += 1;
+      if (!res.ok) continue;
+
+      const ct = String(res.headers.get("content-type") || "");
+      if (!ct.includes("text/html")) continue;
+
+      htmlPages.add(curNorm);
+
+      const html = await res.text();
+      const re = /href\s*=\s*["']([^"']+)["']/gi;
+      let m: RegExpExecArray | null = null;
+      while ((m = re.exec(html))) {
+        const href = String(m[1] || "").trim();
+        if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
+        let u: URL;
+        try {
+          u = new URL(href, curNorm);
+        } catch {
+          continue;
+        }
+        if (u.origin !== origin) continue;
+        if (!isProbablyHtmlUrl(u)) continue;
+
+        const norm = normalize(u);
+        if (!fetched.has(norm)) q.push(norm);
+        if (htmlPages.size >= maxPages) break;
       }
-
-      if (u.origin !== origin) continue;
-      if (!isProbablyHtmlUrl(u)) continue;
-
-      const normalized = normalizeDiscoveredUrl(u);
-      // Skip obvious admin / checkout paths
-      const p = new URL(normalized).pathname.toLowerCase();
-      if (
-        p.startsWith("/wp-admin") ||
-        p.startsWith("/wp-login") ||
-        p.startsWith("/cart") ||
-        p.startsWith("/checkout") ||
-        p.startsWith("/account")
-      ) {
-        continue;
-      }
-
-      if (!seen.has(normalized)) {
-        queue.push({ url: normalized, depth: cur.depth + 1 });
-      }
+    } catch {
+      // ignore
     }
   }
 
-  // Preserve a stable order: start first, then others as discovered.
-  return Array.from(seen);
+  return Array.from(htmlPages);
 }
 
 function capString(s: unknown, max = 800) {
@@ -251,6 +227,8 @@ function sanitizeFinding(f: any) {
   if (out.title) out.title = capString(out.title, 180);
   if (out.description) out.description = capString(out.description, 600);
   if (Array.isArray(out.fixSteps)) out.fixSteps = out.fixSteps.slice(0, 5).map((s: any) => capString(s, 220));
+  // Screenshots disabled (keep payload small + avoid PDF render edge-cases)
+  if (out.screenshotDataUrl) delete out.screenshotDataUrl;
   return out;
 }
 
@@ -262,43 +240,6 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
   let page: any = null;
 
   const allFindings: any[] = [];
-
-  // Capture at most N element screenshots (keeps PDF size + compute cost bounded).
-  let screenshotsLeft = 10;
-
-  async function captureElementScreenshotDataUrl(selector: string | null | undefined): Promise<string | null> {
-    if (!page) return null;
-    if (!selector) return null;
-
-    try {
-      const loc = page.locator(selector).first();
-      await loc.waitFor({ state: "attached", timeout: 1200 }).catch(() => {});
-
-      const box = await loc.boundingBox();
-      if (!box) return null;
-
-      // Scroll element into view (best effort)
-      await page.evaluate(
-        ({ y }: { y: number }) => {
-          window.scrollTo({ top: Math.max(0, y - 120), left: 0, behavior: "instant" as any });
-        },
-        { y: box.y }
-      );
-      await page.waitForTimeout(50);
-
-      const clip = {
-        x: Math.max(0, box.x - 8),
-        y: Math.max(0, box.y - 8),
-        width: Math.min(900, box.width + 16),
-        height: Math.min(520, box.height + 16),
-      };
-
-      const buf: Buffer = await page.screenshot({ type: "jpeg", quality: 60, clip });
-      return `data:image/jpeg;base64,${buf.toString("base64")}`;
-    } catch {
-      return null;
-    }
-  }
 
   const executablePath = await chromiumLambda.executablePath();
   const axeSource = await readFile(path.join(process.cwd(), "node_modules/axe-core/axe.min.js"), "utf8");
@@ -352,20 +293,7 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
           }));
         });
 
-        // Attach up to 10 screenshots for the most important findings (P0/P1).
-        for (const f of raw) {
-          if (screenshotsLeft > 0 && (f.severity === "P0" || f.severity === "P1") && f.selector) {
-            const shot = await captureElementScreenshotDataUrl(f.selector);
-            if (shot) {
-              f.screenshotDataUrl = shot;
-              screenshotsLeft -= 1;
-            }
-          }
-          allFindings.push(f);
-          if (screenshotsLeft <= 0 && allFindings.length > 40) {
-            // nothing special; keep scanning, but stop attempting screenshots
-          }
-        }
+        for (const f of raw) allFindings.push(f);
       } catch (e: any) {
         const nowIso = new Date().toISOString();
         allFindings.push({
@@ -379,7 +307,11 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
           selector: null,
           snippet: null,
           failureSummary: `Fehler beim Scannen: ${String(e?.message || e).slice(0, 300)}`,
-          fixSteps: ["Seite manuell öffnen und auf Redirects/Fehler prüfen.", "Scan erneut starten.", "Wenn es ein Login/Paywall ist: URL anpassen."],
+          fixSteps: [
+            "Seite manuell öffnen und auf Redirects/Fehler prüfen.",
+            "Scan erneut starten.",
+            "Wenn es ein Login/Paywall ist: URL anpassen.",
+          ],
           pageUrl: u,
           capturedAt: nowIso,
         });
@@ -487,15 +419,11 @@ export async function processQueueOnce(convex: ConvexHttpClient) {
 
     await convex.mutation(api.scans.setStatus, { scanId, status: "SUCCEEDED" });
     await convex.mutation(api.scanJobs.complete, { jobId });
-
-    return { ran: true as const, ok: true as const, scanId, jobId };
   } catch (e: any) {
-    const msg = String(e?.message || e);
-    console.error("scan job failed", { jobId, scanId, msg });
-
+    const msg = String(e?.message || e).slice(0, 500);
     await convex.mutation(api.scans.setStatus, { scanId, status: "FAILED", error: msg });
     await convex.mutation(api.scanJobs.fail, { jobId, error: msg });
-
-    return { ran: true as const, ok: false as const, scanId, jobId, error: msg };
   }
+
+  return { ran: true as const };
 }
