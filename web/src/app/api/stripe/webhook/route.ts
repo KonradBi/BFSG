@@ -10,13 +10,41 @@ export const runtime = "nodejs";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2025-12-15.clover" });
+  // Use Stripe account API version (or Stripe SDK default) to avoid invalid/unsupported versions breaking webhooks.
+  return new Stripe(key);
 }
 
 function getConvexClient() {
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
   if (!url) return null;
   return new ConvexHttpClient(url);
+}
+
+type ProcessedEvent = { processedAt: number };
+const PROCESSED_EVENTS: Map<string, ProcessedEvent> =
+  // eslint-disable-next-line no-var
+  (globalThis as any).__als_stripe_events || new Map();
+// eslint-disable-next-line no-var
+(globalThis as any).__als_stripe_events = PROCESSED_EVENTS;
+const MAX_PROCESSED_EVENTS = 2000;
+
+function alreadyProcessed(eventId: string) {
+  return PROCESSED_EVENTS.has(eventId);
+}
+
+function markProcessed(eventId: string) {
+  PROCESSED_EVENTS.set(eventId, { processedAt: Date.now() });
+  if (PROCESSED_EVENTS.size <= MAX_PROCESSED_EVENTS) return;
+  const entries = Array.from(PROCESSED_EVENTS.entries()).sort((a, b) => a[1].processedAt - b[1].processedAt);
+  for (const [id] of entries.slice(0, Math.floor(MAX_PROCESSED_EVENTS / 4))) {
+    PROCESSED_EVENTS.delete(id);
+  }
+}
+
+function isValidScanId(scanId: unknown) {
+  if (typeof scanId !== "string") return false;
+  const trimmed = scanId.trim();
+  return trimmed.length >= 8 && !/\s/.test(trimmed);
 }
 
 export async function POST(req: Request) {
@@ -61,9 +89,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_signature", details: String(err?.message || err) }, { status: 400 });
   }
 
+  if (event?.id && alreadyProcessed(event.id)) {
+    return NextResponse.json({ received: true, deduped: true });
+  }
+
   // Mark scan as paid (idempotent)
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    if (session.mode !== "payment" || session.payment_status !== "paid") {
+      return NextResponse.json({ received: true, ignored: "not_paid" });
+    }
     const scanId = session.metadata?.scanId;
     const tier = session.metadata?.tier;
 
@@ -72,7 +107,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "convex_not_configured" }, { status: 500 });
     }
 
-    if (scanId) {
+    if (isValidScanId(scanId)) {
+      const scan = await convex
+        .query(api.scans.get, {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          scanId: scanId as any,
+        })
+        .catch(() => null);
+      if (!scan) return NextResponse.json({ received: true, ignored: "scan_not_found" });
+
       // Mark scan as paid
       await convex.mutation(api.scans.markPaid, {
         // Convex document IDs are strings at runtime.
@@ -83,10 +126,6 @@ export async function POST(req: Request) {
 
       // Store payment record (proper data model)
       try {
-        const scan = await convex.query(api.scans.get, {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          scanId: scanId as any,
-        });
         const userId = (scan as any)?.userId as string | undefined;
 
         await convex.mutation((api as any).payments.createOrUpdateFromStripe, {
@@ -109,6 +148,8 @@ export async function POST(req: Request) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scanId: scanId as any,
       });
+
+      if (event?.id) markProcessed(event.id);
     }
   }
 

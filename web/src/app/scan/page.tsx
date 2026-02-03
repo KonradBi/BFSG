@@ -208,7 +208,16 @@ function ScanContent() {
     if (prefillTier) setTier(prefillTier);
 
     // Persist token from redirect (Stripe success/cancel) or auth callback if present.
-    if (scanId && token) setToken(scanId, token);
+    if (scanId && token) {
+      setToken(scanId, token);
+      if (typeof window !== "undefined") {
+        const next = new URL(window.location.href);
+        if (next.searchParams.has("token")) {
+          next.searchParams.delete("token");
+          window.history.replaceState({}, "", next.toString());
+        }
+      }
+    }
 
     if (prefillUrl) {
       urlDraftRef.current = prefillUrl;

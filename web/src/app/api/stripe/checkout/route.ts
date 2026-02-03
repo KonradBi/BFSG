@@ -10,6 +10,19 @@ function getStripe() {
   return new Stripe(key);
 }
 
+function isVercelRequest(req: Request) {
+  return Boolean(req.headers.get("x-vercel-id"));
+}
+
+function getAppUrl(req: Request) {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  const host = req.headers.get("host") || "localhost:3000";
+  if (!isVercelRequest(req)) return `https://${host}`;
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+  const fwdHost = req.headers.get("x-forwarded-host") || host;
+  return `${proto}://${fwdHost}`;
+}
+
 const PRICE_BY_TIER: Record<string, string | undefined> = {
   mini: process.env.STRIPE_PRICE_MINI,
   standard: process.env.STRIPE_PRICE_STANDARD,
@@ -32,9 +45,7 @@ export async function POST(req: Request) {
   const price = PRICE_BY_TIER[tier];
   if (!price) return NextResponse.json({ error: "missing_price" }, { status: 400 });
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("x-forwarded-host") || req.headers.get("host")}`;
+  const appUrl = getAppUrl(req);
 
   // MVP: we pass scanId (+token for client-side access) in metadata.
   // Webhook will mark the scan as paid.
