@@ -638,9 +638,21 @@ function ScanContent() {
         requestId?: string;
       };
 
+      if (res.status === 401) {
+        // Not logged in / session not ready. Resume after Google login.
+        setPendingCheckout(scanId, effectiveTier, invoice);
+        await signIn("google", {
+          callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(
+            effectiveTier
+          )}`,
+        });
+        return;
+      }
+
       if (!res.ok) {
         const extra = [
           data.error,
+          `http:${res.status}`,
           data.stripeCode ? `stripe:${data.stripeCode}` : "",
           data.stripeType ? `type:${data.stripeType}` : "",
           data.requestId ? `req:${data.requestId}` : "",
@@ -650,17 +662,6 @@ function ScanContent() {
           .join(" | ");
 
         throw new Error(extra || `checkout_failed_${res.status}`);
-      }
-
-      if (res.status === 401) {
-        // Should not happen if we're authenticated, but handle gracefully.
-        setPendingCheckout(scanId, effectiveTier, invoice);
-        await signIn("google", {
-          callbackUrl: `/scan?scanId=${encodeURIComponent(scanId)}&token=${encodeURIComponent(token)}&prefillTier=${encodeURIComponent(
-            effectiveTier
-          )}`,
-        });
-        return;
       }
 
       if (!data.url) throw new Error(data.error || "checkout_failed");
