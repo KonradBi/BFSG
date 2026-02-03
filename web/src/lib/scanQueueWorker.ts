@@ -263,6 +263,43 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
 
   const allFindings: any[] = [];
 
+  // Capture at most N element screenshots (keeps PDF size + compute cost bounded).
+  let screenshotsLeft = 10;
+
+  async function captureElementScreenshotDataUrl(selector: string | null | undefined): Promise<string | null> {
+    if (!page) return null;
+    if (!selector) return null;
+
+    try {
+      const loc = page.locator(selector).first();
+      await loc.waitFor({ state: "attached", timeout: 1200 }).catch(() => {});
+
+      const box = await loc.boundingBox();
+      if (!box) return null;
+
+      // Scroll element into view (best effort)
+      await page.evaluate(
+        ({ y }: { y: number }) => {
+          window.scrollTo({ top: Math.max(0, y - 120), left: 0, behavior: "instant" as any });
+        },
+        { y: box.y }
+      );
+      await page.waitForTimeout(50);
+
+      const clip = {
+        x: Math.max(0, box.x - 8),
+        y: Math.max(0, box.y - 8),
+        width: Math.min(900, box.width + 16),
+        height: Math.min(520, box.height + 16),
+      };
+
+      const buf: Buffer = await page.screenshot({ type: "jpeg", quality: 60, clip });
+      return `data:image/jpeg;base64,${buf.toString("base64")}`;
+    } catch {
+      return null;
+    }
+  }
+
   const executablePath = await chromiumLambda.executablePath();
   const axeSource = await readFile(path.join(process.cwd(), "node_modules/axe-core/axe.min.js"), "utf8");
 
@@ -315,7 +352,20 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
           }));
         });
 
-        for (const f of raw) allFindings.push(f);
+        // Attach up to 10 screenshots for the most important findings (P0/P1).
+        for (const f of raw) {
+          if (screenshotsLeft > 0 && (f.severity === "P0" || f.severity === "P1") && f.selector) {
+            const shot = await captureElementScreenshotDataUrl(f.selector);
+            if (shot) {
+              f.screenshotDataUrl = shot;
+              screenshotsLeft -= 1;
+            }
+          }
+          allFindings.push(f);
+          if (screenshotsLeft <= 0 && allFindings.length > 40) {
+            // nothing special; keep scanning, but stop attempting screenshots
+          }
+        }
       } catch (e: any) {
         const nowIso = new Date().toISOString();
         allFindings.push({

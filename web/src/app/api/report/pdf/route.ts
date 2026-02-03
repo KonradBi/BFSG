@@ -397,8 +397,9 @@ function reportHtml(params: {
       border-radius: 16px;
       padding: 14px 16px;
       margin-bottom: 10px;
-      break-inside: avoid;
-      page-break-inside: avoid;
+      /* Allow the card to break across pages; otherwise we get huge blank areas. */
+      break-inside: auto;
+      page-break-inside: auto;
       background: var(--card);
       box-shadow: 0 10px 18px rgba(15, 23, 42, 0.04);
     }
@@ -481,7 +482,7 @@ function reportHtml(params: {
       word-break: break-word;
     }
 
-    .shot { margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .shot { margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
     .shot img { width: 100%; display: block; }
 
     .evidence {
