@@ -1305,6 +1305,10 @@ function ScanContent() {
 }
 
 export default function ScanPage() {
+  const { data: session } = useSession();
+  const backHref = session?.user ? "/scans" : "/";
+  const backLabel = session?.user ? "Zur Übersicht" : "Zur Startseite";
+
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
@@ -1318,17 +1322,17 @@ export default function ScanPage() {
 
             {/* Mobile: icon only */}
             <Link
-              href="/"
-              aria-label="Zur Startseite"
+              href={backHref}
+              aria-label={backLabel}
               className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </Link>
 
             {/* Desktop */}
-            <Link href="/" className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
+            <Link href={backHref} className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-              Zurück
+              {backLabel}
             </Link>
           </div>
         </div>
