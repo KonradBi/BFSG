@@ -88,8 +88,21 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: checkout.url });
   } catch (err: unknown) {
-    // Surface useful error details to logs, but keep response generic.
+    // Surface useful error details to logs, and return a safe subset to the client
+    // (helps debug env misconfig in prod without exposing secrets).
     console.error("stripe_checkout_create_failed", err);
-    return NextResponse.json({ error: "checkout_create_failed" }, { status: 500 });
+
+    const stripeErr = err as Partial<Stripe.errors.StripeError> & { message?: string };
+
+    return NextResponse.json(
+      {
+        error: "checkout_create_failed",
+        stripeMessage: stripeErr?.message || "",
+        stripeType: (stripeErr as any)?.type || "",
+        stripeCode: (stripeErr as any)?.code || "",
+        requestId: (stripeErr as any)?.requestId || "",
+      },
+      { status: 500 }
+    );
   }
 }

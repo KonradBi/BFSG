@@ -628,11 +628,27 @@ function ScanContent() {
         body: JSON.stringify({ scanId, tier: effectiveTier, scanToken: token, invoice: Boolean(invoice) }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        url?: string;
+        error?: string;
+        stripeMessage?: string;
+        stripeType?: string;
+        stripeCode?: string;
+        requestId?: string;
+      };
 
       if (!res.ok) {
-        // Surface a useful error message (helps debug env misconfig in prod).
-        throw new Error(data.error || `checkout_failed_${res.status}`);
+        const extra = [
+          data.error,
+          data.stripeCode ? `stripe:${data.stripeCode}` : "",
+          data.stripeType ? `type:${data.stripeType}` : "",
+          data.requestId ? `req:${data.requestId}` : "",
+          data.stripeMessage ? data.stripeMessage : "",
+        ]
+          .filter(Boolean)
+          .join(" | ");
+
+        throw new Error(extra || `checkout_failed_${res.status}`);
       }
 
       if (res.status === 401) {
