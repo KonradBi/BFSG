@@ -459,6 +459,8 @@ function reportHtml(params: {
       padding: 10px 12px;
       margin: 10px 0;
       background: #fbfdff;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
     .steps__title { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
     .steps ol { margin: 0; padding-left: 18px; color: var(--text); font-size: 12px; line-height: 1.45; }
@@ -483,14 +485,16 @@ function reportHtml(params: {
     }
 
     .shot { margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
-    .shot img { width: 100%; display: block; }
+    .shot img { width: 100%; display: block; max-height: 420px; object-fit: contain; }
 
     .evidence {
       margin-top: 10px;
       border-top: 1px solid var(--line);
       padding-top: 8px;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
-    .evidence__title { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .evidence__title { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: var(--text); page-break-after: avoid; break-after: avoid; }
 
     .wrap { word-break: break-word; overflow-wrap: anywhere; }
 
@@ -755,6 +759,24 @@ export async function GET(req: Request) {
 
   try {
     await pdfPage.setContent(html, { waitUntil: "domcontentloaded" });
+
+    // Ensure embedded images (data URLs) are fully loaded before printing.
+    await pdfPage
+      .evaluate(async () => {
+        const imgs = Array.from(document.images || []);
+        await Promise.all(
+          imgs.map(
+            (img) =>
+              img.complete
+                ? Promise.resolve()
+                : new Promise<void>((resolve) => {
+                    img.addEventListener("load", () => resolve(), { once: true });
+                    img.addEventListener("error", () => resolve(), { once: true });
+                  })
+          )
+        );
+      })
+      .catch(() => {});
 
     const pdf = await pdfPage.pdf({
       format: "A4",
