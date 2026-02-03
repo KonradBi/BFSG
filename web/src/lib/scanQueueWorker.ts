@@ -6,6 +6,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
+import { assertPublicHttpUrl, fetchWithSafety } from "@/app/lib/security/urlSafety";
 
 // Shared scan runner + single-job queue worker.
 //
@@ -148,7 +149,7 @@ function isProbablyHtmlUrl(u: URL) {
 }
 
 async function discoverInternalPages(startUrl: string, maxPages: number) {
-  const start = new URL(startUrl);
+  const { url: start } = await assertPublicHttpUrl(startUrl);
   const origin = start.origin;
 
   const fetched = new Set<string>();
@@ -178,7 +179,10 @@ async function discoverInternalPages(startUrl: string, maxPages: number) {
     fetched.add(curNorm);
 
     try {
-      const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
+      const res = await fetchWithSafety(curNorm, {
+        headers: { accept: "text/html,application/xhtml+xml" },
+        maxRedirects: 3,
+      });
       fetches += 1;
       if (!res.ok) continue;
 
@@ -232,6 +236,39 @@ function sanitizeFinding(f: any) {
   return out;
 }
 
+async function gotoWithSafety(
+  page: any,
+  url: string,
+  opts: { waitUntil: "domcontentloaded"; timeout: number; maxRedirects: number }
+) {
+  await assertPublicHttpUrl(url);
+  let navCount = 0;
+
+  const handler = async (route: any) => {
+    const req = route.request();
+    if (req.isNavigationRequest()) {
+      const isMain = req.frame() === page.mainFrame();
+      if (isMain) {
+        navCount += 1;
+        if (navCount > opts.maxRedirects + 1) return route.abort();
+      }
+      try {
+        await assertPublicHttpUrl(req.url());
+      } catch {
+        return route.abort();
+      }
+    }
+    return route.continue();
+  };
+
+  await page.route("**/*", handler);
+  try {
+    await page.goto(url, { waitUntil: opts.waitUntil, timeout: opts.timeout });
+  } finally {
+    await page.unroute("**/*", handler);
+  }
+}
+
 async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number; maxWallTimeMs: number }) {
   const startedAt = Date.now();
 
@@ -255,7 +292,11 @@ async function runAxeScanMulti(urls: string[], opts: { maxPerPageTimeMs: number;
 
       const pageStart = Date.now();
       try {
-        await page.goto(u, { waitUntil: "domcontentloaded", timeout: Math.min(45_000, opts.maxPerPageTimeMs) });
+        await gotoWithSafety(page, u, {
+          waitUntil: "domcontentloaded",
+          timeout: Math.min(45_000, opts.maxPerPageTimeMs),
+          maxRedirects: 4,
+        });
 
         // Inject axe after navigation
         await page.addScriptTag({ content: axeSource });
@@ -375,16 +416,18 @@ export async function processQueueOnce(convex: ConvexHttpClient) {
   if (!claimed) return { ran: false as const };
 
   const { jobId, scanId, scan } = claimed as any;
-  const url = String(scan?.url || "");
+  const rawUrl = String(scan?.url || "");
+  let safeUrl = "";
 
   try {
+    safeUrl = (await assertPublicHttpUrl(rawUrl)).url.toString();
     await convex.mutation(api.scans.setStatus, { scanId, status: "RUNNING" });
 
     const plan = (scan as any)?.plan ?? { maxPages: 1, maxWallTimeMs: 2 * 60_000, maxPerPageTimeMs: 25_000 };
     const maxPages = Math.max(1, Math.min(50, Number(plan.maxPages || 1)));
 
     // Discover pages (internal crawl) up to maxPages.
-    const discovered = await discoverInternalPages(url, maxPages);
+    const discovered = await discoverInternalPages(safeUrl, maxPages);
 
     // Update progress totals and show something in UI immediately.
     await convex.mutation(api.scans.updateProgress, {

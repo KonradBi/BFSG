@@ -10,6 +10,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
+import { assertPublicHttpUrl, fetchWithSafety } from "@/app/lib/security/urlSafety";
 
 export const runtime = "nodejs";
 
@@ -43,8 +44,12 @@ const DEDUPE_BUCKET: Map<DedupeKey, { createdAt: number; promise: Promise<Dedupe
 (globalThis as any).__als_scan_dedupe = DEDUPE_BUCKET;
 const DEDUPE_WINDOW_MS = 15_000;
 
+function isVercelRequest(req: Request) {
+  return Boolean(req.headers.get("x-vercel-id"));
+}
+
 function getClientIp(req: Request) {
-  // Basic best-effort IP extraction (works behind common proxies).
+  if (!isVercelRequest(req)) return "unknown";
   const fwd = req.headers.get("x-forwarded-for") || "";
   const first = fwd.split(",")[0]?.trim();
   return first || req.headers.get("x-real-ip") || "unknown";
@@ -173,6 +178,39 @@ function newAccessToken() {
   return crypto.randomBytes(24).toString("hex");
 }
 
+async function gotoWithSafety(
+  page: any,
+  url: string,
+  opts: { waitUntil: "domcontentloaded"; timeout: number; maxRedirects: number }
+) {
+  await assertPublicHttpUrl(url);
+  let navCount = 0;
+
+  const handler = async (route: any) => {
+    const req = route.request();
+    if (req.isNavigationRequest()) {
+      const isMain = req.frame() === page.mainFrame();
+      if (isMain) {
+        navCount += 1;
+        if (navCount > opts.maxRedirects + 1) return route.abort();
+      }
+      try {
+        await assertPublicHttpUrl(req.url());
+      } catch {
+        return route.abort();
+      }
+    }
+    return route.continue();
+  };
+
+  await page.route("**/*", handler);
+  try {
+    await page.goto(url, { waitUntil: opts.waitUntil, timeout: opts.timeout });
+  } finally {
+    await page.unroute("**/*", handler);
+  }
+}
+
 async function runAxeScan(safeUrl: string) {
   let browser: any = null;
   let context: any = null;
@@ -188,7 +226,7 @@ async function runAxeScan(safeUrl: string) {
     context = await browser.newContext({ bypassCSP: true });
     page = await context.newPage();
 
-    await page.goto(safeUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
+    await gotoWithSafety(page, safeUrl, { waitUntil: "domcontentloaded", timeout: 45_000, maxRedirects: 4 });
 
     const axeSource = await readFile(path.join(process.cwd(), "node_modules/axe-core/axe.min.js"), "utf8");
     await page.addScriptTag({ content: axeSource });
@@ -300,14 +338,17 @@ async function processQueueOnce(convex: ConvexHttpClient) {
 
 export async function POST(req: Request) {
   const body = (await req.json()) as { url?: string; authorizedToScan?: boolean };
-  const safeUrl = String(body?.url || "").trim();
+  const rawUrl = String(body?.url || "").trim();
   const authorizedToScan = Boolean(body?.authorizedToScan);
 
   if (!authorizedToScan) {
     return NextResponse.json({ error: "authorization_required" }, { status: 400 });
   }
-  if (!safeUrl.startsWith("http")) {
-    return NextResponse.json({ error: "invalid_url" }, { status: 400 });
+  let safeUrl = "";
+  try {
+    safeUrl = (await assertPublicHttpUrl(rawUrl)).url.toString();
+  } catch {
+    return NextResponse.json({ error: "unsafe_url" }, { status: 400 });
   }
 
   const convex = getConvexClient();
@@ -351,7 +392,7 @@ export async function POST(req: Request) {
     // Autoplan (discovery): estimate internal page count so the user doesn't need to know it.
     // This is intentionally lightweight (fetch + href parsing) to keep latency reasonable.
     async function discoverCount(startUrl: string, max = 60) {
-      const start = new URL(startUrl);
+      const { url: start } = await assertPublicHttpUrl(startUrl);
       const origin = start.origin;
 
       // Two sets: one for URLs we've already fetched, and one for HTML pages we actually counted.
@@ -412,7 +453,10 @@ export async function POST(req: Request) {
         fetched.add(curNorm);
 
         try {
-          const res = await fetch(curNorm, { headers: { accept: "text/html,application/xhtml+xml" } });
+          const res = await fetchWithSafety(curNorm, {
+            headers: { accept: "text/html,application/xhtml+xml" },
+            maxRedirects: 3,
+          });
           fetches += 1;
           if (!res.ok) continue;
 
