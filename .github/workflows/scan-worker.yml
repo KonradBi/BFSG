@@ -2,10 +2,15 @@ name: Scan Worker
 
 on:
   schedule:
-    # Every 2 minutes.
+    # Every 5 minutes.
     # Note: GitHub may delay scheduled runs; this is best-effort.
-    - cron: "*/2 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
+
+# Prevent stacking/parallel worker calls.
+concurrency:
+  group: scan-worker
+  cancel-in-progress: true
 
 jobs:
   tick:
