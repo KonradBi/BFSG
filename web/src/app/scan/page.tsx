@@ -142,6 +142,7 @@ function ScanContent() {
   const wantInvoice = true;
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
+  const [authorizedToScanError, setAuthorizedToScanError] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
@@ -453,7 +454,7 @@ function ScanContent() {
     }
 
     if (!authorizedToScan) {
-      alert("Bitte bestätigen Sie, dass Sie berechtigt sind, diese Website zu scannen.");
+      setAuthorizedToScanError(true);
       return;
     }
 
@@ -762,7 +763,7 @@ function ScanContent() {
             disabled={(() => {
               const raw = String(urlDraftRef.current || urlSeed || url).trim();
               const normalized = normalizeUrl(raw);
-              return busy || isScanning || cooldownRemaining > 0 || !isValidHttpUrl(normalized);
+              return busy || isScanning || cooldownRemaining > 0 || !authorizedToScan || !isValidHttpUrl(normalized);
             })()}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
@@ -784,7 +785,10 @@ function ScanContent() {
           <input
             type="checkbox"
             checked={authorizedToScan}
-            onChange={(e) => setAuthorizedToScan(e.target.checked)}
+            onChange={(e) => {
+              setAuthorizedToScan(e.target.checked);
+              if (e.target.checked) setAuthorizedToScanError(false);
+            }}
             className="mt-1"
           />
           <span>
@@ -794,6 +798,11 @@ function ScanContent() {
             </span>
           </span>
         </label>
+        {authorizedToScanError && (
+          <div className="mt-2 text-xs font-semibold text-red-600">
+            Bitte bestätigen Sie vor dem Scan, dass Sie berechtigt sind, diese Website zu scannen.
+          </div>
+        )}
 
         {busy && (
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white/60 p-4">
