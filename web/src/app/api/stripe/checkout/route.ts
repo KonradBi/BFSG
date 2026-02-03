@@ -51,17 +51,13 @@ export async function POST(req: Request) {
       // If the customer wants an invoice (B2B), we need address + (optional) tax ids.
       ...(wantInvoice
         ? {
-            invoice_creation: {
-              enabled: true,
-            },
+            invoice_creation: { enabled: true },
             billing_address_collection: "required",
             tax_id_collection: { enabled: true },
             // Persist customer so the invoice can attach address/tax details.
             customer_creation: "always",
-            customer_update: {
-              name: "auto",
-              address: "auto",
-            },
+            // NOTE: Do NOT set `customer_update` unless you provide `customer`.
+            // Otherwise Stripe errors: "customer_update can only be used with customer".
             // Ask for company name explicitly (Stripe's default "name" can be a person).
             custom_fields: [
               {
