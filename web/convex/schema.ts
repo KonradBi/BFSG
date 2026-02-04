@@ -179,6 +179,20 @@ export default defineSchema({
     .index("by_url", ["url"])
     .index("by_paid", ["isPaid"]),
 
+  supportMessages: defineTable({
+    messageId: v.string(),
+    from: v.string(),
+    subject: v.optional(v.string()),
+    text: v.optional(v.string()),
+    raw: v.optional(v.any()),
+    urgent: v.boolean(),
+    receivedAt: v.number(),
+    firstSeenAt: v.number(),
+    repliedAt: v.optional(v.number()),
+    status: v.union(v.literal("NEW"), v.literal("REPLIED"), v.literal("SKIPPED")),
+  }).index("by_messageId", ["messageId"]) 
+    .index("by_status", ["status"]) ,
+
   scanJobs: defineTable({
     scanId: v.id("scans"),
 
