@@ -76,7 +76,7 @@ export default function DatenschutzPage() {
             <br />
             Telefon: 0151 24101580
             <br />
-            E-Mail: konradbierwagen@gmail.com
+            E-Mail: bfsg-webcheck@agentmail.to
           </p>
 
           <h3>Widerruf Ihrer Einwilligung zur Datenverarbeitung</h3>

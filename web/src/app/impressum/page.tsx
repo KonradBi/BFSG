@@ -26,7 +26,7 @@ export default function ImpressumPage() {
           <p>
             <strong>Telefon:</strong> 0151 24101580
             <br />
-            <strong>E-Mail:</strong> info@konraddecode.com
+            <strong>E-Mail:</strong> bfsg-webcheck@agentmail.to
           </p>
 
           <h2>Inhaltlich Verantwortlicher</h2>
