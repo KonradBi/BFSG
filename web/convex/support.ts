@@ -105,7 +105,7 @@ export const sendAutoReply: any = internalAction({
       "<p style=\"font-size:12px;color:#64748b\">Hinweis: Technischer Service, keine Rechtsberatung.</p>";
 
     // Send via AgentMail API
-    const res = await fetch(`https://api.agentmail.to/v0/inboxes/${encodeURIComponent(inboxId)}/messages`, {
+    const res = await fetch(`https://api.agentmail.to/v0/inboxes/${encodeURIComponent(inboxId)}/messages/send`, { 
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
