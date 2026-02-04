@@ -45,11 +45,16 @@ export default function CookieBanner() {
     setVisible(false);
   }
 
+  function accept(v: ConsentValue) {
+    // Support some in-app browsers that sometimes drop click events on fixed/backdrop elements.
+    setConsent(v);
+  }
+
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[60] p-3 md:p-4">
-      <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white/95 backdrop-blur shadow-2xl">
+    <div className="fixed inset-x-0 bottom-0 z-[9999] p-3 md:p-4 pointer-events-auto">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white/95 backdrop-blur shadow-2xl pointer-events-auto">
         <div className="p-4 md:p-5">
           <div className="text-sm font-black text-slate-900">Cookies & Datenschutz</div>
           <p className="mt-2 text-sm text-slate-700 leading-relaxed">
@@ -60,15 +65,19 @@ export default function CookieBanner() {
           <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
             <button
               type="button"
-              onClick={() => setConsent("essential")}
-              className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold"
+              onClick={() => accept("essential")}
+              onPointerUp={() => accept("essential")}
+              onTouchEnd={() => accept("essential")}
+              className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold cursor-pointer"
             >
               Nur notwendige
             </button>
             <button
               type="button"
-              onClick={() => setConsent("accepted")}
-              className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black"
+              onClick={() => accept("accepted")}
+              onPointerUp={() => accept("accepted")}
+              onTouchEnd={() => accept("accepted")}
+              className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black cursor-pointer"
             >
               Akzeptieren
             </button>
