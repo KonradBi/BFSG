@@ -129,17 +129,20 @@ export default function Home() {
             <Link href="#pakete" className="hover:text-blue-600 transition-colors">Preise</Link>
           </div>
           <div className="flex items-center gap-4">
-            {/* Dashboard icon */}
+            {/* Übersicht: mobile icon / desktop text (avoid duplicate) */}
             <Link
               href="/scans"
               aria-label="Übersicht"
-              className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
+              className="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
             >
+              {/* List icon */}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h7v7H4V4z" />
-                <path d="M13 4h7v4h-7V4z" />
-                <path d="M13 10h7v10h-7V10z" />
-                <path d="M4 13h7v7H4v-7z" />
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <circle cx="4" cy="6" r="1" />
+                <circle cx="4" cy="12" r="1" />
+                <circle cx="4" cy="18" r="1" />
               </svg>
             </Link>
             <Link href="/scans" className="hidden lg:inline-block text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
