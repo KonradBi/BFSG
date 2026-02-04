@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ConsentValue = "accepted" | "essential";
 
@@ -66,12 +66,17 @@ export default function CookieBanner() {
     const existing = getConsent();
     return !existing;
   });
+  const handledRef = useRef(false);
 
   useEffect(() => {
     const onReset = () => setVisible(true);
     window.addEventListener("cookie_consent_reset", onReset as EventListener);
     return () => window.removeEventListener("cookie_consent_reset", onReset as EventListener);
   }, []);
+
+  useEffect(() => {
+    if (visible) handledRef.current = false;
+  }, [visible]);
 
   function setConsent(v: ConsentValue) {
     // persist in both cookie + localStorage (some in-app browsers block cookies)
@@ -80,16 +85,27 @@ export default function CookieBanner() {
     setVisible(false);
   }
 
-  function accept(v: ConsentValue) {
-    // Support some in-app browsers that sometimes drop click events on fixed/backdrop elements.
+  function handleConsent(v: ConsentValue, event?: React.SyntheticEvent) {
+    // Support in-app browsers that sometimes drop or delay click events on fixed elements.
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (handledRef.current) return;
+    handledRef.current = true;
     setConsent(v);
   }
 
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[9999] p-3 md:p-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-      <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white/95 backdrop-blur shadow-2xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-x-0 bottom-0 z-[99999] p-3 md:p-4 pointer-events-none">
+      <div
+        className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white/95 backdrop-blur shadow-2xl pointer-events-auto isolate"
+        onClick={(e) => e.stopPropagation()}
+        onPointerUp={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
         <div className="p-4 md:p-5">
           <div className="text-sm font-black text-slate-900">Cookies & Datenschutz</div>
           <p className="mt-2 text-sm text-slate-700 leading-relaxed">
@@ -100,19 +116,21 @@ export default function CookieBanner() {
           <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
             <button
               type="button"
-              onClick={() => accept("essential")}
-              onPointerUp={() => accept("essential")}
-              onTouchEnd={() => accept("essential")}
-              className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold cursor-pointer"
+              onClick={(e) => handleConsent("essential", e)}
+              onPointerDown={(e) => handleConsent("essential", e)}
+              onPointerUp={(e) => handleConsent("essential", e)}
+              onTouchEnd={(e) => handleConsent("essential", e)}
+              className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold cursor-pointer touch-manipulation"
             >
               Nur notwendige
             </button>
             <button
               type="button"
-              onClick={() => accept("accepted")}
-              onPointerUp={() => accept("accepted")}
-              onTouchEnd={() => accept("accepted")}
-              className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black cursor-pointer"
+              onClick={(e) => handleConsent("accepted", e)}
+              onPointerDown={(e) => handleConsent("accepted", e)}
+              onPointerUp={(e) => handleConsent("accepted", e)}
+              onTouchEnd={(e) => handleConsent("accepted", e)}
+              className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black cursor-pointer touch-manipulation"
             >
               Akzeptieren
             </button>
