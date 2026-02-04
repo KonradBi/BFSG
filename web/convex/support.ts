@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation, internalAction, internalQuery } from "./_generated/server";
+import { mutation, internalMutation, internalAction, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const DELAY_MS = 5 * 60 * 1000;
@@ -11,7 +11,7 @@ function isUrgent(subject?: string, text?: string) {
   return URGENT_RE.test(hay);
 }
 
-export const ingest = internalMutation({
+export const ingest = mutation({
   args: {
     messageId: v.string(),
     from: v.string(),

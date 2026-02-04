@@ -51,14 +51,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
   }
 
-  await convex.mutation((api as any).support.ingest, {
-    messageId,
-    from,
-    subject,
-    text,
-    receivedAt,
-    raw,
-  });
-
-  return NextResponse.json({ ok: true });
+  try {
+    await convex.mutation((api as any).support.ingest, {
+      messageId,
+      from,
+      subject,
+      text,
+      receivedAt,
+      raw,
+    });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("agentmail_webhook_error", e);
+    return NextResponse.json({ ok: false, error: String(e) }, { status: 500 });
+  }
 }
