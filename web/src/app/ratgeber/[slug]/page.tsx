@@ -29,6 +29,7 @@ function getPostBySlug(slug: string) {
     metaTitle: data.metaTitle ? String(data.metaTitle) : undefined,
     metaDescription: data.metaDescription ? String(data.metaDescription) : undefined,
     ogImage: data.ogImage ? String(data.ogImage) : undefined,
+    ogImageAlt: data.ogImageAlt ? String(data.ogImageAlt) : undefined,
     content,
   };
 }
@@ -55,6 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     "Ratgeberartikel zu BFSG 2025, Barrierefreiheit, WCAG und BITV. Keine Rechtsberatung.";
 
   const ogImage = (post as any).ogImage as string | undefined;
+  const ogImageAlt = (post as any).ogImageAlt as string | undefined;
 
   return {
     title,
@@ -65,7 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: "article",
       url: `https://bfsg.vercel.app/ratgeber/${post.slug}`,
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : undefined,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: ogImageAlt || title }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -99,6 +101,21 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
           {post.title}
         </h1>
+
+        {post.ogImage && (
+          <figure className="mt-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.ogImage}
+              alt={post.ogImageAlt || post.title}
+              className="w-full h-auto rounded-3xl border border-slate-200 bg-white"
+              loading="eager"
+            />
+            {post.ogImageAlt && (
+              <figcaption className="mt-2 text-xs text-slate-500">{post.ogImageAlt}</figcaption>
+            )}
+          </figure>
+        )}
 
         <div className="prose prose-slate max-w-none mt-8">
           {/* eslint-disable-next-line react/no-danger */}
