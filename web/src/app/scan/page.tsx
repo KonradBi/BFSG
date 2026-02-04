@@ -143,7 +143,10 @@ function ScanContent() {
   const wantInvoice = true;
   const [record, setRecord] = useState<ScanRecord | null>(null);
   const [authorizedToScan, setAuthorizedToScan] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [ackNoLegalAdvice, setAckNoLegalAdvice] = useState(false);
   const [authorizedToScanError, setAuthorizedToScanError] = useState(false);
+  const [termsError, setTermsError] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
@@ -474,6 +477,10 @@ function ScanContent() {
       setAuthorizedToScanError(true);
       return;
     }
+    if (!acceptedTerms || !ackNoLegalAdvice) {
+      setTermsError(true);
+      return;
+    }
 
     scanInFlightRef.current = true;
     setIsScanning(true);
@@ -782,7 +789,15 @@ function ScanContent() {
             disabled={(() => {
               const raw = String(urlInputElRef.current?.value || urlDraftRef.current || urlSeed || url).trim();
               const normalized = normalizeUrl(raw);
-              return busy || isScanning || cooldownRemaining > 0 || !authorizedToScan || !isValidHttpUrl(normalized);
+              return (
+                busy ||
+                isScanning ||
+                cooldownRemaining > 0 ||
+                !authorizedToScan ||
+                !acceptedTerms ||
+                !ackNoLegalAdvice ||
+                !isValidHttpUrl(normalized)
+              );
             })()}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
@@ -812,14 +827,49 @@ function ScanContent() {
           />
           <span>
             Ich bestätige, dass ich berechtigt bin, diese Website zu scannen (z.B. Eigentümer:in, Admin oder ausdrückliche Zustimmung).
-            <span className="block text-[11px] text-slate-500 mt-1">
-              Hinweis: Technischer Check nach WCAG/EN 301 549/BITV. Keine Rechtsberatung. Keine Gewähr/Haftung für Vollständigkeit oder BFSG-/WCAG-Konformität; automatisierte Checks finden nicht alle Barrieren (manuelle Prüfung empfohlen).
-            </span>
           </span>
         </label>
         {authorizedToScanError && (
           <div className="mt-2 text-xs font-semibold text-red-600">
             Bitte bestätigen Sie vor dem Scan, dass Sie berechtigt sind, diese Website zu scannen.
+          </div>
+        )}
+
+        <label className="mt-3 flex items-start gap-3 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => {
+              setAcceptedTerms(e.target.checked);
+              if (e.target.checked) setTermsError(false);
+            }}
+            className="mt-1"
+          />
+          <span>
+            Ich akzeptiere die <Link href="/agb" className="font-bold text-blue-700 hover:text-blue-800">AGB</Link> und die{" "}
+            <Link href="/datenschutz" className="font-bold text-blue-700 hover:text-blue-800">Datenschutzerklärung</Link>.
+          </span>
+        </label>
+
+        <label className="mt-3 flex items-start gap-3 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={ackNoLegalAdvice}
+            onChange={(e) => {
+              setAckNoLegalAdvice(e.target.checked);
+              if (e.target.checked) setTermsError(false);
+            }}
+            className="mt-1"
+          />
+          <span>
+            Mir ist bewusst: Der Scan ist eine <strong>technische</strong> Analyse und <strong>keine Rechtsberatung</strong>. Ergebnisse ohne Gewähr auf Vollständigkeit;
+            automatisierte Checks finden nicht alle Barrieren (manuelle Prüfung empfohlen).
+          </span>
+        </label>
+
+        {termsError && (
+          <div className="mt-2 text-xs font-semibold text-red-600">
+            Bitte bestätigen Sie AGB/Datenschutz und den Haftungs-/Rechtsberatungshinweis, bevor Sie scannen.
           </div>
         )}
 

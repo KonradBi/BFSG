@@ -19,12 +19,25 @@ function setCookie(name: string, value: string, days: number) {
   document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
 }
 
+export function resetCookieConsent() {
+  if (typeof document === "undefined") return;
+  // delete cookie
+  document.cookie = `${COOKIE_NAME}=; Max-Age=0; Path=/; SameSite=Lax`;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("cookie_consent_reset"));
+  }
+}
+
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() => {
+    const existing = getCookie(COOKIE_NAME);
+    return !existing;
+  });
 
   useEffect(() => {
-    const existing = getCookie(COOKIE_NAME);
-    if (!existing) setVisible(true);
+    const onReset = () => setVisible(true);
+    window.addEventListener("cookie_consent_reset", onReset as EventListener);
+    return () => window.removeEventListener("cookie_consent_reset", onReset as EventListener);
   }, []);
 
   function setConsent(v: ConsentValue) {

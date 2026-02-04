@@ -96,7 +96,19 @@ export default function DatenschutzPage() {
           <p>
             Unsere Internetseiten verwenden so genannte „Cookies“. Cookies sind kleine Textdateien und richten auf Ihrem Endgerät keinen Schaden an.
             Sie dienen dazu, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen. Soweit es sich um technisch notwendige Cookies handelt
-            (z.B. für Warenkorbfunktionen), erfolgt die Speicherung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Für andere Cookies holen wir Ihre Einwilligung ein.
+            (z.B. für Login/Sicherheit), erfolgt die Speicherung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Für andere Cookies holen wir Ihre Einwilligung ein.
+          </p>
+
+          <h3>Google Analytics (GA4)</h3>
+          <p>
+            Wir nutzen Google Analytics 4 (GA4) zur Reichweitenmessung. GA4 wird erst geladen, wenn Sie im Cookie‑Banner aktiv zustimmen ("Akzeptieren").
+            Wenn Sie nur notwendige Cookies auswählen oder ablehnen, wird GA4 nicht geladen.
+          </p>
+          <p>
+            <strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit über „Cookie‑Einstellungen“ im Footer widerrufen.
+          </p>
+          <p className="text-xs">
+            Consent‑Cookie: <code>cookie_consent</code> (Speicherdauer: 180 Tage)
           </p>
 
           <h3>Server-Log-Dateien</h3>
