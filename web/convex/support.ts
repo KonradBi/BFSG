@@ -4,9 +4,11 @@ import { internal } from "./_generated/api";
 
 const DELAY_MS = 5 * 60 * 1000;
 
+const MOM_EMAIL = "u.bierwagen@bierwagen-immobilien.de";
 const URGENT_RE = /(refund|chargeback|r[üu]ckzahlung|r[üu]ckerstattung|anwalt|abmahnung|klage|datenschutz|dsgvo|security|hack|exploit|zahlung|stripe|kreditkarte|payment)/i;
 
-function isUrgent(subject?: string, text?: string) {
+function isUrgent(from: string, subject?: string, text?: string) {
+  if ((from || "").toLowerCase() === MOM_EMAIL) return true; // handled separately + always notify Konrad
   const hay = `${subject || ""}\n${text || ""}`;
   return URGENT_RE.test(hay);
 }
@@ -26,7 +28,7 @@ export const ingest = mutation({
       .withIndex("by_messageId", (q) => q.eq("messageId", args.messageId))
       .unique();
 
-    const urgent = isUrgent(args.subject, args.text);
+    const urgent = isUrgent(args.from, args.subject, args.text);
 
     if (!existing) {
       await ctx.db.insert("supportMessages", {
