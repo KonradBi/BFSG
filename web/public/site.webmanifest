@@ -1,0 +1,16 @@
+{
+  "name": "BFSG-WebCheck",
+  "short_name": "BFSG Check",
+  "description": "BFSG Check: Barrierefreiheit Ihrer Website prüfen – technische Analyse nach WCAG/BITV/EN 301 549",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1e3a8a",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+}

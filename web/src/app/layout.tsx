@@ -52,6 +52,10 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: ["/og.png"],
   },
+  manifest: "/site.webmanifest",
+  other: {
+    "theme-color": "#1e3a8a",
+  },
 };
 
 export default function RootLayout({
