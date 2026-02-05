@@ -15,7 +15,7 @@ type Props = {
 export default function SiteNav({ backHref = "/", backLabel = "Zurück", className }: Props) {
   return (
     <nav className={"fixed top-0 w-full z-50 border-b border-slate-200/60 glass " + (className || "")}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <BrandMark />
         </div>

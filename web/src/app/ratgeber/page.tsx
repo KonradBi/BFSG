@@ -82,7 +82,7 @@ export default function RatgeberIndex() {
   const posts = getPosts();
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-28 pb-20 px-4 md:px-6">
       <SiteNav />
 
       <div className="max-w-4xl mx-auto">
