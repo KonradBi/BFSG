@@ -1,7 +1,8 @@
 ---
 slug: gute-alternativtexte-fuer-bilder-schreiben
-title: "Gute Alt-Texte schreiben: SEO & Barrierefreiheit"
-ogImage: "/ratgeber/og/gute-alternativtexte-fuer-bilder-schreiben.svg"
+title: 'Gute Alt-Texte schreiben: SEO & Barrierefreiheit'
+ogImage: /ratgeber/og/gute-alternativtexte-fuer-bilder-schreiben.png
+ogImageAlt: 'Illustration zum Ratgeber: Gute Alt-Texte schreiben: SEO & Barrierefreiheit'
 ---
 **Dateiname (Slug):** `gute-alternativtexte-fuer-bilder-schreiben`
 

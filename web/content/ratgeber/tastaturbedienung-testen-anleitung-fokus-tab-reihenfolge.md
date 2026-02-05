@@ -1,7 +1,10 @@
 ---
 slug: tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge
-title: "Tastaturbedienung testen: Fokus, Tab-Reihenfolge & Skip-Links"
-ogImage: "/ratgeber/og/tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge.svg"
+title: 'Tastaturbedienung testen: Fokus, Tab-Reihenfolge & Skip-Links'
+ogImage: /ratgeber/og/tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: Tastaturbedienung testen: Fokus, Tab-Reihenfolge &
+  Skip-Links
 ---
 **Dateiname (Slug):** `tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge`
 

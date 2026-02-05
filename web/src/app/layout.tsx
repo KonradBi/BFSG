@@ -84,8 +84,8 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="de" className="scroll-smooth">
-      <body className="antialiased">
+    <html lang="de" className="scroll-smooth" suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger

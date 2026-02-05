@@ -1,8 +1,10 @@
 ---
 slug: wcag-kontrastwerte-pruefen-einfach-erklaert
-title: "Kontraste prüfen: WCAG-Kontrastwerte einfach erklärt (mit Tools)"
-ogImage: "/ratgeber/og/wcag-kontrastwerte-pruefen-einfach-erklaert.png"
-ogImageAlt: "Soft 3D Illustration: WCAG Kontrast schnell prüfen"
+title: 'Kontraste prüfen: WCAG-Kontrastwerte einfach erklärt (mit Tools)'
+ogImage: /ratgeber/og/wcag-kontrastwerte-pruefen-einfach-erklaert.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: Kontraste prüfen: WCAG-Kontrastwerte einfach
+  erklärt (mit Tools)
 ---
 **Vorschlag Dateiname:** `wcag-kontrastwerte-pruefen-einfach-erklaert.md`
 

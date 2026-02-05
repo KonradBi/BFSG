@@ -1,7 +1,8 @@
 ---
 slug: faq
-title: "BFSG FAQ: 60 Fragen & Antworten"
-ogImage: "/ratgeber/og/faq.svg"
+title: 'BFSG FAQ: 60 Fragen & Antworten'
+ogImage: /ratgeber/og/faq.png
+ogImageAlt: 'Illustration zum Ratgeber: BFSG FAQ: 60 Fragen & Antworten'
 ---
 # FAQ-Hub: Das Barrierefreiheitsstärkungsgesetz (BFSG) und digitale Barrierefreiheit für Unternehmen
 

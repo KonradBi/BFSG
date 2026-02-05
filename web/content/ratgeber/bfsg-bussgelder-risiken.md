@@ -1,7 +1,10 @@
 ---
 slug: bfsg-bussgelder-risiken
-title: "BFSG Bußgelder & Risiken: Was ist realistisch, was ist Panikmache?"
-ogImage: "/ratgeber/og/bfsg-bussgelder-risiken.svg"
+title: 'BFSG Bußgelder & Risiken: Was ist realistisch, was ist Panikmache?'
+ogImage: /ratgeber/og/bfsg-bussgelder-risiken.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: BFSG Bußgelder & Risiken: Was ist realistisch, was
+  ist Panikmache?
 ---
 **Dateiname:** `bfsg-bussgelder-risiken.md`
 

@@ -1,7 +1,10 @@
 ---
 slug: was-ist-eaa-und-bfsg
-title: "EAA & BFSG einfach erklärt: Was der European Accessibility Act bedeutet"
-ogImage: "/ratgeber/og/was-ist-eaa-und-bfsg.svg"
+title: 'EAA & BFSG einfach erklärt: Was der European Accessibility Act bedeutet'
+ogImage: /ratgeber/og/was-ist-eaa-und-bfsg.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: EAA & BFSG einfach erklärt: Was der European
+  Accessibility Act bedeutet
 ---
 **Dateiname:** `was-ist-eaa-und-bfsg`
 

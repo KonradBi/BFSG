@@ -1,7 +1,12 @@
 ---
 slug: barrierefreiheitserklaerung-inhalt-vorlage
-title: "Die Barrierefreiheitserklärung: Was rein muss, wer sie braucht und eine praktische Vorlage"
-ogImage: "/ratgeber/og/barrierefreiheitserklaerung-inhalt-vorlage.svg"
+title: >-
+  Die Barrierefreiheitserklärung: Was rein muss, wer sie braucht und eine
+  praktische Vorlage
+ogImage: /ratgeber/og/barrierefreiheitserklaerung-inhalt-vorlage.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: Die Barrierefreiheitserklärung: Was rein muss, wer
+  sie braucht und eine praktische Vorlage
 ---
 **Dateiname:** `barrierefreiheitserklaerung-inhalt-vorlage.md`
 

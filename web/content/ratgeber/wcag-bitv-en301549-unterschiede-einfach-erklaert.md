@@ -1,7 +1,10 @@
 ---
 slug: wcag-bitv-en301549-unterschiede-einfach-erklaert
-title: "WCAG, BITV, EN 301 549: Welcher Standard zählt für meine Website?"
-ogImage: "/ratgeber/og/wcag-bitv-en301549-unterschiede-einfach-erklaert.svg"
+title: 'WCAG, BITV, EN 301 549: Welcher Standard zählt für meine Website?'
+ogImage: /ratgeber/og/wcag-bitv-en301549-unterschiede-einfach-erklaert.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: WCAG, BITV, EN 301 549: Welcher Standard zählt für
+  meine Website?
 ---
 **Dateiname:** `wcag-bitv-en301549-unterschiede-einfach-erklaert.md`
 

@@ -1,8 +1,10 @@
 ---
 slug: bfsg-frist-2025-timeline-todo-liste
-title: "BFSG Frist 2025: Die ultimative To-do-Liste für Unternehmen"
-ogImage: "/ratgeber/og/bfsg-frist-2025-timeline-todo-liste.png"
-ogImageAlt: "Bold Typo Grafik: BFSG 2025 – Überblick & To‑do"
+title: 'BFSG Frist 2025: Die ultimative To-do-Liste für Unternehmen'
+ogImage: /ratgeber/og/bfsg-frist-2025-timeline-todo-liste.png
+ogImageAlt: >-
+  Illustration zum Ratgeber: BFSG Frist 2025: Die ultimative To-do-Liste für
+  Unternehmen
 ---
 **Vorschlag Dateiname:** `bfsg-frist-2025-timeline-todo-liste.md`
 

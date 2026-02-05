@@ -41,7 +41,7 @@ function setStoredConsent(value: string) {
 }
 
 function getConsent(): ConsentValue | null {
-  const v = getCookie(COOKIE_NAME) || getStoredConsent();
+  const v = getStoredConsent() || getCookie(COOKIE_NAME);
   if (v === "accepted" || v === "essential") return v;
   return null;
 }
@@ -62,16 +62,24 @@ export function resetCookieConsent() {
 }
 
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(() => {
-    const existing = getConsent();
-    return !existing;
-  });
+  const [visible, setVisible] = useState(false);
   const handledRef = useRef(false);
 
   useEffect(() => {
-    const onReset = () => setVisible(true);
+    const sync = () => setVisible(!getConsent());
+    const onReset = () => sync();
+    const onStorage = (event: StorageEvent) => {
+      if (!event.key || event.key === STORAGE_KEY) sync();
+    };
+
+    sync();
     window.addEventListener("cookie_consent_reset", onReset as EventListener);
-    return () => window.removeEventListener("cookie_consent_reset", onReset as EventListener);
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("cookie_consent_reset", onReset as EventListener);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -85,12 +93,7 @@ export default function CookieBanner() {
     setVisible(false);
   }
 
-  function handleConsent(v: ConsentValue, event?: React.SyntheticEvent) {
-    // Support in-app browsers that sometimes drop or delay click events on fixed elements.
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+  function handleConsent(v: ConsentValue) {
     if (handledRef.current) return;
     handledRef.current = true;
     setConsent(v);
@@ -99,7 +102,7 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[99999] p-3 md:p-4 pointer-events-none">
+    <div className="fixed inset-x-0 bottom-0 z-[99999] p-3 md:p-4">
       <div
         className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white/95 backdrop-blur shadow-2xl pointer-events-auto isolate"
         onClick={(e) => e.stopPropagation()}
@@ -116,20 +119,16 @@ export default function CookieBanner() {
           <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
             <button
               type="button"
-              onClick={(e) => handleConsent("essential", e)}
-              onPointerDown={(e) => handleConsent("essential", e)}
-              onPointerUp={(e) => handleConsent("essential", e)}
-              onTouchEnd={(e) => handleConsent("essential", e)}
+              onClick={() => handleConsent("essential")}
+              onPointerUp={() => handleConsent("essential")}
               className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold cursor-pointer touch-manipulation"
             >
               Nur notwendige
             </button>
             <button
               type="button"
-              onClick={(e) => handleConsent("accepted", e)}
-              onPointerDown={(e) => handleConsent("accepted", e)}
-              onPointerUp={(e) => handleConsent("accepted", e)}
-              onTouchEnd={(e) => handleConsent("accepted", e)}
+              onClick={() => handleConsent("accepted")}
+              onPointerUp={() => handleConsent("accepted")}
               className="px-4 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black cursor-pointer touch-manipulation"
             >
               Akzeptieren

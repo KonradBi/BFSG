@@ -18,7 +18,13 @@ const MIN_EXCERPT_LENGTH = 160;
 const MAX_EXCERPT_LENGTH = 200;
 
 function createExcerpt(markdown: string) {
-  let text = markdown
+  const metaLine = /^\s*\*{0,2}\s*(?:Vorschlag\s+)?(?:Dateiname|Meta Title|Meta Description|H1)\b.*$/i;
+  const cleanedMarkdown = markdown
+    .split(/\r?\n/)
+    .filter((line) => !metaLine.test(line))
+    .join("\n");
+
+  let text = cleanedMarkdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]*`/g, " ")
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")

@@ -6,7 +6,17 @@ import AuthNav from "./components/AuthNav";
 import BrandMark from "./components/BrandMark";
 import { isValidHttpUrl, normalizeUrl } from "./lib/normalizeUrl";
 
+// Mobile menu links
+const NAV_LINKS = [
+  { href: "/ratgeber", label: "Ratgeber" },
+  { href: "/bfsg-2025", label: "BFSG 2025" },
+  { href: "/audit-kosten", label: "Audit-Kosten" },
+  { href: "/ratgeber/faq", label: "FAQ" },
+  { href: "#pakete", label: "Preise" },
+];
+
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const useCountUp = (target: number, opts?: { durationMs?: number; start?: boolean }) => {
     const { durationMs = 1100, start = true } = opts || {};
     const [value, setValue] = useState(0);
@@ -122,20 +132,40 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
           <BrandMark />
           <div className="hidden lg:flex items-center gap-10 text-sm font-semibold text-slate-600">
-            <Link href="/ratgeber" className="hover:text-blue-600 transition-colors">Ratgeber</Link>
-            <Link href="/bfsg-2025" className="hover:text-blue-600 transition-colors">BFSG 2025</Link>
-            <Link href="/audit-kosten" className="hover:text-blue-600 transition-colors">Audit-Kosten</Link>
-            <Link href="/ratgeber/faq" className="hover:text-blue-600 transition-colors">FAQ</Link>
-            <Link href="#pakete" className="hover:text-blue-600 transition-colors">Preise</Link>
+            {NAV_LINKS.map((link) => (
+              <Link key={link.href} href={link.href} className="hover:text-blue-600 transition-colors">
+                {link.label}
+              </Link>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            {/* Übersicht: mobile icon / desktop text (avoid duplicate) */}
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger menu button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700 hover:bg-white transition-colors"
+              aria-label="Menü öffnen"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
+            {/* Übersicht: mobile icon / desktop text */}
             <Link
               href="/scans"
               aria-label="Übersicht"
               className="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
             >
-              {/* List icon */}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="8" y1="6" x2="21" y2="6" />
                 <line x1="8" y1="12" x2="21" y2="12" />
@@ -149,9 +179,26 @@ export default function Home() {
               Übersicht
             </Link>
             <AuthNav />
-            {/* Remove "Jetzt prüfen" CTA in header; use dashboard icon instead to reduce clutter on mobile. */}
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-200/60 bg-white/95 backdrop-blur shadow-lg">
+            <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-3 rounded-xl text-base font-bold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -603,6 +650,11 @@ export default function Home() {
           <p className="mt-12 text-xs text-center text-slate-500 font-semibold tracking-wide uppercase opacity-60">
             Wir bieten technische Prüfungen, KEINE Rechtsberatung.
           </p>
+          <p className="mt-4 text-center">
+            <Link href="/audit-kosten" className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
+              Was kostet ein Barrierefreiheits-Audit? → Zum Kostenüberblick
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -661,34 +713,45 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-24 px-6 border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16">
+      <footer className="py-16 sm:py-24 px-4 sm:px-6 border-t border-slate-200 bg-white">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
           <div className="col-span-2">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-6">
               <span className="h-12 w-12 rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm p-2 flex items-center justify-center">
                 <img src="/brand/logo.png" alt="BFSG WebCheck Logo" className="w-full h-auto" />
               </span>
-              <span className="font-black text-2xl tracking-tighter text-navy-900">BFSG‑WebCheck</span>
+              <span className="font-black text-xl sm:text-2xl tracking-tighter text-navy-900">BFSG‑WebCheck</span>
             </div>
-            <p className="text-slate-500 max-w-sm leading-relaxed font-medium">
+            <p className="text-slate-500 max-w-sm leading-relaxed font-medium text-sm">
               Ihr Partner für digitale Barrierefreiheit. Wir machen das Web für alle zugänglich – und Ihre Website rechtssicher gegen Abmahnungen.
             </p>
           </div>
 
           <div>
-            <h4 className="font-black text-navy-900 mb-8 uppercase tracking-[0.2em] text-xs">Produkt</h4>
-            <div className="space-y-4 text-sm font-bold text-slate-500">
+            <h4 className="font-black text-navy-900 mb-4 sm:mb-6 uppercase tracking-[0.15em] text-xs">Produkt</h4>
+            <div className="space-y-3 text-sm font-bold text-slate-500">
               <div><Link href="#audit" className="hover:text-blue-600 transition-colors">Starten</Link></div>
               <div><Link href="#pakete" className="hover:text-blue-600 transition-colors">Preise</Link></div>
-              <div><Link href="#faq" className="hover:text-blue-600 transition-colors">FAQ</Link></div>
+              <div><Link href="/scans" className="hover:text-blue-600 transition-colors">Übersicht</Link></div>
             </div>
           </div>
 
           <div>
-            <h4 className="font-black text-navy-900 mb-8 uppercase tracking-[0.2em] text-xs">Rechtliches</h4>
-            <div className="space-y-4 text-sm font-bold text-slate-500">
+            <h4 className="font-black text-navy-900 mb-4 sm:mb-6 uppercase tracking-[0.15em] text-xs">Ressourcen</h4>
+            <div className="space-y-3 text-sm font-bold text-slate-500">
+              <div><Link href="/ratgeber" className="hover:text-blue-600 transition-colors">Ratgeber</Link></div>
+              <div><Link href="/bfsg-2025" className="hover:text-blue-600 transition-colors">BFSG 2025</Link></div>
+              <div><Link href="/audit-kosten" className="hover:text-blue-600 transition-colors">Audit-Kosten</Link></div>
+              <div><Link href="/ratgeber/faq" className="hover:text-blue-600 transition-colors">FAQ</Link></div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-black text-navy-900 mb-4 sm:mb-6 uppercase tracking-[0.15em] text-xs">Rechtliches</h4>
+            <div className="space-y-3 text-sm font-bold text-slate-500">
               <div><Link href="/impressum" className="hover:text-blue-600 transition-colors">Impressum</Link></div>
               <div><Link href="/datenschutz" className="hover:text-blue-600 transition-colors">Datenschutz</Link></div>
+              <div><Link href="/agb" className="hover:text-blue-600 transition-colors">AGB</Link></div>
             </div>
           </div>
         </div>
