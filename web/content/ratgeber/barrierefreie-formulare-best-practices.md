@@ -1,7 +1,8 @@
 ---
 slug: barrierefreie-formulare-best-practices
 title: "Barrierefreie Formulare: Labels, Fehler & Pflichtfelder"
-ogImage: "/ratgeber/og/barrierefreie-formulare-best-practices.svg"
+ogImage: "/ratgeber/og/barrierefreie-formulare-best-practices.png"
+ogImageAlt: "Editorial Illustration: Barrierefreie Formulare (Labels, Fehlermeldungen, Fokus)"
 ---
 **Dateiname (Slug):** `barrierefreie-formulare-best-practices`
 
