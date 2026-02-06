@@ -41,8 +41,14 @@ function setStoredConsent(value: string) {
 }
 
 function getConsent(): ConsentValue | null {
-  const v = getStoredConsent() || getCookie(COOKIE_NAME);
-  if (v === "accepted" || v === "essential") return v;
+  // Prefer stored consent, but don't let a corrupted/legacy localStorage value
+  // mask a valid cookie value.
+  const stored = getStoredConsent();
+  if (stored === "accepted" || stored === "essential") return stored;
+
+  const cookie = getCookie(COOKIE_NAME);
+  if (cookie === "accepted" || cookie === "essential") return cookie;
+
   return null;
 }
 
@@ -66,7 +72,21 @@ export default function CookieBanner() {
   const handledRef = useRef(false);
 
   useEffect(() => {
-    const sync = () => setVisible(!getConsent());
+    const sync = () => {
+      // Keep cookie + localStorage in sync so dismissal survives across
+      // navigations even if one of the mechanisms is flaky in a given browser.
+      const stored = getStoredConsent();
+      const storedValid = stored === "accepted" || stored === "essential";
+
+      const cookie = getCookie(COOKIE_NAME);
+      const cookieValid = cookie === "accepted" || cookie === "essential";
+
+      if (!storedValid && cookieValid) setStoredConsent(cookie);
+      if (storedValid && !cookieValid) setCookie(COOKIE_NAME, stored, MAX_AGE_DAYS);
+
+      const effective: ConsentValue | null = storedValid ? (stored as ConsentValue) : cookieValid ? (cookie as ConsentValue) : null;
+      setVisible(!effective);
+    };
     const onReset = () => sync();
     const onStorage = (event: StorageEvent) => {
       if (!event.key || event.key === STORAGE_KEY) sync();
