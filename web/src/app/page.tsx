@@ -212,15 +212,15 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                 </span>
-                BFSG Check: Website-Barrierefreiheit in 2 Minuten prüfen
+                BFSG‑WebCheck: Website‑Barrierefreiheit in wenigen Minuten prüfen
               </div>
               
               <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 text-navy-900 leading-[1.1]">
-                BFSG Check: Barrierefreiheit Ihrer Website <span className="text-blue-600">prüfen</span> – schnell & verständlich.
+                BFSG‑WebCheck: Barrierefreiheit Ihrer Website <span className="text-blue-600">prüfen</span> – klar & nachvollziehbar.
               </h1>
               
               <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
-                Automatisierte Analyse nach WCAG, BITV und EN 301 549: Wir finden Barrieren, priorisieren (P0–P2) und geben konkrete Fix‑Schritte. Hinweis: keine Rechtsberatung.
+                Automatisierte Analyse nach WCAG, BITV und EN 301 549: Wir finden Barrieren, priorisieren (P0–P2) und geben konkrete Fix‑Schritte. Für einen ersten technischen Überblick – keine Rechtsberatung.
               </p>
 
               <ScanInput id="audit" />
@@ -306,7 +306,7 @@ export default function Home() {
                 className="text-navy-900"
               />
               <Stat
-                label="Abmahnfallen entdeckt"
+                label="Barrieren entdeckt"
                 target={2570}
                 suffix="+"
                 className="text-red-600"
@@ -365,7 +365,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <a href="/bfsg-2025" className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition">
-              <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Cornerstone</div>
               <div className="mt-1 text-lg font-extrabold text-slate-900">BFSG 2025 Guide</div>
               <div className="mt-2 text-sm text-slate-600 leading-relaxed">Anforderungen, Fristen & Checkliste – kompakt und praxisnah.</div>
               <div className="mt-3 text-sm font-black text-blue-700">Zum Guide →</div>
@@ -379,8 +378,7 @@ export default function Home() {
             </a>
 
             <a href="/audit-kosten" className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition">
-              <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">Cornerstone</div>
-              <div className="mt-1 text-lg font-extrabold text-slate-900">Audit‑Kosten</div>
+              <div className="text-lg font-extrabold text-slate-900">Audit‑Kosten</div>
               <div className="mt-2 text-sm text-slate-600 leading-relaxed">Preise, Umfang & Auswahl – inkl. Checkliste für Anbieter.</div>
               <div className="mt-3 text-sm font-black text-blue-700">Zu den Kosten →</div>
             </a>
@@ -409,19 +407,19 @@ export default function Home() {
           </div>
           
           <h2 className="text-4xl md:text-7xl font-black mb-8 leading-[1.05] font-display">
-            Das BFSG 2025 ist keine <span className="text-slate-400">Option</span>.<br/>
-            <span className="text-red-500 underline decoration-8 decoration-red-900/50 underline-offset-8">Es ist Gesetz.</span>
+            BFSG 2025 wird verbindlich.<br/>
+            <span className="text-slate-300">Gut vorbereitet, weniger Aufwand.</span>
           </h2>
           
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-20 leading-relaxed font-bold text-slate-200">
-            Ab Juni 2025 riskieren Unternehmen ohne barrierefreie Website empfindliche Bußgelder von bis zu <span className="text-red-500 font-black text-3xl md:text-4xl px-2">100.000 €</span> und existenzbedrohende Abmahnwellen.
+            Ab Juni 2025 gelten verbindliche Anforderungen an digitale Barrierefreiheit. Ein strukturierter technischer Check hilft, Prioritäten zu setzen und den Aufwand planbar zu machen.
           </p>
           
           <div className="grid md:grid-cols-3 gap-8 mb-24">
             {[
-              { t: "Bußgeldrisiko", d: "Strengste Sanktionen bei Verstößen gegen das Barrierefreiheitsstärkungsgesetz.", c: "bg-red-950/40 border-red-500/30" },
-              { t: "Abmahngefahr", d: "Spezialisierte Kanzleien nutzen automatisierte Scans zur Massenabmahnung.", c: "bg-white/5 border-white/10" },
-              { t: "Ausschluss", d: "Verlust von über 10 Millionen Kunden, die auf Zugänglichkeit angewiesen sind.", c: "bg-white/5 border-white/10" }
+              { t: "Verbindliche Anforderungen", d: "Barrierefreiheit wird für viele B2C-Angebote verpflichtend und muss nachvollziehbar umgesetzt werden.", c: "bg-red-950/40 border-red-500/30" },
+              { t: "Bessere Nutzbarkeit", d: "Klare Strukturen und gute Bedienbarkeit verbessern UX, Support-Aufwand und Conversion.", c: "bg-white/5 border-white/10" },
+              { t: "Planbare Umsetzung", d: "Technische Prioritäten schaffen klare Aufgaben für Teams und Agenturen.", c: "bg-white/5 border-white/10" }
             ].map(item => (
               <div key={item.t} className={`p-10 rounded-[2.5rem] border text-left transition-all hover:scale-[1.02] hover:bg-white/10 shadow-2xl ${item.c}`}>
                 <div className="w-14 h-14 rounded-2xl bg-red-600/20 flex items-center justify-center mb-8 border border-red-500/20">
@@ -439,8 +437,8 @@ export default function Home() {
 
           <div className="p-1 rounded-[3rem] bg-gradient-to-br from-red-600 via-red-900 to-navy-900 shadow-[0_0_50px_rgba(220,38,38,0.2)]">
             <div className="bg-navy-900 rounded-[2.9rem] p-12 md:p-16">
-              <h3 className="text-3xl font-black mb-8 italic">Wie hoch ist Ihr Risiko?</h3>
-              <ScanInput id="audit-pain" label="Sofort-Check Starten" variant="red" />
+              <h3 className="text-3xl font-black mb-8 italic">Wie weit ist Ihre Website?</h3>
+              <ScanInput id="audit-pain" label="Check starten" variant="red" />
             </div>
           </div>
         </div>
@@ -563,7 +561,7 @@ export default function Home() {
       <section className="py-20 bg-white border-y border-slate-100 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full" />
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl font-black text-navy-900 mb-8">Warten Sie nicht auf eine Abmahnung.</h2>
+          <h2 className="text-3xl font-black text-navy-900 mb-8">Starten Sie frühzeitig mit dem Check.</h2>
           <ScanInput id="audit-mid" label="Gratis Scan Starten" />
         </div>
       </section>
@@ -572,8 +570,8 @@ export default function Home() {
       <section id="pakete" className="section-padding">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-black text-navy-900 mb-6 font-display">Wählen Sie Ihren Schutz.</h2>
-            <p className="text-slate-600 text-xl font-medium">Einmalige Investition. Dauerhafter Schutz.</p>
+            <h2 className="text-4xl md:text-6xl font-black text-navy-900 mb-6 font-display">Wählen Sie Ihr Paket.</h2>
+            <p className="text-slate-600 text-xl font-medium">Einmalige Investition. Klarer Überblick.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-10">
@@ -582,7 +580,7 @@ export default function Home() {
                 t: "Quick Start",
                 p: "29€",
                 d: "Ideal für Landingpages und Solos.",
-                b: ["Vollreport für 1 URL", "WCAG & BITV Check", "PDF-Audit Export"],
+                b: ["Vollreport für 5 Seiten", "WCAG & BITV Check", "PDF-Audit Export"],
                 href: "/scan?prefillTier=mini",
                 accent: false
               },
@@ -705,10 +703,12 @@ export default function Home() {
       <section className="section-padding bg-slate-50 relative overflow-hidden">
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-red-600/5 blur-[120px] rounded-full" />
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-black uppercase mb-8">Letzte Chance zur Absicherung</div>
-          <h2 className="text-4xl md:text-6xl font-black text-navy-900 mb-8 font-display">Handeln Sie jetzt.</h2>
-          <p className="text-slate-600 text-lg md:text-xl mb-12 font-medium">Bevor die Frist abläuft und die ersten Abmahnwellen starten.</p>
-          <ScanInput id="audit-footer" label="Letzter Check" variant="red" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-black uppercase mb-8">Technischer Status‑Check</div>
+          <h2 className="text-4xl md:text-6xl font-black text-navy-900 mb-8 font-display">Technischen Stand prüfen.</h2>
+          <p className="text-slate-600 text-lg md:text-xl mb-12 font-medium">
+            Erhalten Sie eine strukturierte Übersicht über Barrieren und nächste Fix‑Schritte – kein Rechtsrat.
+          </p>
+          <ScanInput id="audit-footer" label="Check starten" variant="red" />
         </div>
       </section>
 

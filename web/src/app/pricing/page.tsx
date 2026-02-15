@@ -6,7 +6,7 @@ const tiers = [
     id: "mini",
     name: "Audit Mini",
     price: "€29",
-    bullets: ["1 URL-Scan", "Vollständiger Bericht", "Konkrete Umsetzungshinweise", "PDF-Export"],
+    bullets: ["Bis zu 5 Seiten", "Vollständiger Bericht", "Konkrete Umsetzungshinweise", "PDF-Export"],
     popular: false,
   },
   {

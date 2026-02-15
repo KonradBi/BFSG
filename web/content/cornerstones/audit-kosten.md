@@ -8,7 +8,7 @@ ogImage: "/cornerstones/audit-kosten.svg"
 
 # WCAG/BITV Audit Kosten: Ein detaillierter Leitfaden zu Preisen, Umfang und Anbieterwahl
 
-Das Barrierefreiheitsstärkungsgesetz (BFSG) verpflichtet ab dem 28. Juni 2025 die meisten Unternehmen in Deutschland, ihre digitalen Produkte und Dienstleistungen barrierefrei anzubieten. Herzstück der Konformität ist oft ein professionelles Audit nach den Web Content Accessibility Guidelines (WCAG) oder der nationalen BITV. Doch die Frage, die viele Unternehmer umtreibt, lautet: Was kostet ein solches Audit? Die Antwort ist komplex, denn die Preise variieren stark. Dieser Leitfaden schlüsselt die Kostenfaktoren auf, liefert konkrete Preisspannen und gibt Ihnen eine Checkliste an die Hand, um den passenden Dienstleister für Ihr digitales Barrierefreiheitsprojekt zu finden und böse Überraschungen zu vermeiden.
+Das Barrierefreiheitsstärkungsgesetz (BFSG) verpflichtet ab dem 28. Juni 2025 die meisten Unternehmen in Deutschland, ihre digitalen Produkte und Dienstleistungen barrierefrei anzubieten. Herzstück der Konformität ist oft ein professionelles Audit nach den Web Content Accessibility Guidelines (WCAG) oder der nationalen BITV. Doch die Frage, die viele Unternehmer umtreibt, lautet: Was kostet ein solches Audit? Die Antwort ist komplex, denn die Preise variieren stark. Dieser Leitfaden schlüsselt die Kostenfaktoren auf, liefert konkrete Preisspannen und gibt Ihnen eine Checkliste an die Hand, um den passenden Dienstleister für Ihr digitales Barrierefreiheitsprojekt zu finden. Hinweis: keine Rechtsberatung.
 
 ## Die 7 wichtigsten Faktoren, die die Kosten eines WCAG-Audits bestimmen
 
@@ -91,6 +91,21 @@ Obwohl jeder Preis individuell ist, lassen sich basierend auf den genannten Fakt
 *   **Preisspanne:** 10.000 €+
 *   **Umfang:** Ein tiefgehendes, primär manuelles Audit, das nahezu alle Templates und kritischen Komponenten der Website umfasst. Es beinhaltet Tests mit verschiedenen assistiven Technologien, die Erstellung der Barrierefreiheitserklärung, Workshops für Entwickler und mindestens eine Runde zur Nachprüfung (Re-Audit).
 *   **Ideal für:** Große Unternehmen, öffentliche Stellen, komplexe Webanwendungen (z.B. Online-Banking) und Organisationen, die Barrierefreiheit als strategisches Qualitätsmerkmal verstehen und Risiken minimieren wollen.
+
+## Optionen im Vergleich: Agentur/Consultant vs. BFSG-WebCheck
+
+Viele Teams brauchen zuerst eine technische Standortbestimmung, bevor sie ein umfassendes Audit beauftragen. Hier hilft ein klarer Vergleich der Optionen.
+
+| Option | Typischer Fokus | Typische Preisspanne (einmalig) | Einordnung |
+| --- | --- | --- | --- |
+| Agentur/Consultant – Quick-Check | Automatisierter Scan + kurze manuelle Stichprobe | 400 € – 1.800 € | Sinnvoll für eine erste, grobe Einschätzung. |
+| Agentur/Consultant – Standard-Audit | Hybrides Audit, repräsentative Templates, WCAG 2.1 AA | 2.500 € – 9.000 € | Solide Grundlage für BFSG-Vorbereitung. |
+| Agentur/Consultant – Premium-Audit | Tiefgehende manuelle Prüfung, Workshops, Re-Audit | 10.000 €+ | Für große/komplexe Projekte mit hohem Anspruch. |
+| BFSG-WebCheck | Technischer, automatisierter Check mit P0–P2 Priorisierung | 29 € – 99 € | Deutlich günstiger Einstieg, fokusiert auf umsetzbare Entwickler-Fixes. |
+
+**Einordnung:** BFSG-WebCheck ist eine technische, kosteneffiziente Alternative für den Einstieg und die Priorisierung. Er ersetzt kein manuelles Voll-Audit und bietet keine Rechtsberatung oder Zertifizierung, kann aber eine fundierte Basis schaffen, bevor Sie externe Prüfungen beauftragen.
+
+**CTA:** Preise vergleichen und Paket wählen → [Zur Preisübersicht](/pricing)
 
 ## Grenzen der Automatisierung: Was ein Tool kann – und was nicht
 

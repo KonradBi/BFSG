@@ -18,7 +18,8 @@ export const RELATED_POSTS: Record<string, string[]> = {
   "bitv-test-vs-bfsg-check-unterschiede": ["bfsg-2025", "wcag-bitv-en301549-unterschiede-einfach-erklaert", "bfsg-website-testen-automatisch-manuell"],
 
   // Commercial
-  "barrierefreiheit-audit-kosten-faktoren": ["audit-kosten", "bfsg-website-testen-automatisch-manuell", "bfsg-anwendbarkeit-website-check"],
+  "barrierefreiheit-audit-kosten-faktoren": ["audit-kosten", "barrierefreiheit-audit-kosten-vergleich-webcheck", "bfsg-website-testen-automatisch-manuell"],
+  "barrierefreiheit-audit-kosten-vergleich-webcheck": ["audit-kosten", "barrierefreiheit-audit-kosten-faktoren", "bfsg-website-testen-automatisch-manuell"],
 
   // Media
   "barrierefreie-videos-untertitel-transkripte-player": ["bfsg-2025", "top-15-barrierefreiheit-fehler-websites-fixes", "barrierefreiheitserklaerung-inhalt-vorlage"],
