@@ -96,12 +96,42 @@ Obwohl jeder Preis individuell ist, lassen sich basierend auf den genannten Fakt
 
 Viele Teams brauchen zuerst eine technische Standortbestimmung, bevor sie ein umfassendes Audit beauftragen. Hier hilft ein klarer Vergleich der Optionen.
 
-| Option | Typischer Fokus | Typische Preisspanne (einmalig) | Einordnung |
-| --- | --- | --- | --- |
-| Agentur/Consultant – Quick-Check | Automatisierter Scan + kurze manuelle Stichprobe | 400 € – 1.800 € | Sinnvoll für eine erste, grobe Einschätzung. |
-| Agentur/Consultant – Standard-Audit | Hybrides Audit, repräsentative Templates, WCAG 2.1 AA | 2.500 € – 9.000 € | Solide Grundlage für BFSG-Vorbereitung. |
-| Agentur/Consultant – Premium-Audit | Tiefgehende manuelle Prüfung, Workshops, Re-Audit | 10.000 €+ | Für große/komplexe Projekte mit hohem Anspruch. |
-| BFSG-WebCheck | Technischer, automatisierter Check mit P0–P2 Priorisierung | 29 € – 99 € | Deutlich günstiger Einstieg, fokusiert auf umsetzbare Entwickler-Fixes. |
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Typischer Fokus</th>
+      <th>Typische Preisspanne (einmalig)</th>
+      <th>Einordnung</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Agentur/Consultant – Quick‑Check</strong></td>
+      <td>Automatisierter Scan + kurze manuelle Stichprobe</td>
+      <td>400 € – 1.800 €</td>
+      <td>Sinnvoll für eine erste, grobe Einschätzung.</td>
+    </tr>
+    <tr>
+      <td><strong>Agentur/Consultant – Standard‑Audit</strong></td>
+      <td>Hybrides Audit, repräsentative Templates, WCAG 2.1 AA</td>
+      <td>2.500 € – 9.000 €</td>
+      <td>Solide Grundlage für BFSG‑Vorbereitung.</td>
+    </tr>
+    <tr>
+      <td><strong>Agentur/Consultant – Premium‑Audit</strong></td>
+      <td>Tiefgehende manuelle Prüfung, Workshops, Re‑Audit</td>
+      <td>10.000 €+</td>
+      <td>Für große/komplexe Projekte mit hohem Anspruch.</td>
+    </tr>
+    <tr>
+      <td><strong>BFSG‑WebCheck</strong></td>
+      <td>Technischer, automatisierter Check mit P0–P2 Priorisierung</td>
+      <td>29 € – 99 €</td>
+      <td>Deutlich günstiger Einstieg, fokussiert auf umsetzbare Entwickler‑Fixes.</td>
+    </tr>
+  </tbody>
+</table>
 
 **Einordnung:** BFSG-WebCheck ist eine technische, kosteneffiziente Alternative für den Einstieg und die Priorisierung. Er ersetzt kein manuelles Voll-Audit und bietet keine Rechtsberatung oder Zertifizierung, kann aber eine fundierte Basis schaffen, bevor Sie externe Prüfungen beauftragen.
 
