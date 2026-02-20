@@ -20,13 +20,13 @@ export default function SiteFooter({
           <button
             type="button"
             onClick={() => resetCookieConsent()}
-            className="hover:text-blue-700"
+            className="hover:text-navy-900"
           >
             Cookie‑Einstellungen
           </button>
-          <Link href="/agb" className="hover:text-blue-700">AGB</Link>
-          <Link href="/impressum" className="hover:text-blue-700">Impressum</Link>
-          <Link href="/datenschutz" className="hover:text-blue-700">Datenschutz</Link>
+          <Link href="/agb" className="hover:text-navy-900">AGB</Link>
+          <Link href="/impressum" className="hover:text-navy-900">Impressum</Link>
+          <Link href="/datenschutz" className="hover:text-navy-900">Datenschutz</Link>
         </div>
       </div>
     </footer>

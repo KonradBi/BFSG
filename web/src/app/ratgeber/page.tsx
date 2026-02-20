@@ -82,7 +82,7 @@ export default function RatgeberIndex() {
   const posts = getPosts();
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-28 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-28 pb-20 px-4 md:px-6">
       <SiteNav />
 
       <div className="max-w-4xl mx-auto">
@@ -92,12 +92,12 @@ export default function RatgeberIndex() {
         </p>
 
         <div className="mt-10 grid gap-4">
-          <Link href="/ratgeber/faq" className="group rounded-3xl border border-blue-100 bg-blue-50 p-6 hover:bg-blue-100/60 transition">
-            <div className="text-xl font-extrabold text-slate-900 group-hover:text-blue-800 transition">BFSG FAQ: 60 Fragen & Antworten</div>
+          <Link href="/ratgeber/faq" className="group rounded-3xl border border-slate-200 bg-slate-50 p-6 hover:bg-slate-100/60 transition">
+            <div className="text-xl font-extrabold text-slate-900 group-hover:text-navy-900 transition">BFSG FAQ: 60 Fragen & Antworten</div>
             <div className="mt-2 text-sm text-slate-700 leading-relaxed">
               Der Schnellstart für Teams: Geltung, Fristen, Anforderungen, Tests, Kosten, Risiken – kompakt erklärt.
             </div>
-            <div className="mt-3 text-sm font-bold text-blue-800">Zur FAQ →</div>
+            <div className="mt-3 text-sm font-bold text-navy-900">Zur FAQ →</div>
           </Link>
 
           {posts.map((p) => (
@@ -122,7 +122,7 @@ export default function RatgeberIndex() {
                   </div>
                 </div>
                 <div className="min-w-0 md:order-1">
-                  <div className="text-xl font-extrabold text-slate-900 group-hover:text-blue-700 transition">
+                  <div className="text-xl font-extrabold text-slate-900 group-hover:text-navy-900 transition">
                     {p.title}
                   </div>
                   {p.description && (
@@ -131,17 +131,17 @@ export default function RatgeberIndex() {
                       {p.descriptionTruncated ? "…" : ""}
                     </div>
                   )}
-                  <div className="mt-3 text-sm font-bold text-blue-700">Weiterlesen →</div>
+                  <div className="mt-3 text-sm font-bold text-navy-900">Weiterlesen →</div>
                 </div>
               </div>
             </Link>
           ))}
         </div>
 
-        <div className="mt-10 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+        <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6">
           <div className="font-extrabold text-slate-900">Schneller BFSG‑Check</div>
           <div className="mt-1 text-slate-700">Sie wollen nicht nur lesen, sondern direkt prüfen? Starten Sie einen Kurz‑Check.</div>
-          <Link href="/" className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">
+          <Link href="/" className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-navy-900 text-white font-bold hover:bg-navy-800">
             Zum Scan
           </Link>
         </div>

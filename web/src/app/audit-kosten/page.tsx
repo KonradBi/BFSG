@@ -48,15 +48,15 @@ export default async function AuditKostenPage() {
   const html = await markdownToHtml(content);
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-24 pb-20 px-4 md:px-6">
       <SiteNav />
 
       <article className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <Link href="/ratgeber" className="text-sm font-bold text-slate-700 hover:text-blue-700">
+          <Link href="/ratgeber" className="text-sm font-bold text-slate-700 hover:text-navy-900">
             ← Ratgeber
           </Link>
-          <Link href="/scan" className="text-sm font-bold text-blue-700 hover:text-blue-800">
+          <Link href="/scan" className="text-sm font-bold text-navy-900 hover:text-navy-900">
             Kurz‑Check starten
           </Link>
         </div>
@@ -75,14 +75,14 @@ export default async function AuditKostenPage() {
           dangerouslySetInnerHTML={{ __html: html }}
         />
 
-        <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+        <div className="mt-12 rounded-3xl border border-slate-200 bg-slate-50 p-6">
           <div className="font-extrabold text-slate-900">Nächster Schritt</div>
           <div className="mt-1 text-slate-700">
             Sie wollen Klarheit über Ihre eigene Website? Starten Sie einen Kurz‑Check.
           </div>
           <Link
             href="/"
-            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-navy-900 text-white font-bold hover:bg-navy-800"
           >
             Zum Scan
           </Link>

@@ -7,7 +7,7 @@ import SiteFooter from "../components/SiteFooter";
 
 export default function ImpressumPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-blue-500/30 pt-24 pb-20">
+    <main className="min-h-screen bg-background text-foreground selection:bg-slate-500/30 pt-24 pb-20">
       <SiteNav />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-10 text-slate-900">Impressum</h1>

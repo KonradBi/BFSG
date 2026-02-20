@@ -777,7 +777,7 @@ function ScanContent() {
             onChange={(e) => {
               urlDraftRef.current = e.target.value;
             }}
-            className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-slate-900 placeholder-slate-400"
+            className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 outline-none focus:ring-2 focus:ring-slate-500/50 transition-all text-slate-900 placeholder-slate-400"
             placeholder="https://ihre-website.de"
             inputMode="url"
             autoCapitalize="none"
@@ -799,7 +799,7 @@ function ScanContent() {
                 !isValidHttpUrl(normalized)
               );
             })()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+            className="bg-navy-900 hover:bg-navy-800 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-slate-900/5 hover:shadow-slate-900/10"
           >
             {busy ? (
               <span className="flex items-center gap-2">
@@ -846,8 +846,8 @@ function ScanContent() {
             className="mt-1"
           />
           <span>
-            Ich akzeptiere die <Link href="/agb" className="font-bold text-blue-700 hover:text-blue-800">AGB</Link> und die{" "}
-            <Link href="/datenschutz" className="font-bold text-blue-700 hover:text-blue-800">Datenschutzerklärung</Link>.
+            Ich akzeptiere die <Link href="/agb" className="font-bold text-navy-900 hover:text-navy-900">AGB</Link> und die{" "}
+            <Link href="/datenschutz" className="font-bold text-navy-900 hover:text-navy-900">Datenschutzerklärung</Link>.
           </span>
         </label>
 
@@ -884,7 +884,7 @@ function ScanContent() {
 
             <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-blue-600 transition-all"
+                className="h-full rounded-full bg-navy-900 transition-all"
                 style={{
                   width:
                     liveProgress && liveProgress.pagesTotal
@@ -909,7 +909,7 @@ function ScanContent() {
             <div className="p-8 border-b border-slate-100">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <div className="text-sm font-semibold text-blue-600 mb-1 uppercase tracking-wider">Ergebnis für</div>
+                  <div className="text-sm font-semibold text-navy-800 mb-1 uppercase tracking-wider">Ergebnis für</div>
                   <div className="text-xl font-bold truncate max-w-md text-slate-900">{(record?.url || teaser?.url) ?? ""}</div>
                 </div>
                 <div className="text-right">
@@ -971,7 +971,7 @@ function ScanContent() {
               )}
 
               {!record?.isPaid && record?.status && record.status !== "SUCCEEDED" && (
-                <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold">
+                <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-300 text-navy-900 text-xs font-bold">
                   Status: {record.status}
                   {record.progress ? ` · ${record.progress.pagesDone}/${record.progress.pagesTotal}` : ""}
                 </div>
@@ -1075,7 +1075,7 @@ function ScanContent() {
               {(record?.sampleFinding || teaser?.sampleFinding) && (
                 <>
                   <div className="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
                     VORSCHAU-FINDING (1 von {(record?.totals?.total ?? teaser?.totals.total) ?? 0})
                   </div>
                   <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -1210,7 +1210,7 @@ function ScanContent() {
                   <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="text-center">
                       <h4 className="text-2xl font-black tracking-tight">
-                        Dein Kurzcheck: <span className="text-blue-700">{teaser.totals.total}</span> Probleme gefunden
+                        Dein Kurzcheck: <span className="text-navy-900">{teaser.totals.total}</span> Probleme gefunden
                       </h4>
                       <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
                         <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-700">P0 {teaser.totals.p0}</span>
@@ -1284,7 +1284,7 @@ function ScanContent() {
                               </div>
 
                               {isRec && (
-                                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black border ${isSelected ? "bg-white/10 border-white/20 text-white" : "bg-blue-50 border-blue-200 text-blue-700"}`}>
+                                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black border ${isSelected ? "bg-white/10 border-white/20 text-white" : "bg-slate-50 border-slate-300 text-navy-900"}`}>
                                   Empfohlen
                                 </span>
                               )}
@@ -1360,7 +1360,7 @@ export default function ScanPage() {
   const backLabel = session?.user ? "Zur Übersicht" : "Zur Startseite";
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6">
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/60 glass">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -1374,13 +1374,13 @@ export default function ScanPage() {
             <Link
               href={backHref}
               aria-label={backLabel}
-              className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-blue-700"
+              className="inline-flex md:hidden items-center justify-center h-10 w-10 rounded-full border border-slate-200 bg-white/70 text-slate-700 hover:text-navy-900"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </Link>
 
             {/* Desktop */}
-            <Link href={backHref} className="hidden md:flex text-sm font-medium text-slate-600 hover:text-blue-600 transition items-center gap-2">
+            <Link href={backHref} className="hidden md:flex text-sm font-medium text-slate-600 hover:text-navy-800 transition items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               {backLabel}
             </Link>

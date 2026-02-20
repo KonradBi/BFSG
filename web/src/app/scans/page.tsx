@@ -82,7 +82,7 @@ export default function ScansPage() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black text-slate-900">Ihre Scans</h1>
-          <Link href="/scan" className="text-sm font-bold text-blue-700 hover:text-blue-800">
+          <Link href="/scan" className="text-sm font-bold text-navy-900 hover:text-navy-900">
             + Neuer Scan
           </Link>
         </div>
@@ -94,7 +94,7 @@ export default function ScansPage() {
               Starten Sie einen neuen Scan. Diese Übersicht speichert Scan-IDs lokal in Ihrem Browser (localStorage).
             </div>
             <div className="mt-4">
-              <Link href="/scan" className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">
+              <Link href="/scan" className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-navy-900 text-white font-bold hover:bg-navy-800">
                 Neuen Scan starten
               </Link>
             </div>
@@ -112,7 +112,7 @@ export default function ScansPage() {
             return (
               <div
                 key={r.scanId}
-                className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-blue-200 hover:bg-slate-50 transition"
+                className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-slate-300 hover:bg-slate-50 transition"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -129,7 +129,7 @@ export default function ScansPage() {
                     {r.error && <div className="mt-2 text-xs font-bold text-red-700">Fehler: {r.error}</div>}
 
                     <div className="mt-4 flex items-center gap-3">
-                      <Link href={scanHref} className="text-sm font-black text-blue-700 hover:text-blue-800">
+                      <Link href={scanHref} className="text-sm font-black text-navy-900 hover:text-navy-900">
                         Öffnen
                       </Link>
                       {r.isPaid && token && (

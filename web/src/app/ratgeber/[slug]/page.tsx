@@ -86,14 +86,14 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
   const related = (RELATED_POSTS[post.slug] || []).slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-24 pb-20 px-4 md:px-6">
       <SiteNav backHref="/ratgeber" backLabel="Ratgeber" />
       <article className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <Link href="/ratgeber" className="text-sm font-bold text-blue-700 hover:text-blue-800">
+          <Link href="/ratgeber" className="text-sm font-bold text-navy-900 hover:text-navy-900">
             ← Zur Ratgeber-Übersicht
           </Link>
-          <Link href="/" className="text-sm font-black text-slate-900 hover:text-blue-700">
+          <Link href="/" className="text-sm font-black text-slate-900 hover:text-navy-900">
             BFSG Check starten
           </Link>
         </div>
@@ -139,12 +139,12 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
           </div>
         )}
 
-        <div className="mt-12 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+        <div className="mt-12 rounded-3xl border border-slate-200 bg-slate-50 p-6">
           <div className="font-extrabold text-slate-900">Direkt prüfen</div>
           <div className="mt-1 text-slate-700">
             Nutzen Sie den Kurz‑Check und erhalten Sie sofort technische Hinweise (kein Rechtsrat).
           </div>
-          <Link href="/" className="mt-4 inline-flex rounded-xl bg-blue-600 text-white px-5 py-3 font-black">
+          <Link href="/" className="mt-4 inline-flex rounded-xl bg-navy-900 text-white px-5 py-3 font-black">
             BFSG Check starten
           </Link>
         </div>

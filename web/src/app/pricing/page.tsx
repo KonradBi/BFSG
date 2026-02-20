@@ -27,7 +27,7 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-blue-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6 overflow-x-hidden">
+    <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-24 md:pt-32 pb-20 px-4 md:px-6 overflow-x-hidden">
       <SiteNav />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -42,10 +42,10 @@ export default function PricingPage() {
           {tiers.map((t, idx) => (
             <div 
               key={t.id} 
-              className={`p-6 md:p-8 rounded-[2.5rem] border ${t.popular ? 'border-blue-200 bg-blue-50/50 shadow-xl shadow-blue-500/10' : 'border-slate-100 bg-white shadow-lg'} flex flex-col relative animate-fade-in transition-all md:hover:-translate-y-2`}
+              className={`p-6 md:p-8 rounded-[2.5rem] border ${t.popular ? 'border-slate-300 bg-slate-50/50 shadow-xl shadow-slate-500/10' : 'border-slate-100 bg-white shadow-lg'} flex flex-col relative animate-fade-in transition-all md:hover:-translate-y-2`}
               style={{ animationDelay: `${idx * 100}ms` }}
             >
-              {t.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-500/30">Empfohlen</div>}
+              {t.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-navy-900 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-slate-500/30">Empfohlen</div>}
               <div className="text-xl font-bold mb-2 text-slate-900">{t.name}</div>
               <div className="flex items-baseline gap-1 mb-8">
                 <span className="text-5xl font-bold text-slate-900">{t.price}</span>
@@ -54,14 +54,14 @@ export default function PricingPage() {
               <ul className="space-y-4 mb-10 flex-1">
                 {t.bullets.map((b) => (
                   <li key={b} className="flex items-center gap-3 text-sm text-slate-600">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><path d="M20 6 9 17l-5-5"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-navy-800"><path d="M20 6 9 17l-5-5"/></svg>
                     {b}
                   </li>
                 ))}
               </ul>
               <Link
                 href={`/scan?prefillTier=${t.id}`}
-                className={`block w-full py-4 rounded-2xl text-center font-bold transition-all ${t.popular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200'}`}
+                className={`block w-full py-4 rounded-2xl text-center font-bold transition-all ${t.popular ? 'bg-navy-900 hover:bg-navy-800 text-white shadow-lg shadow-slate-500/30' : 'bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200'}`}
               >
                 Teaser-Scan starten
               </Link>
@@ -71,7 +71,7 @@ export default function PricingPage() {
 
         <div className="mt-20 glass rounded-3xl p-10 border border-slate-200 shadow-xl max-w-3xl mx-auto">
            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-500"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 16V12"/><path d="M12 8H12.01"/></svg>
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-navy-700"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 16V12"/><path d="M12 8H12.01"/></svg>
              Häufige Fragen zum Pricing
            </h3>
            <div className="space-y-6">
