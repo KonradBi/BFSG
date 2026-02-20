@@ -73,7 +73,7 @@ Die Überprüfung der Tastaturbedienbarkeit ist einer der schnellsten und effekt
 
 Ist Ihre Website wirklich für alle zugänglich? Starten Sie einen automatisierten Check, um weitere potenzielle Barrieren aufzudecken.
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 
 ---
 **Hinweis:** Dieser Artikel stellt keine Rechtsberatung dar, sondern dient der allgemeinen Information.
@@ -83,3 +83,9 @@ Ist Ihre Website wirklich für alle zugänglich? Starten Sie einen automatisiert
 *   W3C WAI - Keyboard Accessible: https://www.w3.org/WAI/perspectives/keyboard-accessible/
 *   MDN Web Docs - Focus management: https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Keyboard_accessibility
 *   The A11Y Project - Skip Navigation Links: https://www.a11yproject.com/pattern/skip-navigation-links/
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

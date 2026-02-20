@@ -82,7 +82,7 @@ Der Weg zu einem barrierefreien Onlineshop ist ein Prozess, aber einer, der sich
 
 Wollen Sie wissen, wie barrierefrei Ihr Onlineshop wirklich ist? Starten Sie eine erste Analyse und decken Sie die größten Hürden für Ihre Kunden auf.
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 ---
 
 **Hinweis:** Dieser Artikel stellt keine Rechtsberatung dar, sondern dient der allgemeinen Information.
@@ -94,3 +94,9 @@ Wollen Sie wissen, wie barrierefrei Ihr Onlineshop wirklich ist? Starten Sie ein
 
 ---
 ---
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

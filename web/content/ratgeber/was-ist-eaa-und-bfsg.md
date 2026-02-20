@@ -83,7 +83,7 @@ Wenn also Ihr Unternehmen eine Dienstleistung anbietet, die unter den EAA fällt
 
 **Sind Sie unsicher, ob und wie stark Ihre digitalen Angebote vom BFSG betroffen sind? Finden Sie es in wenigen Minuten heraus.**
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 
 ---
 
@@ -95,3 +95,9 @@ Wenn also Ihr Unternehmen eine Dienstleistung anbietet, die unter den EAA fällt
 *   Gesetzestext: [Barrierefreiheitsstärkungsgesetz - BFSG](https://www.gesetze-im-internet.de/bfsg/BJNR212900021.html)
 
 ***
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

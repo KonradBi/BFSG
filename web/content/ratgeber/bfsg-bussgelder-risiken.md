@@ -78,3 +78,9 @@ Der beste Schutz vor Bußgeldern und Abmahnungen ist, aktiv zu werden. Der BFSG 
 - [Stellungnahmen der Verbraucherzentralen](https://www.vzbv.de/)
 
 *Hinweis: Dieser Artikel stellt keine Rechtsberatung dar und dient lediglich der allgemeinen Einschätzung und Information.*
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

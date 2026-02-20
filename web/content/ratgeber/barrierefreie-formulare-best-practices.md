@@ -76,7 +76,7 @@ Die Umsetzung von barrierefreien Formularen ist kein Hexenwerk. Durch die korrek
 
 Sind Sie unsicher, ob Ihre Formulare und Ihre gesamte Website den Anforderungen des BFSG entsprechen? Ein automatisierter Test kann erste Schwachstellen aufdecken.
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 
 ---
 **Hinweis:** Dieser Artikel stellt keine Rechtsberatung dar, sondern dient der allgemeinen Information.
@@ -88,3 +88,9 @@ Sind Sie unsicher, ob Ihre Formulare und Ihre gesamte Website den Anforderungen 
 *   WebAIM - Creating Accessible Forms: https://webaim.org/techniques/forms/
 
 ***
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

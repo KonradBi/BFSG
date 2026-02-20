@@ -81,7 +81,7 @@ Die sorgfältige Erstellung von Alternativtexten ist ein entscheidender Schritt 
 
 Prüfen Sie jetzt, ob Ihre Website bereits die wichtigsten Standards der Barrierefreiheit erfüllt, einschließlich der korrekten Verwendung von Bild-Attributen.
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 
 ---
 **Hinweis:** Dieser Artikel stellt keine Rechtsberatung dar, sondern dient der allgemeinen Information.
@@ -93,3 +93,9 @@ Prüfen Sie jetzt, ob Ihre Website bereits die wichtigsten Standards der Barrier
 *   Smashing Magazine - Accessible Images For When They Matter Most: https://www.smashingmagazine.com/2021/05/accessible-images-matter/
 
 ***
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

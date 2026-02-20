@@ -55,9 +55,17 @@ Das Risiko ist nicht theoretisch. Ein Bußgeld von 100.000 € ist die Höchstgr
 
 Minimieren Sie Ihr Haftungsrisiko. Erstellen Sie jetzt Ihren Maßnahmenplan mit unserem Audit-Tool.
 
-[Jetzt Risiko-Check machen]
+[Jetzt Risiko-Check machen](/scan)
 ---
 
 **Quellen:**
 1.  BFSG § 37 Bußgeldvorschriften.
 2.  IHK Ratgeber zur Marktüberwachung.
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)
+- [BFSG Bußgelder & Risiken (Überblick)](/ratgeber/bfsg-bussgelder-risiken)
+- [Barrierefreiheit-Audit: Kosten-Faktoren](/ratgeber/barrierefreiheit-audit-kosten-faktoren)

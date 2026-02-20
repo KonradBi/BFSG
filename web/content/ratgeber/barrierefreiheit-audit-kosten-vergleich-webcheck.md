@@ -61,3 +61,9 @@ So koennen Sie Risiken frueh reduzieren und das Budget zielgerichtet einsetzen.
 ## Fazit
 
 Ein Vollaudit ist die tiefste und teuerste Form der Pruefung. Der BFSG-WebCheck ist die guenstigere Alternative fuer einen schnellen technischen Ueberblick. Welche Option passt, haengt von Umfang, Ziel und Zeitplan ab. Fuer rechtliche Einordnung ist im Zweifel spezialisierter Rat erforderlich.
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

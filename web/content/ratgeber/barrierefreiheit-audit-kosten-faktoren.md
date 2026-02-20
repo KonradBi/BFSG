@@ -95,3 +95,9 @@ Finden Sie mit einem ersten automatisierten Check heraus, wo Sie stehen.
 *Hinweis: Dieser Artikel stellt keine Rechtsberatung dar, sondern dient der allgemeinen Information. Für eine verbindliche rechtliche Einschätzung wenden Sie sich bitte an einen spezialisierten Anwalt.*
 
 ***
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

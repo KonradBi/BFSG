@@ -78,7 +78,7 @@ Für die meisten Unternehmen, die jetzt vor der Herausforderung "BFSG" stehen, i
 
 **Starten Sie jetzt Ihren Weg zur BFSG-Konformität. Finden Sie mit unserem Check heraus, wo Ihre Webseite steht.**
 
-[BFSG Check starten]
+[BFSG Check starten](/scan)
 
 ---
 
@@ -89,3 +89,9 @@ Für die meisten Unternehmen, die jetzt vor der Herausforderung "BFSG" stehen, i
 *   Web Content Accessibility Guidelines (WCAG) Overview: [w3.org/WAI/standards-guidelines/wcag/](https://www.w3.org/WAI/standards-guidelines/wcag/)
 *   Aktion Mensch: [Informationen zum Barrierefreiheitsstärkungsgesetz](https://www.aktion-mensch.de/inklusion/barrierefreiheit/barrierefreie-website/bfsg)
 *   Überwachungsstelle des Bundes für Barrierefreiheit von Informationstechnik: [Die BITV 2.0](https://www.bfit-bund.de/DE/IT-sicher-nutzen/Barrierefreie-IT/BITV/bitv_node.html)
+
+## Weiterführende Artikel
+
+- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
+- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
+- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)
