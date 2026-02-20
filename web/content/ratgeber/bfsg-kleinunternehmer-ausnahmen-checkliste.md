@@ -4,13 +4,8 @@ title: 'BFSG für Kleinunternehmer: Bin ich betroffen? (Checkliste)'
 ogImage: /ratgeber/og/bfsg-kleinunternehmer-ausnahmen-checkliste.png
 ogImageAlt: Illustration eines Kleinunternehmers, der eine Checkliste prüft
 ---
-**Vorschlag Dateiname:** `bfsg-kleinunternehmer-ausnahmen-checkliste.md`
 
-**Meta Title:** BFSG für Kleinunternehmer: Ausnahmen, Pflichten & Checkliste
-
-**Meta Description:** Müssen Kleinunternehmer das Barrierefreiheitsstärkungsgesetz (BFSG) umsetzen? Erfahren Sie alles über Ausnahmen für Kleinstunternehmen und Dienstleistungen.
-
-**H1:** BFSG für Kleinunternehmer: Bin ich betroffen? Die große Checkliste
+# BFSG für Kleinunternehmer: Bin ich betroffen? Die große Checkliste
 
 Viele Selbstständige und Kleinunternehmer sind verunsichert: Gilt das Barrierefreiheitsstärkungsgesetz (BFSG) ab Juni 2025 auch für mich? Die Antwort ist ein klares "Jein". Das Gesetz sieht zwar Ausnahmen vor, doch diese sind eng gefasst und werden oft missverstanden.
 
@@ -79,4 +74,3 @@ Wollen Sie sichergehen? Nutzen Sie unseren kostenlosen Erst-Check, um zu sehen, 
 **Quellen:**
 1.  Gesetz zur Stärkung der Barrierefreiheit (BFSG): § 2 Anwendungsbereich.
 2.  Bundesfachstelle Barrierefreiheit: FAQ für Wirtschaftakteure.
-

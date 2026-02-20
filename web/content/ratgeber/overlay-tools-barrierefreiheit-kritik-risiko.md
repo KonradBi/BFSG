@@ -4,13 +4,8 @@ title: 'Accessibility Overlays: Die schnelle Lösung oder rechtliches Risiko?'
 ogImage: /ratgeber/og/overlay-tools-barrierefreiheit-kritik-risiko.png
 ogImageAlt: Warnschild vor einem Computerbildschirm mit einem Overlay-Icon
 ---
-**Vorschlag Dateiname:** `overlay-tools-barrierefreiheit-kritik-risiko.md`
 
-**Meta Title:** Accessibility Overlays: BFSG-konform oder Abmahnrisiko? (Kritik)
-
-**Meta Description:** Können Overlay-Tools (Widgets) eine Website automatisch barrierefrei machen? Wir beleuchten die Risiken, Kritik von Experten und die BFSG-Konformität.
-
-**H1:** Accessibility Overlays: Die schnelle Lösung oder rechtliches Risiko?
+# Accessibility Overlays: Die schnelle Lösung oder rechtliches Risiko?
 
 Es klingt zu schön, um wahr zu sein: Einzeiler Code auf die Website kopieren, ein kleines Icon ("Männchen") erscheint, und zack – die Website ist barrierefrei und gesetzeskonform. Das versprechen Anbieter von sogenannten **Accessibility Overlays** oder Widgets.
 
@@ -69,4 +64,3 @@ Verlassen Sie sich nicht auf Zaubertools. Prüfen Sie den echten Code Ihrer Seit
 
 [Echte Probleme finden]
 ---
-

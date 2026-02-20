@@ -4,13 +4,8 @@ title: 'Barrierefreie Website: WordPress, Shopify & Wix im BFSG-Check'
 ogImage: /ratgeber/og/barrierefreie-cms-wordpress-shopify-wix-vergleich.png
 ogImageAlt: Logos von WordPress, Shopify und Wix im Vergleich
 ---
-**Vorschlag Dateiname:** `barrierefreie-cms-wordpress-shopify-wix-vergleich.md`
 
-**Meta Title:** WordPress, Shopify oder Wix: Welches CMS ist barrierefrei (BFSG)?
-
-**Meta Description:** Welches CMS eignet sich für eine BFSG-konforme Website? Wir vergleichen WordPress, Shopify und Wix hinsichtlich Barrierefreiheit, Themes und Plugins.
-
-**H1:** Welches CMS für Barrierefreiheit? WordPress, Shopify & Wix im Vergleich
+# Welches CMS für Barrierefreiheit? WordPress, Shopify & Wix im Vergleich
 
 Wer heute eine Website baut, muss an morgen denken – und damit an das Barrierefreiheitsstärkungsgesetz (BFSG). Doch nicht jedes Content Management System (CMS) macht es Ihnen leicht, konforme Seiten zu erstellen.
 
@@ -78,4 +73,3 @@ Egal welches CMS Sie nutzen: Machen Sie den Test. Unser Scanner prüft den ausge
 
 [CMS-Unabhängigen Check starten]
 ---
-

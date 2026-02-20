@@ -4,13 +4,8 @@ title: 'BFSG Bußgelder & Haftung: Was Geschäftsführer wissen müssen'
 ogImage: /ratgeber/og/bfsg-bussgeld-abmahnung-haftung-geschaeftsfuehrer.png
 ogImageAlt: Richterhammer und Gesetzbuch auf einem Schreibtisch
 ---
-**Vorschlag Dateiname:** `bfsg-bussgeld-abmahnung-haftung-geschaeftsfuehrer.md`
 
-**Meta Title:** BFSG Bußgelder & Haftung: Risiken für Geschäftsführer (2025)
-
-**Meta Description:** Welche Strafen drohen bei Verstößen gegen das Barrierefreiheitsstärkungsgesetz? Infos zu Bußgeldern bis 100.000 €, Abmahnungen und Geschäftsführerhaftung.
-
-**H1:** BFSG Bußgelder & Haftung: Was Geschäftsführer jetzt wissen müssen
+# BFSG Bußgelder & Haftung: Was Geschäftsführer jetzt wissen müssen
 
 Ab dem 28. Juni 2025 ist Barrierefreiheit im E-Commerce und bei digitalen Dienstleistungen keine "Nettigkeit" mehr, sondern gesetzliche Pflicht. Für Geschäftsführer und IT-Verantwortliche stellt sich die Frage: Was passiert eigentlich, wenn wir nicht rechtzeitig fertig werden?
 
@@ -66,4 +61,3 @@ Minimieren Sie Ihr Haftungsrisiko. Erstellen Sie jetzt Ihren Maßnahmenplan mit 
 **Quellen:**
 1.  BFSG § 37 Bußgeldvorschriften.
 2.  IHK Ratgeber zur Marktüberwachung.
-
