@@ -83,7 +83,9 @@ export default async function RatgeberPostPage({ params }: { params: Promise<{ s
   const post = getPostBySlug(slug);
   const html = await markdownToHtml(post.content);
 
-  const related = (RELATED_POSTS[post.slug] || []).slice(0, 3);
+  // Only show related articles that actually exist as markdown posts.
+  const existing = new Set(getAllSlugs());
+  const related = (RELATED_POSTS[post.slug] || []).filter((s) => existing.has(s)).slice(0, 3);
 
   return (
     <main className="min-h-screen bg-background text-foreground hero-gradient selection:bg-slate-500/30 pt-24 pb-20 px-4 md:px-6">

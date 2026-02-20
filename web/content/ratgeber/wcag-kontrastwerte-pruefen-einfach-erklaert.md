@@ -105,9 +105,3 @@ Ein guter Kontrast ist nur ein Aspekt der Barrierefreiheit. Möchten Sie wissen,
 2.  Adobe Color - Contrast Analyzer: [https://color.adobe.com/create/color-contrast-analyzer](https://color.adobe.com/create/color-contrast-analyzer)
 3.  MDN Web Docs - Color and color contrast: [https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast](https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast)
 4.  W3C - Understanding Success Criterion 1.4.3: Contrast (Minimum): [https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

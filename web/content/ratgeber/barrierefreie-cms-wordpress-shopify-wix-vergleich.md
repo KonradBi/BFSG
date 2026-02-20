@@ -73,11 +73,3 @@ Egal welches CMS Sie nutzen: Machen Sie den Test. Unser Scanner prüft den ausge
 
 [CMS-Unabhängigen Check starten](/scan)
 ---
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)
-- [Barrierefreie Formulare: Best Practices](/ratgeber/barrierefreie-formulare-best-practices)
-- [ARIA richtig einsetzen: typische Fehler & Patterns](/ratgeber/aria-richtig-einsetzen-fehler-patterns)

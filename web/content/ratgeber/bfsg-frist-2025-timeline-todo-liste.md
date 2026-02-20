@@ -94,9 +94,3 @@ Sind Sie unsicher, wo Ihr Unternehmen steht? Finden Sie es jetzt heraus und iden
 
 ---
 ---
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

@@ -74,11 +74,3 @@ Wollen Sie sichergehen? Nutzen Sie unseren kostenlosen Erst-Check, um zu sehen, 
 **Quellen:**
 1.  Gesetz zur Stärkung der Barrierefreiheit (BFSG): § 2 Anwendungsbereich.
 2.  Bundesfachstelle Barrierefreiheit: FAQ für Wirtschaftakteure.
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)
-- [BFSG Anwendbarkeit: Bin ich mit meiner Website betroffen?](/ratgeber/bfsg-anwendbarkeit-website-check)
-- [BFSG für Onlineshops: Anforderungen & Checkliste](/ratgeber/bfsg-fuer-onlineshops-anforderungen-checkliste)

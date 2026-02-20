@@ -91,9 +91,3 @@ Unsicher, ob Ihre Website die ARIA-Anforderungen erfüllt und andere Barrieren v
 *Hinweis: Dieser Artikel stellt keine Rechtsberatung dar und dient lediglich der allgemeinen Information.*
 
 ---
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

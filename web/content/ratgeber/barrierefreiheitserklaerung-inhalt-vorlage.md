@@ -122,9 +122,3 @@ Eine korrekte Erklärung ist nur die halbe Miete. Finden Sie mit einer automatis
 *Hinweis: Dieser Artikel und die bereitgestellte Vorlage stellen keine Rechtsberatung dar. Sie müssen im Einzelfall juristisch geprüft und angepasst werden.*
 
 ---
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

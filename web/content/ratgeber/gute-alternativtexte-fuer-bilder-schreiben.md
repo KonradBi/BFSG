@@ -93,9 +93,3 @@ Prüfen Sie jetzt, ob Ihre Website bereits die wichtigsten Standards der Barrier
 *   Smashing Magazine - Accessible Images For When They Matter Most: https://www.smashingmagazine.com/2021/05/accessible-images-matter/
 
 ***
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)

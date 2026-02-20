@@ -64,11 +64,3 @@ Verlassen Sie sich nicht auf Zaubertools. Prüfen Sie den echten Code Ihrer Seit
 
 [Echte Probleme finden](/scan)
 ---
-
-## Weiterführende Artikel
-
-- [BFSG FAQ: 60 Fragen & Antworten](/ratgeber/faq)
-- [BFSG Frist 2025: Timeline & To-do-Liste](/ratgeber/bfsg-frist-2025-timeline-todo-liste)
-- [Top-15 Barrierefreiheitsfehler (mit Fixes)](/ratgeber/top-15-barrierefreiheit-fehler-websites-fixes)
-- [WCAG Kontrastwerte prüfen (einfach erklärt)](/ratgeber/wcag-kontrastwerte-pruefen-einfach-erklaert)
-- [Tastaturbedienung testen: Anleitung](/ratgeber/tastaturbedienung-testen-anleitung-fokus-tab-reihenfolge)
