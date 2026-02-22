@@ -38,3 +38,36 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 ---
 
 Add whatever helps you do your job. This is your cheat sheet.
+
+## Codex CLI (gpt-5.3-codex) — PATH Fix
+
+If `codex exec --model gpt-5.3-codex` fails, check for multiple installations in PATH:
+
+```bash
+which -a codex
+codex --version
+```
+
+Known-good binary on this machine:
+
+```bash
+/Users/konrad/.npm-global/bin/codex --version
+/Users/konrad/.npm-global/bin/codex exec --model gpt-5.3-codex "Reply with exactly: OK"
+```
+
+Permanent fix (zsh): ensure `~/.npm-global/bin` comes first:
+
+```bash
+export PATH="$HOME/.npm-global/bin:$PATH"
+source ~/.zshrc
+hash -r
+which codex
+codex --version
+```
+
+Update if needed:
+
+```bash
+npm -g config set prefix ~/.npm-global
+npm i -g @openai/codex@latest
+```
